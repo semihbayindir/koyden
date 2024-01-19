@@ -88,7 +88,7 @@ import { Button } from "react-native";
   
       // send a POST  request to the backend API to register the user
       axios
-        .post("http://192.168.1.45:8000/register", user)
+        .post("http://localhost:8000/register", user)
         .then((response) => {
           console.log(response);
           Alert.alert(
@@ -285,7 +285,7 @@ import { Button } from "react-native";
             </Pressable>
             {/* <Text>{JSON.stringify(userInfo,null,2)}</Text> */}
             <Pressable
-  onPress={() => promptAsync({ redirectUri: 'http://192.168.1.45:8081' })}
+  onPress={() => promptAsync({ redirectUri: 'http://localhost:8081' })}
   style={{
     backgroundColor: '#304D30',
     padding: 15,
