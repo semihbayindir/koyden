@@ -1,6 +1,3 @@
-// web 808671565379-h5p3pglt3dq4pdehpv8nde2c60se9hia.apps.googleusercontent.com
-// ios 808671565379-034ci5u15jfuqg096ujp3mb9d0h86erv.apps.googleusercontent.com
-// android 808671565379-2s13c97dij89bi4n0pjgf8hgbvbihp1u.apps.googleusercontent.com
 import {
     StyleSheet,
     Text,
@@ -17,8 +14,8 @@ import {
   import * as WebBrowser from "expo-web-browser"
   import * as Google from "expo-auth-session/providers/google"
   import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Button } from "react-native";
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+  import { Button } from "react-native";
+  import FontAwesome from '@expo/vector-icons/FontAwesome';
 
   WebBrowser.maybeCompleteAuthSession();
 
@@ -89,7 +86,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
   
       // send a POST  request to the backend API to register the user
       axios
-        .post("http://192.168.1.117:8000/register", user)
+        .post("http://localhost:8000/register", user)
         .then((response) => {
           console.log(response);
           Alert.alert(
@@ -287,7 +284,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
             {/* <Text>{JSON.stringify(userInfo,null,2)}</Text> */}
             <Pressable style={{marginTop:15}}>
 
-  <FontAwesome.Button name="google" onPress={() => promptAsync({ redirectUri: 'http://192.168.1.45:8081' })}
+  <FontAwesome.Button name="google" onPress={() => promptAsync({ redirectUri: 'http://localhost:8081' })}
   style={{
     padding: 10,
     marginBottom: 5,
