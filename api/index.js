@@ -14,6 +14,8 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 const jwt = require("jsonwebtoken");
 
+
+
 mongoose
   .connect("mongodb+srv://admin:EpyvP3HHct10obHz@koyden.97gdxbo.mongodb.net/", {
     useNewUrlParser: true,
@@ -26,10 +28,10 @@ mongoose
     console.log("Error connecting to MongoDb", err);
   });
 
+  
 
-
-app.listen(port, "localhost", () => {
-    console.log("Server is running on localhost - port = 8000");
+app.listen(port, "192.168.1.45", () => {
+    console.log("Server is running on http://192.168.1.45");
   });
 const User = require("./models/user");
 // const Message = require("./models/message");

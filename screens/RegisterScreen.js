@@ -1,6 +1,3 @@
-// web 808671565379-h5p3pglt3dq4pdehpv8nde2c60se9hia.apps.googleusercontent.com
-// ios 808671565379-034ci5u15jfuqg096ujp3mb9d0h86erv.apps.googleusercontent.com
-// android 808671565379-2s13c97dij89bi4n0pjgf8hgbvbihp1u.apps.googleusercontent.com
 import {
     StyleSheet,
     Text,
@@ -17,7 +14,8 @@ import {
   import * as WebBrowser from "expo-web-browser"
   import * as Google from "expo-auth-session/providers/google"
   import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Button } from "react-native";
+  import { Button } from "react-native";
+  import FontAwesome from '@expo/vector-icons/FontAwesome';
 
   WebBrowser.maybeCompleteAuthSession();
 
@@ -257,7 +255,7 @@ import { Button } from "react-native";
                 width: 200,
                 backgroundColor: "#304D30",
                 padding: 15,
-                marginTop: 50,
+                marginTop: 20,
                 marginLeft: "auto",
                 marginRight: "auto",
                 borderRadius: 6,
@@ -277,7 +275,7 @@ import { Button } from "react-native";
   
             <Pressable
               onPress={() => navigation.goBack()}
-              style={{ marginTop: 15 }}
+              style={{ marginTop: 5 }}
             >
               <Text style={{ textAlign: "center", color: "gray", fontSize: 16}}>
                 Bir hesabın var mı? Giriş Yap
@@ -285,18 +283,18 @@ import { Button } from "react-native";
             </Pressable>
             {/* <Text>{JSON.stringify(userInfo,null,2)}</Text> */}
             <Pressable
-  onPress={() => promptAsync({ redirectUri: 'http://localhost:8081' })}
+  onPress={() => promptAsync({ redirectUri: 'http://192.168.1.45:8081' })}
   style={{
-    backgroundColor: '#304D30',
-    padding: 15,
-    marginBottom: 20,
+    padding: 10,
+    marginBottom: 5,
     borderRadius: 6,
-    alignItems: 'center',
-  }}
->
-  <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>
-    Google ile kayıt ol
-  </Text>
+    textAlign:'center',
+    justifyContent:'center',
+  }}>
+        Google ile Giriş Yap
+      </FontAwesome.Button>
+
+
 </Pressable>
           </View>
           </ScrollView>
