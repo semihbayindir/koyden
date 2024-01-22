@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import HomeScreen from "./screens/HomeScreen";
+import UreticiScreen from "./screens/UreticiScreen";
 
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -56,6 +57,21 @@ const StackNavigator = () => {
             headerTitleStyle: {
               fontWeight: 'bold',
             },
+          }}
+        />
+        <Stack.Screen
+          name="Uretici"
+          component={UreticiScreen}
+          options={{
+            title: 'KÖYDEN',
+            headerBackTitle: '‎',
+            headerStyle: {
+              backgroundColor: '#304D10',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },        
           }}
         />
       </Stack.Navigator>
