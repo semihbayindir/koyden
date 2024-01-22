@@ -39,7 +39,7 @@ import {
       };
   
       axios
-        .post("http://172.20.10.3:8000/login", user)
+        .post("http://localhost:8000/login", user)
         .then((response) => {
           console.log(response);
           const token = response.data.token;

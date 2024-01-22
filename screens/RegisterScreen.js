@@ -89,7 +89,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
   
       // send a POST  request to the backend API to register the user
       axios
-        .post("http://172.20.10.3:8000/register", user)
+        .post("http://localhost:8000/register", user)
         .then((response) => {
           console.log(response);
           Alert.alert(

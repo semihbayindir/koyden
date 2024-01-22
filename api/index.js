@@ -31,8 +31,8 @@ mongoose
   
 
 
-app.listen(port, "172.20.10.3", () => {
-    console.log("Server is running on 172.20.10.3");
+  app.listen(port, "localhost", () => {
+    console.log("Server is running on localhost");
   });
 const User = require("./models/user");
 // const Message = require("./models/message");
