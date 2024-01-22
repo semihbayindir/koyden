@@ -17,7 +17,7 @@ const jwt = require("jsonwebtoken");
 
 
 mongoose
-  .connect("mongodb+srv://admin:ROJf6AYGbMcj1M9Y@koyden.97gdxbo.mongodb.net/", {
+  .connect("mongodb+srv://admin:EpyvP3HHct10obHz@koyden.97gdxbo.mongodb.net/", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -30,9 +30,8 @@ mongoose
 
   
 
-
-app.listen(port, "192.168.1.117", () => {
-    console.log("Server is running on 192.168.1.117");
+app.listen(port, "192.168.1.45", () => {
+    console.log("Server is running on http://192.168.1.45");
   });
 const User = require("./models/user");
 // const Message = require("./models/message");
