@@ -16,21 +16,21 @@ import {
     const [password, setPassword] = useState("");
     const navigation = useNavigation();
     useEffect(() => {
-      // const checkLoginStatus = async () => {
-      //   try {
-      //     const token = await AsyncStorage.getItem("authToken");
+      const checkLoginStatus = async () => {
+        try {
+          const token = await AsyncStorage.getItem("authToken");
   
-      //     if (token) {
-      //       navigation.replace("Home");
-      //     } else {
-      //       // token not found , show the login screen itself
-      //     }
-      //   } catch (error) {
-      //     console.log("error", error);
-      //   }
-      // };
+          if (token) {
+            navigation.replace("Home");
+          } else {
+            // token not found , show the login screen itself
+          }
+        } catch (error) {
+          console.log("error", error);
+        }
+      };
   
-      //checkLoginStatus();
+      checkLoginStatus();
     }, []);
     const handleLogin = () => {
       const user = {
@@ -39,7 +39,7 @@ import {
       };
   
       axios
-        .post("http://192.168.1.45:8000/login", user)
+        .post("http://172.20.10.3:8000/login", user)
         .then((response) => {
           console.log(response);
           const token = response.data.token;
@@ -75,7 +75,7 @@ import {
             
             <Text style={{ color: "#304D30", fontSize: 28, fontWeight: "600" }} >Hoşgeldiniz</Text>
             <Text style={{ fontSize: 15, fontWeight: "600", marginTop: 15 }}>
-              Hesabınza giriş yapın
+              Hesabınıza giriş yapın
             </Text>
           </View>
   
