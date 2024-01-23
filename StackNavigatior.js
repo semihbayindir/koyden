@@ -7,6 +7,7 @@ import RegisterScreen from "./screens/RegisterScreen";
 import HomeScreen from "./screens/HomeScreen";
 import UreticiScreen from "./screens/UreticiScreen";
 
+
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
   return (
@@ -19,7 +20,7 @@ const StackNavigator = () => {
             title: 'KÖYDEN',
             headerLeft:null,
             headerStyle: {
-              backgroundColor: '#304D10',
+              backgroundColor: '#729c44',
             },
             headerTintColor: '#fff',
             headerTitleStyle: {
@@ -36,7 +37,7 @@ const StackNavigator = () => {
             headerLeft: (props) => null,
             title: 'KÖYDEN',
             headerStyle: {
-              backgroundColor: '#304D10',
+              backgroundColor: '#729c44',
             },
             headerTintColor: '#fff',
             headerTitleStyle: {
@@ -51,7 +52,7 @@ const StackNavigator = () => {
           options={{
             title: 'KÖYDEN',
             headerStyle: {
-              backgroundColor: '#304D10',
+              backgroundColor: '#729c44',
             },
             headerTintColor: '#fff',
             headerTitleStyle: {
@@ -66,7 +67,7 @@ const StackNavigator = () => {
             title: 'KÖYDEN',
             headerBackTitle: '‎',
             headerStyle: {
-              backgroundColor: '#304D10',
+              backgroundColor: '#729c44',
             },
             headerTintColor: '#fff',
             headerTitleStyle: {
