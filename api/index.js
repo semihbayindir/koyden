@@ -115,3 +115,67 @@ app.get("/users/:userId", (req, res) => {
       res.status(500).json({ message: "Error retrieving users" });
     });
 });
+
+const Product = require("./models/product");
+
+
+// ÜRÜN EKLEME
+app.post("/products", (req, res) => {
+  const { name, description, category, qty, minQty, price } = req.body;
+
+  const newProduct = new Product({ name, description, category, qty, minQty, price  });
+
+  newProduct
+    .save()
+    .then(() => {
+      res.status(200).json({ message: "Product added successfully" });
+    })
+    .catch((err) => {
+      console.log("Error adding product", err);
+      res.status(500).json({ message: "Error adding the product!" });
+    });
+});
+
+// ÜRÜNLERİ LİSTELEME
+app.get("/products", (req, res) => {
+  Product.find()
+    .then((products) => {
+      res.status(200).json(products);
+    })
+    .catch((err) => {
+      console.log("Error retrieving products", err);
+      res.status(500).json({ message: "Error retrieving products" });
+    });
+});
+
+// ÜRÜNLERİ GÜNCELLEME VE SİLME
+app.put("/products/:productId", (req, res) => {
+  const productId = req.params.productId;
+  const { name, description, category, qty, minQty, price  } = req.body;
+
+  Product.findByIdAndUpdate(
+    productId,
+    { name, description, category, qty, minQty, price  },
+    { new: true }
+  )
+    .then((updatedProduct) => {
+      res.status(200).json(updatedProduct);
+    })
+    .catch((err) => {
+      console.log("Error updating product", err);
+      res.status(500).json({ message: "Error updating the product" });
+    });
+});
+
+app.delete("/products/:productId", (req, res) => {
+  const productId = req.params.productId;
+
+  Product.findByIdAndDelete(productId)
+    .then(() => {
+      res.status(200).json({ message: "Product deleted successfully" });
+    })
+    .catch((err) => {
+      console.log("Error deleting product", err);
+      res.status(500).json({ message: "Error deleting the product" });
+    });
+});
