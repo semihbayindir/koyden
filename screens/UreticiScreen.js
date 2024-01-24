@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Modal from 'react-native-modal';
+import axios from 'axios';
 
 const UreticiScreen = () => {
   const navigation = useNavigation();
@@ -92,18 +93,24 @@ function AddProduct() {
 
 
   const handleAddProduct = () => {
-    // Implement logic to add the product with the entered details
-    // For now, you can log the values to the console
-    console.log({
-      productName,
-      productDescription,
-      productCategory,
-      productQuantity,
-      minOrderQuantity,
-      unitPrice,
-    });
+    const productData = {
+      name: productName,
+      description: productDescription,
+      category: productCategory,
+      qty: productQuantity,
+      minQty: minOrderQuantity,
+      price: unitPrice,
+    };
+  
+    
+    axios.post("http://localhost:8000/products", productData)
+      .then((response) => {
+        console.log('Product added successfully:', response.data);
+      })
+      .catch((error) => {
+        console.error('Error adding product:', error);
+      });
 
-    // Close the modal
     toggleModal();
   };
 
