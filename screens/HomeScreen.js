@@ -5,7 +5,7 @@ import React from 'react';
 const HomeScreen = ({ navigation }) => {
   return (
 
-    <ScrollView>
+    <ScrollView style={{backgroundColor:'#f9fbe5'}}>
     <View style={{backgroundColor:'#f9fbe5'}}>
     <View style={styles.container}>
       <Pressable style={styles.cardWhite}
