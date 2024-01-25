@@ -7,6 +7,7 @@ import Modal from 'react-native-modal';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AnimatedLottieView from 'lottie-react-native';
 
 
 
@@ -200,9 +201,10 @@ const handleImagePick = async () => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground style={{width:520, height:680,}} source={require('../assets/home/large-set-isolated-vegetables-white-background.png')}>
+      <AnimatedLottieView autoPlay style={{marginTop:15,width:320, height:480, justifyContent:'center', alignItems:'center'}} source={require('../assets/üretici/Animation - 1706213809711.json')}/>
+        <Text style={{fontSize:30, fontWeight:'700',textAlign:'center'}}>YENİ ÜRÜNLERİNİZİ EKLEYİN...</Text>
       <TouchableOpacity onPress={toggleModal}>
-      <MaterialCommunityIcons style={{paddingLeft: 360, paddingTop:600}} name='plus-box' color={'#729c44'} size={80} />
+      <MaterialCommunityIcons style={{paddingLeft: 250, paddingTop:10}} name='plus-box' color={'#729c44'} size={80} />
       </TouchableOpacity>
 
       <Modal isVisible={isModalVisible}>
@@ -270,7 +272,7 @@ const handleImagePick = async () => {
           
         </View>
       </Modal>
-      </ImageBackground>
+     
     </View>
     
   );
