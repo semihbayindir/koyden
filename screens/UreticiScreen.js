@@ -28,7 +28,7 @@ const UreticiScreen = () => {
 
   const renderProductItem = ({ item }) => (
     <TouchableOpacity style={styles.urunler}>
-      <Image style={styles.images} source={{ uri: item.image_url }} />
+      <Image style={styles.images} source={{ uri: item.images[0] }} /> 
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.name}</Text>
         <View style={styles.productDet}>
@@ -178,6 +178,7 @@ const handleImagePick = async () => {
     const productData = {
       name: productName,
       description: productDescription,
+      images: [productImage],
       category: productCategory,
       qty: productQuantity,
       minQty: minOrderQuantity,
