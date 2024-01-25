@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Modal from 'react-native-modal';
 import axios from 'axios';
+import * as ImagePicker from 'expo-image-picker';
 
 
 const UreticiScreen = () => {
@@ -51,7 +52,7 @@ const UreticiScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <View style={{flexDirection:'row', marginTop:15 }}>
+      {/* <View style={{flexDirection:'row', marginTop:15 }}>
         <TouchableOpacity style={styles.urunler}>        
           <Image style={styles.images} source={require("../assets/üretici/GF-Apple-Orchard-lead-2048x2048.png")}></Image>
           <Text style={{fontSize:18, padding:5 }}>Amasya Elma</Text>
@@ -69,8 +70,7 @@ const UreticiScreen = () => {
               <Text style={{fontSize:18, paddingLeft:30, paddingBottom:10}}>450 ₺</Text>
             </View>
         </TouchableOpacity>
-        
-      </View>
+        </View> */}
       <FlatList
         data={products}
         renderItem={renderProductItem}
@@ -107,26 +107,30 @@ function AddProduct() {
 
 
 
-  const handleImagePick = () => {
-    const options = {
-      title: 'Select Product Image',
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
-    };
+const handleImagePick = async () => {
+  try {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    ImagePicker.showImagePicker(options, (response) => {
-      if (response.didCancel) {
-        console.log('Image selection cancelled');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        // Set the selected image URI
-        setProductImage(response.uri);
-      }
+    if (permissionResult.granted === false) {
+      alert('Permission to access gallery is required!');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
-  };
+
+    if (!result.cancelled) {
+      // Set the selected image URI
+      setProductImage(result.uri);
+    }
+  } catch (error) {
+    console.error('Error picking image:', error);
+  }
+};
 
 
   const handleAddProduct = () => {
@@ -169,13 +173,18 @@ function AddProduct() {
               </View>
 
               <TouchableOpacity style={styles.input} onPress={handleImagePick}>
+
+              <View style={{flexDirection:'row'}}>
               <MaterialCommunityIcons style={{marginLeft: 5}} name='file-image-plus-outline' color={'#729c44'} size={80} />
+              {productImage && (
+                <Image source={{ uri: productImage }} style={{ width: 100, height: 100 }} />
+              )}
+              </View>
             <Text>Ürün Fotoğrafı Ekleyin</Text>
+            
           </TouchableOpacity>
 
-          {productImage && (
-            <Image source={{ uri: productImage }} style={{ width: 100, height: 100 }} />
-          )}
+          
 
           <TextInput
             style={styles.input}
