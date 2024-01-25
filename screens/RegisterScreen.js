@@ -17,6 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Button } from "react-native";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
+
 WebBrowser.maybeCompleteAuthSession();
 
 const RegisterScreen = () => {
@@ -119,7 +120,7 @@ const RegisterScreen = () => {
         <ScrollView showsVerticalScrollIndicator={false}>
         <View
           style={{
-            marginTop: 45,
+            marginTop: 25,
             justifyContent: "center",
             alignItems: "center",
           }}
@@ -253,7 +254,7 @@ const RegisterScreen = () => {
             onPress={handleRegister}
             style={{
               width: 200,
-              backgroundColor: "#304D30",
+              backgroundColor: "#729c44",
               padding: 15,
               marginTop: 20,
               marginLeft: "auto",
@@ -282,21 +283,21 @@ const RegisterScreen = () => {
             </Text>
           </Pressable>
           {/* <Text>{JSON.stringify(userInfo,null,2)}</Text> */}
+
           <Pressable style={{marginTop:15}}>
+          
+            <FontAwesome.Button name="google" backgroundColor='red' onPress={() => promptAsync({ redirectUri: 'http://localhost:8081' })}
+              style={{
+                padding: 10,
+                marginBottom: 5,
+                borderRadius: 6,
+                textAlign:'center',
+                justifyContent:'center',
+              }}>
+            Google ile Giriş Yap
+          </FontAwesome.Button>
+          </Pressable>
 
-<FontAwesome.Button name="google" onPress={() => promptAsync({ redirectUri: 'http://localhost:8081' })}
-style={{
-  padding: 10,
-  marginBottom: 5,
-  borderRadius: 6,
-  textAlign:'center',
-  justifyContent:'center',
-}}>
-      Google ile Giriş Yap
-    </FontAwesome.Button>
-
-
-</Pressable>
         </View>
         </ScrollView>
       </KeyboardAvoidingView>
