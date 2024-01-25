@@ -21,6 +21,7 @@
     "expo": "~49.0.15",
     "expo-auth-session": "~5.0.2",
     "expo-crypto": "~12.4.1",
+    "expo-image-picker": "~14.3.2",
     "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",
     "expo-web-browser": "~12.3.2",
