@@ -1,16 +1,44 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ImageBackground } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ImageBackground, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Modal from 'react-native-modal';
 import axios from 'axios';
 
+
 const UreticiScreen = () => {
   const navigation = useNavigation();
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    // Fetch products from the server
+    axios.get("http://localhost:8000/products")
+      .then(response => {
+        setProducts(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching products:', error);
+      });
+  }, []);
+
+
+  const renderProductItem = ({ item }) => (
+    <TouchableOpacity style={styles.urunler}>
+      <Image style={styles.images} source={{ uri: item.image_url }} />
+      <View style={styles.productInfo}>
+        <Text style={styles.productName}>{item.name}</Text>
+        <View style={styles.productDet}>
+          <Text style={styles.productQty}>{item.qty} kg</Text>
+          <Text style={styles.productPrice}>{item.price} ₺</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.welcome}>
+      
       <Text style={{textAlign:'left', fontWeight:200, fontSize:30, fontStyle:'italic'}}>Hoşgeldin
       <Text style={{textAlign:'left', fontWeight:800, fontSize:30, fontStyle:'normal' }}>  ÜRETİCİ,</Text>
       </Text>
@@ -41,7 +69,14 @@ const UreticiScreen = () => {
               <Text style={{fontSize:18, paddingLeft:30, paddingBottom:10}}>450 ₺</Text>
             </View>
         </TouchableOpacity>
+        
       </View>
+      <FlatList
+        data={products}
+        renderItem={renderProductItem}
+        keyExtractor={(item) => item._id.toString()}
+        numColumns={2}
+      />
     </View>
   );
 }
@@ -53,6 +88,8 @@ function SettingsScreen() {
     </View>
   );
 }
+
+
 
 function AddProduct() {
   const [isModalVisible, setModalVisible] = useState(true);
@@ -260,6 +297,7 @@ const styles = StyleSheet.create({
     borderColor:'#9ab863',
     width: '45%',
     justifyContent:'center',
+    marginBottom:10,
   },
   images: {
     width: '100%',
@@ -282,6 +320,23 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderColor: 'rgba(0, 0, 0, 0.1)',
   },
+  productName:{
+    fontSize:18, 
+    padding:5,
+  },
+  productQty:{
+    fontSize:18, 
+    paddingLeft:20, 
+    paddingBottom:10,
+  },
+  productPrice:{
+    fontSize:18, 
+    paddingLeft:30, 
+    paddingBottom:10,
+  },
+  productDet:{
+    flexDirection:'row',
+  }
 });
 
 export default MyTabs;
