@@ -6,6 +6,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Modal from 'react-native-modal';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 
 const UreticiScreen = () => {
@@ -82,10 +84,49 @@ const UreticiScreen = () => {
 }
 
 function SettingsScreen() {
+  //const { user, signOut } = useContext(AuthContext); // Get user and signOut from your AuthContext
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    // Fetch user information from AsyncStorage
+    const fetchUserInfo = async () => {
+      try {
+        const storedUserInfo = await AsyncStorage.getItem('userInfo');
+        if (storedUserInfo) {
+          setUserInfo(JSON.parse(storedUserInfo));
+        }
+      } catch (error) {
+        console.error('Error fetching user information from AsyncStorage:', error);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <Text>Profil!</Text>
+    
+      // <View style={styles.container}>
+      //   <TouchableOpacity>
+      //     <MaterialCommunityIcons name='account-circle' color={'#729c44'} size={100} />
+      //   </TouchableOpacity>
+      //   <Text>Profil!</Text>
+      // </View>
+    
+     
+      <View style={styles.container}>
+      <View style={styles.profileHeader}>
+        <Image style={styles.avatar} source={{ uri: userInfo?.avatarUrl || 'default_avatar_url' }} />
+        <Text style={styles.username}>{userInfo?.username || 'Guest'}</Text>
+      </View>
+      <View style={styles.userInfo}>
+        <Text>Email: {userInfo?.email || 'N/A'}</Text>
+        {/* Add other user information fields as needed */}
+      </View>
+      <TouchableOpacity onPress={() => signOut()} style={styles.signOutButton}>
+        <Text style={styles.signOutText}>Sign Out</Text>
+      </TouchableOpacity>
     </View>
+   
   );
 }
 
@@ -345,7 +386,35 @@ const styles = StyleSheet.create({
   },
   productDet:{
     flexDirection:'row',
-  }
+  },
+
+
+  profileHeader: {
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
+  username: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  userInfo: {
+    marginTop: 20,
+  },
+  signOutButton: {
+    marginTop: 20,
+    backgroundColor: '#FF0000', // Customize the color as needed
+    padding: 10,
+    borderRadius: 5,
+  },
+  signOutText: {
+    color: '#FFFFFF', // Customize the color as needed
+    fontWeight: 'bold',
+  },
 });
 
 export default MyTabs;
