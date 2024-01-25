@@ -121,9 +121,9 @@ const Product = require("./models/product");
 
 // ÜRÜN EKLEME
 app.post("/products", (req, res) => {
-  const { name, description, category, qty, minQty, price } = req.body;
+  const { name, description, images, category, qty, minQty, price } = req.body;
 
-  const newProduct = new Product({ name, description, category, qty, minQty, price  });
+  const newProduct = new Product({ name, description, images, category, qty, minQty, price  });
 
   newProduct
     .save()
@@ -151,11 +151,11 @@ app.get("/products", (req, res) => {
 // ÜRÜNLERİ GÜNCELLEME VE SİLME
 app.put("/products/:productId", (req, res) => {
   const productId = req.params.productId;
-  const { name, description, category, qty, minQty, price  } = req.body;
+  const { name, description, images, category, qty, minQty, price  } = req.body;
 
   Product.findByIdAndUpdate(
     productId,
-    { name, description, category, qty, minQty, price  },
+    { name, description, images, category, qty, minQty, price  },
     { new: true }
   )
     .then((updatedProduct) => {
