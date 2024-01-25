@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ImageBackground, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image,ScrollView, TextInput, ImageBackground, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -34,7 +34,7 @@ const UreticiScreen = () => {
         <Text style={styles.productName}>{item.name}</Text>
         <View style={styles.productDet}>
           <Text style={styles.productQty}>{item.qty} kg</Text>
-          <Text style={styles.productPrice}>{item.price} ₺</Text>
+          <Text style={styles.productPrice}>{(item.price)*(item.qty)} ₺</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -42,7 +42,7 @@ const UreticiScreen = () => {
 
   return (
     <View style={styles.welcome}>
-      
+
       <Text style={{textAlign:'left', fontWeight:200, fontSize:30, fontStyle:'italic'}}>Hoşgeldin
       <Text style={{textAlign:'left', fontWeight:800, fontSize:30, fontStyle:'normal' }}>  ÜRETİCİ,</Text>
       </Text>
@@ -74,12 +74,14 @@ const UreticiScreen = () => {
             </View>
         </TouchableOpacity>
         </View> */}
-      <FlatList
-        data={products}
-        renderItem={renderProductItem}
-        keyExtractor={(item) => item._id.toString()}
-        numColumns={2}
-      />
+        <View>
+          <FlatList
+            data={products}
+            renderItem={renderProductItem}
+            keyExtractor={(item) => item._id.toString()}
+            numColumns={2}           
+            />
+      </View>
     </View>
   );
 }
@@ -142,6 +144,32 @@ function AddProduct() {
   const [minOrderQuantity, setMinOrderQuantity] = useState('');
   const [unitPrice, setUnitPrice] = useState('');
   const [productImage, setProductImage] = useState(null);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    // Fetch products from the server
+    axios.get("http://localhost:8000/products")
+      .then(response => {
+        setProducts(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching products:', error);
+      });
+  }, []);
+
+
+  const renderProductItem = ({ item }) => (
+    <TouchableOpacity style={styles.urunler}>
+      <Image style={styles.images} source={{ uri: item.images[0] }} /> 
+      <View style={styles.productInfo}>
+        <Text style={styles.productName}>{item.name}</Text>
+        <View style={styles.productDet}>
+          <Text style={styles.productQty}>{item.qty} kg</Text>
+          <Text style={styles.productPrice}>{(item.price)*(item.qty)} ₺</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -201,11 +229,53 @@ const handleImagePick = async () => {
 
   return (
     <View style={styles.container}>
-      <AnimatedLottieView autoPlay style={{marginTop:15,width:320, height:480, justifyContent:'center', alignItems:'center'}} source={require('../assets/üretici/Animation - 1706213809711.json')}/>
-        <Text style={{fontSize:30, fontWeight:'700',textAlign:'center'}}>YENİ ÜRÜNLERİNİZİ EKLEYİN...</Text>
-      <TouchableOpacity onPress={toggleModal}>
-      <MaterialCommunityIcons style={{paddingLeft: 250, paddingTop:10}} name='plus-box' color={'#729c44'} size={80} />
-      </TouchableOpacity>
+       <View style={styles.welcome}>
+
+<Text style={{textAlign:'left', fontWeight:200, fontSize:30, fontStyle:'italic'}}>Hoşgeldin
+<Text style={{textAlign:'left', fontWeight:800, fontSize:30, fontStyle:'normal' }}>  ÜRETİCİ,</Text>
+</Text>
+<View style={{flexDirection:'row', marginLeft:20, marginTop:10 }}>
+  <TouchableOpacity style={styles.butons}>
+    <Text style={{fontSize:18}}>Tümü</Text>
+  </TouchableOpacity>
+  <TouchableOpacity style={styles.butons}>
+    <Text style={{fontSize:18}}>Siparişlerim</Text>
+  </TouchableOpacity>
+</View>
+
+{/* <View style={{flexDirection:'row', marginTop:15 }}>
+  <TouchableOpacity style={styles.urunler}>        
+    <Image style={styles.images} source={require("../assets/üretici/GF-Apple-Orchard-lead-2048x2048.png")}></Image>
+    <Text style={{fontSize:18, padding:5 }}>Amasya Elma</Text>
+      <View style={{flexDirection:'row'}}>
+        <Text style={{fontSize:18, paddingLeft:20, paddingBottom:10}}>5 kg</Text>
+        <Text style={{fontSize:18, paddingLeft:30, paddingBottom:10}}>200 ₺</Text>
+      </View>
+    
+  </TouchableOpacity>
+  <TouchableOpacity style={styles.urunler}>
+    <Image style={styles.images} source={require("../assets/üretici/Pasted-Graphic.png")}></Image>
+    <Text style={{fontSize:18, padding:5 }}>Armut</Text>
+    <View style={{flexDirection:'row'}}>
+        <Text style={{fontSize:18, paddingLeft:20, paddingBottom:10}}>10 kg</Text>
+        <Text style={{fontSize:18, paddingLeft:30, paddingBottom:10}}>450 ₺</Text>
+      </View>
+  </TouchableOpacity>
+  </View> */}
+  <View>
+    <FlatList
+      data={products}
+      renderItem={renderProductItem}
+      keyExtractor={(item) => item._id.toString()}
+      numColumns={2}           
+      />
+  </View>   
+</View>
+
+<TouchableOpacity style={{marginLeft: 300, paddingTop:10}}onPress={toggleModal}>
+      <MaterialCommunityIcons name='plus-box' color={'#729c44'} size={80} />
+  </TouchableOpacity> 
+
 
       <Modal isVisible={isModalVisible}>
         <View style={styles.modalContainer}>
@@ -384,7 +454,7 @@ const styles = StyleSheet.create({
   },
   productPrice:{
     fontSize:18, 
-    paddingLeft:30, 
+    paddingLeft:10, 
     paddingBottom:10,
   },
   productDet:{
