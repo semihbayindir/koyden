@@ -200,7 +200,7 @@ const handleImagePick = async () => {
 
   return (
     <View style={styles.container}>
-      <AnimatedLottieView autoPlay style={{marginTop:15,width:320, height:480, justifyContent:'center', alignItems:'center'}} source={require('../assets/loading/Animation - 1706197142779.json')}/>
+      <AnimatedLottieView autoPlay style={{marginTop:15,width:320, height:480, justifyContent:'center', alignItems:'center'}} source={require('../assets/üretici/Animation - 1706213809711.json')}/>
         <Text style={{fontSize:30, fontWeight:'700',textAlign:'center'}}>YENİ ÜRÜNLERİNİZİ EKLEYİN...</Text>
       <TouchableOpacity onPress={toggleModal}>
       <MaterialCommunityIcons style={{paddingLeft: 250, paddingTop:10}} name='plus-box' color={'#729c44'} size={80} />
