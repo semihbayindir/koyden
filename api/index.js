@@ -14,6 +14,9 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 const jwt = require("jsonwebtoken");
 
+const userRoutes = require('./routes/user');
+app.use('/api', userRoutes);
+
 
 
 mongoose
@@ -101,6 +104,7 @@ app.post("/login", (req, res) => {
       res.status(500).json({ message: "Internal server Error!" });
     });
 });
+
 
 //endpoint to access all the users except the user who's is currently logged in!
 app.get("/users/:userId", (req, res) => {

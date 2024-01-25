@@ -75,61 +75,58 @@ const UreticiScreen = () => {
         </TouchableOpacity>
         </View> */}
         <View>
-          <FlatList
-            data={products}
-            renderItem={renderProductItem}
-            keyExtractor={(item) => item._id.toString()}
-            numColumns={2}           
-            />
-      </View>
+        <FlatList
+        data={products}
+        renderItem={renderProductItem}
+        keyExtractor={(item) => item._id.toString()}
+        numColumns={2}
+      />
+        </View>
+      
     </View>
   );
 }
 
 function SettingsScreen() {
-  //const { user, signOut } = useContext(AuthContext); // Get user and signOut from your AuthContext
+  // Burada userId'i alacak bir yol belirlemeniz gerekiyor
+  const userId = '6581ada8c6efa70eab90197b'; // Örnek olarak sabit bir değer kullandım, gerçek senaryoda bu değeri dinamik bir şekilde elde etmelisiniz
+
   const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
-    // Fetch user information from AsyncStorage
+    // Fetch user information from the server
     const fetchUserInfo = async () => {
       try {
-        const storedUserInfo = await AsyncStorage.getItem('userInfo');
-        if (storedUserInfo) {
-          setUserInfo(JSON.parse(storedUserInfo));
-        }
+        const response = await axios.get(`http://localhost:8000/api/users/${userId}`);
+        const userData = response.data;
+        setUserInfo(userData);
       } catch (error) {
-        console.error('Error fetching user information from AsyncStorage:', error);
+        console.error('Error fetching user information:', error);
       }
     };
 
     fetchUserInfo();
-  }, []);
+  }, [userId]);
+
+  const signOut = () => {
+    // Çıkış işlemlerini gerçekleştir
+    console.log('Sign out logic');
+  };
 
   return (
-    
-      // <View style={styles.container}>
-      //   <TouchableOpacity>
-      //     <MaterialCommunityIcons name='account-circle' color={'#729c44'} size={100} />
-      //   </TouchableOpacity>
-      //   <Text>Profil!</Text>
-      // </View>
-    
-     
-      <View style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.profileHeader}>
         <Image style={styles.avatar} source={{ uri: userInfo?.avatarUrl || 'default_avatar_url' }} />
-        <Text style={styles.username}>{userInfo?.username || 'Guest'}</Text>
+        <Text style={styles.username}>{userInfo?.name + userInfo?.password || 'Guest'}</Text>
       </View>
       <View style={styles.userInfo}>
         <Text>Email: {userInfo?.email || 'N/A'}</Text>
-        {/* Add other user information fields as needed */}
+        {/* Diğer kullanıcı bilgilerini ihtiyaca göre ekleyin */}
       </View>
-      <TouchableOpacity onPress={() => signOut()} style={styles.signOutButton}>
+      <TouchableOpacity onPress={signOut} style={styles.signOutButton}>
         <Text style={styles.signOutText}>Sign Out</Text>
       </TouchableOpacity>
     </View>
-   
   );
 }
 
@@ -157,7 +154,6 @@ function AddProduct() {
       });
   }, []);
 
-
   const renderProductItem = ({ item }) => (
     <TouchableOpacity style={styles.urunler}>
       <Image style={styles.images} source={{ uri: item.images[0] }} /> 
@@ -165,7 +161,7 @@ function AddProduct() {
         <Text style={styles.productName}>{item.name}</Text>
         <View style={styles.productDet}>
           <Text style={styles.productQty}>{item.qty} kg</Text>
-          <Text style={styles.productPrice}>{(item.price)*(item.qty)} ₺</Text>
+          <Text style={styles.productPrice}>{item.price} ₺</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -226,57 +222,36 @@ const handleImagePick = async () => {
     toggleModal();
   };
 
-
   return (
     <View style={styles.container}>
-       <View style={styles.welcome}>
-
-<Text style={{textAlign:'left', fontWeight:200, fontSize:30, fontStyle:'italic'}}>Hoşgeldin
-<Text style={{textAlign:'left', fontWeight:800, fontSize:30, fontStyle:'normal' }}>  ÜRETİCİ,</Text>
-</Text>
-<View style={{flexDirection:'row', marginLeft:20, marginTop:10 }}>
-  <TouchableOpacity style={styles.butons}>
-    <Text style={{fontSize:18}}>Tümü</Text>
-  </TouchableOpacity>
-  <TouchableOpacity style={styles.butons}>
-    <Text style={{fontSize:18}}>Siparişlerim</Text>
-  </TouchableOpacity>
-</View>
-
-{/* <View style={{flexDirection:'row', marginTop:15 }}>
-  <TouchableOpacity style={styles.urunler}>        
-    <Image style={styles.images} source={require("../assets/üretici/GF-Apple-Orchard-lead-2048x2048.png")}></Image>
-    <Text style={{fontSize:18, padding:5 }}>Amasya Elma</Text>
-      <View style={{flexDirection:'row'}}>
-        <Text style={{fontSize:18, paddingLeft:20, paddingBottom:10}}>5 kg</Text>
-        <Text style={{fontSize:18, paddingLeft:30, paddingBottom:10}}>200 ₺</Text>
+       
+    <View style={styles.welcome}>
+      <Text style={{textAlign:'left', fontWeight:200, fontSize:30, fontStyle:'italic'}}>Hoşgeldin
+      <Text style={{textAlign:'left', fontWeight:800, fontSize:30, fontStyle:'normal' }}>  ÜRETİCİ,</Text>
+      </Text>
+      <View style={{flexDirection:'row', marginLeft:20, marginTop:10 }}>
+        <TouchableOpacity style={styles.butons}>
+          <Text style={{fontSize:18}}>Tümü</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.butons}>
+          <Text style={{fontSize:18}}>Siparişlerim</Text>
+        </TouchableOpacity>
       </View>
-    
-  </TouchableOpacity>
-  <TouchableOpacity style={styles.urunler}>
-    <Image style={styles.images} source={require("../assets/üretici/Pasted-Graphic.png")}></Image>
-    <Text style={{fontSize:18, padding:5 }}>Armut</Text>
-    <View style={{flexDirection:'row'}}>
-        <Text style={{fontSize:18, paddingLeft:20, paddingBottom:10}}>10 kg</Text>
-        <Text style={{fontSize:18, paddingLeft:30, paddingBottom:10}}>450 ₺</Text>
-      </View>
-  </TouchableOpacity>
-  </View> */}
-  <View>
-    <FlatList
-      data={products}
-      renderItem={renderProductItem}
-      keyExtractor={(item) => item._id.toString()}
-      numColumns={2}           
+      <View>
+      <FlatList
+        data={products}
+        renderItem={renderProductItem}
+        keyExtractor={(item) => item._id.toString()}
+        numColumns={2}
       />
-  </View>   
-</View>
-
-<TouchableOpacity style={{marginLeft: 300, paddingTop:10}}onPress={toggleModal}>
-      <MaterialCommunityIcons name='plus-box' color={'#729c44'} size={80} />
-  </TouchableOpacity> 
-
-
+      </View>
+      
+    </View>
+    <TouchableOpacity style={{marginLeft: 300, marginBottom:10}} onPress={toggleModal}>
+      <MaterialCommunityIcons  name='plus-box' color={'#729c44'} size={80} />
+      </TouchableOpacity>
+    
+      
       <Modal isVisible={isModalVisible}>
         <View style={styles.modalContainer}>
               <View style={{flexDirection:'row'}}>
@@ -402,7 +377,7 @@ const styles = StyleSheet.create({
   },
   welcome:{
     flex:1,
-    margin:15
+    margin:15,
   },
   butons:{
     margin:10,
