@@ -11,6 +11,7 @@ import AnimatedLottieView from 'lottie-react-native';
 
 
 
+
 const UreticiScreen = () => {
   const navigation = useNavigation();
   const [products, setProducts] = useState([]);
@@ -199,27 +200,46 @@ const handleImagePick = async () => {
 };
 
 
-  const handleAddProduct = () => {
+  const handleAddProduct = async () => {
+    try {
+      // AWS S3'ye görsel yüklemesi
+      const formData = new FormData();
+      // Tarih ve saat bilgisini kullanarak dosya adını oluştur
+      const timestamp = new Date().toISOString().replace(/:/g, '_');
+      const fileName = `product_image_${timestamp}.jpg`;
+
+      formData.append('image', {
+        name: 'product_image.jpg',
+        type: 'image/jpg',
+        uri: productImage,
+      });
+  
+      const s3Response = await axios.post('http://localhost:8000/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      const imageUrl = s3Response.data.imageUrl;
+
     const productData = {
       name: productName,
       description: productDescription,
-      images: [productImage],
+      images: [imageUrl], // AWS S3'den alınan URL
       category: productCategory,
       qty: productQuantity,
       minQty: minOrderQuantity,
       price: unitPrice,
     };
   
-    
-    axios.post("http://localhost:8000/products", productData)
-      .then((response) => {
-        console.log('Product added successfully:', response.data);
-      })
-      .catch((error) => {
-        console.error('Error adding product:', error);
-      });
+    // Sunucuya yeni ürünü ekle
+    const response = await axios.post('http://localhost:8000/products', productData);
 
+    console.log('Product added successfully:', response.data);
     toggleModal();
+  } catch (error) {
+    console.error('Error adding product:', error);
+  }
   };
 
   return (
