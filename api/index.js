@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const multer = require('multer');
+const AWS = require('aws-sdk');
 
 const app = express();
 const port = 8000;
@@ -182,4 +184,34 @@ app.delete("/products/:productId", (req, res) => {
       console.log("Error deleting product", err);
       res.status(500).json({ message: "Error deleting the product" });
     });
+});
+
+// AWS S3 konfigürasyonu
+const s3 = new AWS.S3({
+  accessKeyId: 'AKIAYS2NVLWJLYKFENOA',
+  secretAccessKey: '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',
+  region: 'eu-central-1',
+});
+
+// Multer yapılandırması
+const upload = multer({ dest: 'uploads/' });
+
+// Görsel yükleme endpoint'i
+app.post('/upload', upload.single('image'), (req, res) => {
+  const { file } = req;
+
+  const params = {
+    Bucket: 'koyden',
+    Key: file.originalname,
+    Body: require('fs').createReadStream(file.path),
+    ContentType: file.mimetype
+  };
+
+  s3.upload(params, (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    return res.json({ imageUrl: data.Location });
+  });
 });
