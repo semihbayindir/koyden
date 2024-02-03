@@ -1,27 +1,58 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { decode as atob } from 'base-64';
 
 
 const Profile = () => {
-    // Burada userId'i alacak bir yol belirlemeniz gerekiyor
-    const userId = '6581ada8c6efa70eab90197b'; // Örnek olarak sabit bir değer kullandım, gerçek senaryoda bu değeri dinamik bir şekilde elde etmelisiniz
+  
+    const [userId,setUserId] = useState('');
+    // const userIdNew = '6581ada8c6efa70eab90197b'
   
     const [userInfo, setUserInfo] = useState(null);
   
-    useEffect(() => {
-      // Fetch user information from the server
-      const fetchUserInfo = async () => {
-        try {
-          const response = await axios.get(`http://localhost:8000/api/users/${userId}`);
-          const userData = response.data;
-          setUserInfo(userData);
-        } catch (error) {
-          console.error('Error fetching user information:', error);
-        }
+    const base64UrlDecode = (input) => {
+        const base64 = input.replace(/-/g, '+').replace(/_/g, '/');
+      const decoded = atob(base64);
+      return JSON.parse(decoded);
       };
-  
-      fetchUserInfo();
+    
+      useEffect(() => {
+          const fetchUsers = async () => {
+              try{
+                const token = await AsyncStorage.getItem('authToken');   
+                console.log(token)
+                if (token !== null){
+                  const [header, payload, signature] = token.split('.');
+                  const decodedHeader = base64UrlDecode(header);
+                  const decodedPayload = base64UrlDecode(payload);
+                  setUserId(decodedPayload.userId)
+
+                  console.log('Decoded Header:', decodedHeader);
+                  console.log('Decoded Payload:', decodedPayload);
+                  console.log('Signature:', signature);
+                        }        
+              }catch (error) {
+                console.error('Token alınamadı veya decode edilemedi:', error);
+              }
+            }
+          fetchUsers();
+      },[]);
+
+      useEffect(() => {
+        // Fetch user information from the server
+        const fetchUserInfo = async () => {
+          try {
+            const response = await axios.get(`http://localhost:8000/api/users/${userId}`);
+            const userData = response.data;
+            setUserInfo(userData);
+          } catch (error) {
+            console.error('Error fetching user information:', error);
+          }
+        };
+    
+        fetchUserInfo();
     }, [userId]);
   
     const signOut = () => {
@@ -32,7 +63,7 @@ const Profile = () => {
     return (
       <View style={styles.container}>
         <View style={styles.profileHeader}>
-          <Image style={styles.avatar} source={{ uri: userInfo?.avatarUrl || 'default_avatar_url' }} />
+          {/* <Image style={styles.avatar} source={{ uri: userInfo?.avatarUrl || 'default_avatar_url' }} /> */}
           <Text style={styles.username}>{userInfo?.name + userInfo?.password || 'Guest'}</Text>
         </View>
         <View style={styles.userInfo}>

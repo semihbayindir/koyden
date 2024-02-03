@@ -1,8 +1,9 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable, ScrollView } from 'react-native';
-import React from 'react';
+import React, {} from 'react';
+import { useNavigation } from '@react-navigation/native';
+  const HomeScreen = () => {
+  const navigation = useNavigation();
 
-
-const HomeScreen = ({ navigation }) => {
   return (
 
     <ScrollView style={{backgroundColor:'#f9fbe5'}}>
