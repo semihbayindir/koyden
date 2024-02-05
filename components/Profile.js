@@ -19,41 +19,38 @@ const Profile = () => {
       };
     
       useEffect(() => {
-          const fetchUsers = async () => {
-              try{
-                const token = await AsyncStorage.getItem('authToken');   
-                console.log(token)
-                if (token !== null){
-                  const [header, payload, signature] = token.split('.');
-                  const decodedHeader = base64UrlDecode(header);
-                  const decodedPayload = base64UrlDecode(payload);
-                  setUserId(decodedPayload.userId)
-
-                  console.log('Decoded Header:', decodedHeader);
-                  console.log('Decoded Payload:', decodedPayload);
-                  console.log('Signature:', signature);
-                        }        
-              }catch (error) {
-                console.error('Token alınamadı veya decode edilemedi:', error);
-              }
-            }
-          fetchUsers();
-      },[]);
-
-      useEffect(() => {
-        // Fetch user information from the server
-        const fetchUserInfo = async () => {
+        const fetchUsers = async () => {
           try {
-            const response = await axios.get(`http://localhost:8000/api/users/${userId}`);
-            const userData = response.data;
-            setUserInfo(userData);
+            const token = await AsyncStorage.getItem('authToken');
+            if (token !== null) {
+              const [header, payload, signature] = token.split('.');
+              const decodedPayload = base64UrlDecode(payload);
+              setUserId(decodedPayload.userId);
+            }
           } catch (error) {
-            console.error('Error fetching user information:', error);
+            console.error('Token alınamadı veya decode edilemedi:', error);
           }
         };
-    
-        fetchUserInfo();
-    }, [userId]);
+      
+        fetchUsers();
+      }, []);
+      
+      useEffect(() => {
+        if (userId) {
+          const fetchUserInfo = async () => {
+            try {
+              const response = await axios.get(`http://localhost:8000/api/users/${userId}`);
+              const userData = response.data;
+              setUserInfo(userData);
+            } catch (error) {
+              console.error('Error fetching user information:', error);
+            }
+          };
+      
+          fetchUserInfo();
+        }
+      }, [userId]);
+      
   
     const signOut = () => {
       // Çıkış işlemlerini gerçekleştir
