@@ -122,6 +122,42 @@ app.get("/users/:userId", (req, res) => {
     });
 });
 
+// Endpoint to access the user's verification information
+app.get("/users/:userId/verification", (req, res) => {
+  const userId = req.params.userId;
+
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+      }
+
+      res.status(200).json(user.verification);
+    })
+    .catch((err) => {
+      console.log("Kullanıcı doğrulama bilgileri alınamadı", err);
+      res.status(500).json({ message: "Kullanıcı doğrulama bilgileri alınamadı" });
+    });
+});
+
+// Endpoint to update or add verification information for a user
+app.post("/users/:userId/verification", (req, res) => {
+  const userId = req.params.userId;
+  const { verification } = req.body;
+
+  User.findByIdAndUpdate(userId, { verification }, { new: true })
+    .then((updatedUser) => {
+      if (!updatedUser) {
+        return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+      }
+      res.status(200).json(updatedUser.verification);
+    })
+    .catch((err) => {
+      console.log("Kullanıcı doğrulama bilgileri güncellenemedi", err);
+      res.status(500).json({ message: "Kullanıcı doğrulama bilgileri güncellenemedi" });
+    });
+});
+
 const Product = require("./models/product");
 
 
