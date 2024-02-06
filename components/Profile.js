@@ -3,13 +3,12 @@ import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { decode as atob } from 'base-64';
+import { useNavigation } from '@react-navigation/native';
 
 
 const Profile = () => {
-  
+    const navigation = useNavigation();
     const [userId,setUserId] = useState('');
-    // const userIdNew = '6581ada8c6efa70eab90197b'
-  
     const [userInfo, setUserInfo] = useState(null);
   
     const base64UrlDecode = (input) => {
@@ -42,6 +41,7 @@ const Profile = () => {
               const response = await axios.get(`http://localhost:8000/api/users/${userId}`);
               const userData = response.data;
               setUserInfo(userData);
+              // console.log(userInfo);
             } catch (error) {
               console.error('Error fetching user information:', error);
             }
@@ -52,20 +52,28 @@ const Profile = () => {
       }, [userId]);
       
   
-    const signOut = () => {
-      // Çıkış işlemlerini gerçekleştir
-      console.log('Sign out logic');
-    };
+      const signOut = async () => {
+        try {
+          await AsyncStorage.removeItem('authToken');
+          console.log('Çıkış işlemi başarılı.');
+          navigation.navigate('Login');
+        } catch (error) {
+          console.error('Çıkış işlemi sırasında bir hata oluştu:', error);
+        }
+      };
   
     return (
       <View style={styles.container}>
         <View style={styles.profileHeader}>
           {/* <Image style={styles.avatar} source={{ uri: userInfo?.avatarUrl || 'default_avatar_url' }} /> */}
-          <Text style={styles.username}>{userInfo?.name + userInfo?.password || 'Guest'}</Text>
+          <Text style={styles.username}>{userInfo?.name +" "+ userInfo?.surname|| 'Guest'}</Text>
+          <Text style={styles.username}>{userInfo?.verification?.producerAddress?.city +" "+ userInfo?.verification?.producerAddress?.district || 'Guest'}</Text>
+          <Text style={styles.username}>{userInfo?.verification?.description || 'Guest'}</Text>
+          <Text style={styles.username}>{"account no : " + userInfo?.verification?.paymentInfo?.accountNumber || 'Guest'}</Text>
+          <Text style={styles.username}>{"iban : " + userInfo?.verification?.paymentInfo?.iban || 'Guest'}</Text>
         </View>
         <View style={styles.userInfo}>
           <Text>Email: {userInfo?.email || 'N/A'}</Text>
-          {/* Diğer kullanıcı bilgilerini ihtiyaca göre ekleyin */}
         </View>
         <TouchableOpacity onPress={signOut} style={styles.signOutButton}>
           <Text style={styles.signOutText}>Sign Out</Text>
@@ -160,12 +168,12 @@ const Profile = () => {
     },
     signOutButton: {
       marginTop: 20,
-      backgroundColor: '#FF0000', // Customize the color as needed
+      backgroundColor: '#FF0000',
       padding: 10,
       borderRadius: 5,
     },
     signOutText: {
-      color: '#FFFFFF', // Customize the color as needed
+      color: '#FFFFFF', 
       fontWeight: 'bold',
     },
   });
