@@ -39,7 +39,6 @@ app.listen(port, "localhost", () => {
     console.log("Server is running on localhost");
   });
 const User = require("./models/user");
-// const Message = require("./models/message");
 
 //endpoint for registration of the user
 
@@ -163,9 +162,9 @@ const Product = require("./models/product");
 
 // ÜRÜN EKLEME
 app.post("/products", (req, res) => {
-  const { name, description, images, category, qty, minQty, price } = req.body;
+  const { name, description, images, category, qty, minQty, price,producerId } = req.body;
 
-  const newProduct = new Product({ name, description, images, category, qty, minQty, price  });
+  const newProduct = new Product({ name, description, images, category, qty, minQty, price,producerId  });
 
   newProduct
     .save()
@@ -189,6 +188,21 @@ app.get("/products", (req, res) => {
       res.status(500).json({ message: "Error retrieving products" });
     });
 });
+
+// ÜRETİCİ KENDİ ÜRÜNLERİNİ LİSTELEME
+app.get("/products/producer/:producerId", (req, res) => {
+  const producerId = req.params.producerId;
+
+  Product.find({ producerId: producerId })
+    .then((products) => {
+      res.status(200).json(products);
+    })
+    .catch((err) => {
+      console.error('Error fetching products:', err);
+      res.status(500).json({ message: "Error fetching products" });
+    });
+});
+
 
 // ÜRÜNLERİ GÜNCELLEME VE SİLME
 app.put("/products/:productId", (req, res) => {
