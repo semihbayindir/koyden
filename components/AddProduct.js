@@ -4,6 +4,7 @@ import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useUserIdDecoder } from './UserIdDecoder';
 
 
 const AddProduct = () => {
@@ -16,17 +17,20 @@ const AddProduct = () => {
     const [unitPrice, setUnitPrice] = useState('');
     const [productImage, setProductImage] = useState(null);
     const [products, setProducts] = useState([]);
-  
+    const producerId = useUserIdDecoder();
+
     useEffect(() => {
-      // Fetch products from the server
-      axios.get("http://localhost:8000/products")
-        .then(response => {
-          setProducts(response.data);
-        })
-        .catch(error => {
-          console.error('Error fetching products:', error);
-        });
-    }, []);
+      if (producerId) {
+        axios.get(`http://localhost:8000/products/producer/${producerId}`)
+          .then(response => {
+            setProducts(response.data);
+          })
+          .catch(error => {
+            console.error('Error fetching products:', error);
+          });
+      }
+    }, [producerId]);
+    
   
     const renderProductItem = ({ item }) => (
       <TouchableOpacity style={styles.urunler}>
@@ -82,7 +86,7 @@ const AddProduct = () => {
         const fileName = `product_image_${timestamp}.jpg`;
   
         formData.append('image', {
-          name: 'product_image.jpg',
+          name: `product_image_${timestamp}.jpg`,
           type: 'image/jpg',
           uri: productImage,
         });
@@ -103,6 +107,7 @@ const AddProduct = () => {
         qty: productQuantity,
         minQty: minOrderQuantity,
         price: unitPrice,
+        producerId: producerId
       };
     
       // Sunucuya yeni ürünü ekle

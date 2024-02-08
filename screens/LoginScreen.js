@@ -41,7 +41,7 @@ import {
       axios
         .post("http://localhost:8000/login", user)
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           const token = response.data.token;
           AsyncStorage.setItem("authToken", token);
   

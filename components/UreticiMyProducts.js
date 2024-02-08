@@ -2,23 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
-
+import { useUserIdDecoder } from './UserIdDecoder';
 
 const UreticiMyProducts = () => {
-    const navigation = useNavigation();
-    const [products, setProducts] = useState([]);
-  
-    useEffect(() => {
-      // Fetch products from the server
-      axios.get("http://localhost:8000/products")
+  const navigation = useNavigation();
+  const [products, setProducts] = useState([]);
+  const userId = useUserIdDecoder();
+
+  useEffect(() => {
+    if (userId) {
+      axios.get(`http://localhost:8000/products/producer/${userId}`)
         .then(response => {
           setProducts(response.data);
         })
         .catch(error => {
           console.error('Error fetching products:', error);
         });
-    }, []);
-  
+    }
+  }, [userId]);
   
     const renderProductItem = ({ item }) => (
       <TouchableOpacity style={styles.urunler}>
@@ -47,26 +48,6 @@ const UreticiMyProducts = () => {
             <Text style={{fontSize:18}}>Siparişlerim</Text>
           </TouchableOpacity>
         </View>
-  
-        {/* <View style={{flexDirection:'row', marginTop:15 }}>
-          <TouchableOpacity style={styles.urunler}>        
-            <Image style={styles.images} source={require("../assets/üretici/GF-Apple-Orchard-lead-2048x2048.png")}></Image>
-            <Text style={{fontSize:18, padding:5 }}>Amasya Elma</Text>
-              <View style={{flexDirection:'row'}}>
-                <Text style={{fontSize:18, paddingLeft:20, paddingBottom:10}}>5 kg</Text>
-                <Text style={{fontSize:18, paddingLeft:30, paddingBottom:10}}>200 ₺</Text>
-              </View>
-            
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.urunler}>
-            <Image style={styles.images} source={require("../assets/üretici/Pasted-Graphic.png")}></Image>
-            <Text style={{fontSize:18, padding:5 }}>Armut</Text>
-            <View style={{flexDirection:'row'}}>
-                <Text style={{fontSize:18, paddingLeft:20, paddingBottom:10}}>10 kg</Text>
-                <Text style={{fontSize:18, paddingLeft:30, paddingBottom:10}}>450 ₺</Text>
-              </View>
-          </TouchableOpacity>
-          </View> */}
           <View>
           <FlatList
           data={products}
