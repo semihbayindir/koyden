@@ -203,6 +203,23 @@ app.get("/products/producer/:producerId", (req, res) => {
     });
 });
 
+// Single Product
+app.get("/products/:productId", (req, res) => {
+  const productId = req.params.productId;
+
+  Product.findById(productId)
+    .then((product) => {
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      res.status(200).json(product);
+    })
+    .catch((err) => {
+      console.log("Error fetching product:", err);
+      res.status(500).json({ message: "Error fetching product" });
+    });
+});
+
 
 // ÜRÜNLERİ GÜNCELLEME VE SİLME
 app.put("/products/:productId", (req, res) => {

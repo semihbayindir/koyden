@@ -21,18 +21,22 @@ const UreticiMyProducts = () => {
     }
   }, [userId]);
   
-    const renderProductItem = ({ item }) => (
-      <TouchableOpacity style={styles.urunler}>
-        <Image style={styles.images} source={{ uri: item.images[0] }} /> 
-        <View style={styles.productInfo}>
-          <Text style={styles.productName}>{item.name}</Text>
-          <View style={styles.productDet}>
-            <Text style={styles.productQty}>{item.qty} kg</Text>
-            <Text style={styles.productPrice}>{item.price} ₺</Text>
-          </View>
+  const handleProductPress = (productId) => {
+    navigation.navigate('SingleProduct', { productId: productId });
+  };
+
+  const renderProductItem = ({ item }) => (
+    <TouchableOpacity style={styles.urunler} onPress={() => handleProductPress(item._id)}>
+      <Image style={styles.images} source={{ uri: item.images[0] }} /> 
+      <View style={styles.productInfo}>
+        <Text style={styles.productName}>{item.name}</Text>
+        <View style={styles.productDet}>
+          <Text style={styles.productQty}>{item.qty} kg</Text>
+          <Text style={styles.productPrice}>{item.price} ₺</Text>
         </View>
-      </TouchableOpacity>
-    );
+      </View>
+    </TouchableOpacity>
+  );
   
     return (
       <View style={styles.welcome}>

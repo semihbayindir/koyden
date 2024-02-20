@@ -28,7 +28,6 @@ const UreticiScreen = () => {
     },
     description: ''
   });
-  const [isLoading, setIsLoading] = useState(true);
 
 
 
