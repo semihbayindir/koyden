@@ -8,6 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 import { decode as atob } from 'base-64';
 import { Text, View, Modal, TextInput, Button, StyleSheet } from 'react-native';
+import Loading from './Loading';
 
 
 const Tab = createBottomTabNavigator();
@@ -27,6 +28,9 @@ const UreticiScreen = () => {
     },
     description: ''
   });
+  const [isLoading, setIsLoading] = useState(true);
+
+
 
   const base64UrlDecode = (input) => {
     const base64 = input.replace(/-/g, '+').replace(/_/g, '/');
@@ -78,6 +82,10 @@ const UreticiScreen = () => {
       console.error('Doğrulama bilgileri eklenirken bir hata oluştu:', error.message);
     }
   };
+
+  if (!verificationData) {
+    return <Loading />; // Eğer verificationData henüz yüklenmemişse Loading bileşenini göster
+  }
 
   return (
     <View style={{ flex: 1 }}>
