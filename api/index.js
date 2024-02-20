@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const multer = require('multer');
+const AWS = require('aws-sdk');
 
 const app = express();
 const port = 8000;
@@ -37,7 +39,6 @@ app.listen(port, "localhost", () => {
     console.log("Server is running on localhost");
   });
 const User = require("./models/user");
-// const Message = require("./models/message");
 
 //endpoint for registration of the user
 
@@ -120,14 +121,50 @@ app.get("/users/:userId", (req, res) => {
     });
 });
 
+// Endpoint to access the user's verification information
+app.get("/users/:userId/verification", (req, res) => {
+  const userId = req.params.userId;
+
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+      }
+
+      res.status(200).json(user.verification);
+    })
+    .catch((err) => {
+      console.log("Kullanıcı doğrulama bilgileri alınamadı", err);
+      res.status(500).json({ message: "Kullanıcı doğrulama bilgileri alınamadı" });
+    });
+});
+
+// Endpoint to update or add verification information for a user
+app.post("/users/:userId/verification", (req, res) => {
+  const userId = req.params.userId;
+  const { verification } = req.body;
+
+  User.findByIdAndUpdate(userId, { verification }, { new: true })
+    .then((updatedUser) => {
+      if (!updatedUser) {
+        return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+      }
+      res.status(200).json(updatedUser.verification);
+    })
+    .catch((err) => {
+      console.log("Kullanıcı doğrulama bilgileri güncellenemedi", err);
+      res.status(500).json({ message: "Kullanıcı doğrulama bilgileri güncellenemedi" });
+    });
+});
+
 const Product = require("./models/product");
 
 
 // ÜRÜN EKLEME
 app.post("/products", (req, res) => {
-  const { name, description, images, category, qty, minQty, price } = req.body;
+  const { name, description, images, category, qty, minQty, price,producerId } = req.body;
 
-  const newProduct = new Product({ name, description, images, category, qty, minQty, price  });
+  const newProduct = new Product({ name, description, images, category, qty, minQty, price,producerId  });
 
   newProduct
     .save()
@@ -151,6 +188,21 @@ app.get("/products", (req, res) => {
       res.status(500).json({ message: "Error retrieving products" });
     });
 });
+
+// ÜRETİCİ KENDİ ÜRÜNLERİNİ LİSTELEME
+app.get("/products/producer/:producerId", (req, res) => {
+  const producerId = req.params.producerId;
+
+  Product.find({ producerId: producerId })
+    .then((products) => {
+      res.status(200).json(products);
+    })
+    .catch((err) => {
+      console.error('Error fetching products:', err);
+      res.status(500).json({ message: "Error fetching products" });
+    });
+});
+
 
 // ÜRÜNLERİ GÜNCELLEME VE SİLME
 app.put("/products/:productId", (req, res) => {
@@ -182,4 +234,34 @@ app.delete("/products/:productId", (req, res) => {
       console.log("Error deleting product", err);
       res.status(500).json({ message: "Error deleting the product" });
     });
+});
+
+// AWS S3 konfigürasyonu
+const s3 = new AWS.S3({
+  accessKeyId: 'AKIAYS2NVLWJLYKFENOA',
+  secretAccessKey: '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',
+  region: 'eu-central-1',
+});
+
+// Multer yapılandırması
+const upload = multer({ dest: 'uploads/' });
+
+// Görsel yükleme endpoint'i
+app.post('/upload', upload.single('image'), (req, res) => {
+  const { file } = req;
+
+  const params = {
+    Bucket: 'koyden',
+    Key: file.originalname,
+    Body: require('fs').createReadStream(file.path),
+    ContentType: file.mimetype
+  };
+
+  s3.upload(params, (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    return res.json({ imageUrl: data.Location });
+  });
 });
