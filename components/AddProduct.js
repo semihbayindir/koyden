@@ -67,7 +67,7 @@ const AddProduct = () => {
         quality: 1,
       });
   
-      if (!result.cancelled) {
+      if (!result.canceled) {
         // Set the selected image URI
         setProductImage(result.uri);
       }
@@ -112,7 +112,11 @@ const AddProduct = () => {
     
       // Sunucuya yeni ürünü ekle
       const response = await axios.post('http://localhost:8000/products', productData);
-  
+      
+      // Güncel ürün listesini yeniden al
+      const updatedProductsResponse = await axios.get(`http://localhost:8000/products/producer/${producerId}`);
+      setProducts(updatedProductsResponse.data);
+
       console.log('Product added successfully:', response.data);
       toggleModal();
     } catch (error) {
