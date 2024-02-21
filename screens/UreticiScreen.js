@@ -8,6 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 import { decode as atob } from 'base-64';
 import { Text, View, Modal, TextInput, Button, StyleSheet } from 'react-native';
+import Loading from './Loading';
 
 
 const Tab = createBottomTabNavigator();
@@ -15,6 +16,7 @@ const UreticiScreen = () => {
   const [verificationData, setVerificationData] = useState(null);
   const [userId, setUserId] = useState(null);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+
   const [verificationInput, setVerificationInput] = useState({
     producerAddress: {
       city: '',
@@ -73,6 +75,7 @@ const UreticiScreen = () => {
   }, [userId]);
 
   const handleAddVerification = async () => {
+    
     try {
       await axios.post(`http://localhost:8000/users/${userId}/verification`, { verification: verificationInput });
       setShowVerificationModal(false);
@@ -80,6 +83,11 @@ const UreticiScreen = () => {
       console.error('Doğrulama bilgileri eklenirken bir hata oluştu:', error.message);
     }
   };
+
+ 
+  if(!verificationData){
+    return <Loading/>
+  }
 
   return (
     <View style={{ flex: 1 }}>
