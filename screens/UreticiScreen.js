@@ -7,7 +7,7 @@ import UreticiMyProducts from '../components/UreticiMyProducts';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 import { decode as atob } from 'base-64';
-import { Text, View, Modal, TextInput, Button, StyleSheet } from 'react-native';
+import { Text, View, Modal, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import Loading from './Loading';
 
 
@@ -16,6 +16,7 @@ const UreticiScreen = () => {
   const [verificationData, setVerificationData] = useState(null);
   const [userId, setUserId] = useState(null);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+
   const [verificationInput, setVerificationInput] = useState({
     producerAddress: {
       city: '',
@@ -28,7 +29,6 @@ const UreticiScreen = () => {
     },
     description: ''
   });
-
 
 
   const base64UrlDecode = (input) => {
@@ -54,6 +54,7 @@ const UreticiScreen = () => {
     fetchUsers();
   }, []);
 
+
   useEffect(() => {
     const fetchVerificationData = async () => {
       try {
@@ -74,6 +75,7 @@ const UreticiScreen = () => {
   }, [userId]);
 
   const handleAddVerification = async () => {
+    
     try {
       await axios.post(`http://localhost:8000/users/${userId}/verification`, { verification: verificationInput });
       setShowVerificationModal(false);
@@ -82,9 +84,11 @@ const UreticiScreen = () => {
     }
   };
 
-  if (!verificationData) {
-    return <Loading />; // Eğer verificationData henüz yüklenmemişse Loading bileşenini göster
-  }
+
+  // if (!verificationData) {
+  //   return <Loading />; // Eğer verificationData henüz yüklenmemişse Loading bileşenini göster
+
+  // }
 
   return (
     <View style={{ flex: 1 }}>
@@ -134,19 +138,47 @@ const UreticiScreen = () => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.heading}>Doğrulama Bilgileri</Text>
+
+            <View style={{flexDirection:'row'}}>
+              <Text style={styles.heading}>Doğrulama Bilgileri     </Text>
+              <MaterialCommunityIcons name='close' size={40} color={'#729c44'} onPress={setShowVerificationModal}/>
+            </View>
+
+            <View style={{flexDirection:'row'}}>
+            <MaterialCommunityIcons name='alert' size={22} color={"red"} style={{marginTop:5}}/>
+              <Text style={{fontSize:17,color:"red",padding:5}}>Lütfen devam etmek için eksik bilgilerinizi tamamlayın.</Text>
+            </View>
+
+            <View style={{flexDirection:'row'}}>
             <TextInput
-              style={styles.input}
+              style={{
+                flex:0.5,
+                borderWidth: 1,
+                borderColor: 'gray',
+                borderRadius: 5,
+                padding: 10,
+                marginTop: 15,
+                marginRight:2
+              }}
               placeholder="Şehir"
               value={verificationInput.producerAddress.city}
               onChangeText={(text) => setVerificationInput({ ...verificationInput, producerAddress: { ...verificationInput.producerAddress, city: text } })}
             />
             <TextInput
-              style={styles.input}
+              style={{
+                flex:0.5,
+                borderWidth: 1,
+                borderColor: 'gray',
+                borderRadius: 5,
+                padding: 10,
+                marginTop: 15,
+                marginLeft:2
+              }}
               placeholder="İlçe"
               value={verificationInput.producerAddress.district}
               onChangeText={(text) => setVerificationInput({ ...verificationInput, producerAddress: { ...verificationInput.producerAddress, district: text } })}
             />
+            </View>
             <TextInput
               style={styles.input}
               placeholder="Sokak"
@@ -159,19 +191,25 @@ const UreticiScreen = () => {
               value={verificationInput.paymentInfo.iban}
               onChangeText={(text) => setVerificationInput({ ...verificationInput, paymentInfo: { ...verificationInput.paymentInfo, iban: text } })}
             />
+            <Text style={{fontSize:10}}>*Ürün satışı veya iadesi ardından ücret yatırmak için kullanılacaktır</Text>
             <TextInput
               style={styles.input}
               placeholder="Hesap Numarası"
               value={verificationInput.paymentInfo.accountNumber}
               onChangeText={(text) => setVerificationInput({ ...verificationInput, paymentInfo: { ...verificationInput.paymentInfo, accountNumber: text } })}
             />
+            <Text style={{fontSize:10}}>*Ürün satışı veya iadesi ardından ücret yatırmak için kullanılacaktır</Text>
             <TextInput
               style={styles.input}
               placeholder="Açıklama"
               value={verificationInput.description}
               onChangeText={(text) => setVerificationInput({ ...verificationInput, description: text })}
             />
-            <Button title="Kaydet" onPress={handleAddVerification} />
+
+            <TouchableOpacity style={{alignItems:'center', marginHorizontal:100, borderWidth:1, borderRadius:7, borderColor: '#377d38' , backgroundColor:'#729c44', margin:15}} onPress={handleAddVerification}>
+              <Text style={{margin:7, color:'white', fontSize:18}}>KAYDET</Text>
+            </TouchableOpacity>
+
           </View>
         </View>
       </Modal>
@@ -188,22 +226,23 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: 'white',
-    padding: 20,
+    padding: 15,
     borderRadius: 10,
     elevation: 5, 
   },
+
   heading: {
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10,
+    marginLeft:5
   },
   input: {
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 5,
     padding: 10,
-    marginTop: 10,
-    width: '100%',
+    marginTop: 15,
   },
 });
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, TextInput, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, TextInput, ScrollView, Alert } from 'react-native';
+
 import axios from 'axios';
 import { useUserIdDecoder } from '../components/UserIdDecoder';
 
@@ -110,24 +111,73 @@ const SingleProductScreen = ({ route }) => {
   const { name, description, category, qty, minQty, price, images } = product;
 
   return (
-    <View>
-      <Text>Ürün Adı: {name}</Text>
-      <Text>Açıklama: {description}</Text>
-      <Text>Kategori: {category}</Text>
-      <Text>Stok: {qty} kg</Text>
-      <Text>Min Sipariş Miktarı: {minQty}</Text>
-      <Text>Birim Fiyatı: {price} ₺</Text>
-      <Image source={{ uri: images[0] }} style={{ width: 200, height: 200 }} />
+    <ScrollView>
+      <Image source={{ uri: images[0] }} style={{ width: 250, height: 250, margin:15, borderRadius:5, alignSelf:'center'}} />
+
+      <View style={{backgroundColor:'#cde8b5',borderRadius:15, margin:10}}>
+        <View style={{flexDirection:'row'}}>
+          <Text style={styles.productHead}>Ürün Adı:</Text>
+          <Text style={styles.productInfo}>{name}</Text>
+        </View>
+        <View style={{flexDirection:'row'}}>
+          <Text style={styles.productHead}>Açıklama:</Text>
+          <Text style={styles.productInfo}>{description}</Text>
+        </View>
+        <View style={{flexDirection:'row'}}>
+          <Text style={styles.productHead}>Kategori:</Text>
+          <Text style={styles.productInfo}>{category}</Text>
+        </View>
+        <View style={{flexDirection:'row'}}>
+          <Text style={styles.productHead}>Stok:</Text>
+          <Text style={styles.productInfo}>{qty} kg</Text>
+        </View>
+        <View style={{flexDirection:'row'}}>
+          <Text style={styles.productHead}>Min Sipariş Miktarı:</Text>
+          <Text style={styles.productInfo}>{minQty}</Text>
+        </View>
+        <View style={{flexDirection:'row'}}>
+          <Text style={styles.productHead}>Birim Fiyatı: </Text>
+          <Text style={styles.productInfo}>{price} ₺</Text>
+        </View>
+      </View>
+
+
        {/* Güncelleme Butonu */}
-       {userId == product.producerId && (
-       <TouchableOpacity onPress={toggleUpdateModal}>
-        <Text style={styles.button}>Güncelle</Text>
+
+      {userId == product.producerId && (
+       <TouchableOpacity style={{
+        backgroundColor: '#729c44',
+        borderRadius:5,
+        padding: 13,
+        marginVertical: 5,
+        alignSelf:'center',
+        width:'80%',
+        marginHorizontal:8,
+        marginTop:17}} onPress={toggleUpdateModal}>
+        <Text style ={{
+          color: 'white',
+          textAlign: 'center',
+          fontSize:22}} >Güncelle</Text>
+
       </TouchableOpacity>
        )}
       {/* Silme Butonu */}
-      {userId == product.producerId && (
-      <TouchableOpacity onPress={handleDeleteProduct}>
-        <Text style={styles.button}>Sil</Text>
+
+    {userId == product.producerId && (
+      <TouchableOpacity style={{
+        backgroundColor: 'red',
+        borderRadius:5,
+        padding: 15,
+        alignSelf:'center',
+        width:'80%',
+        marginVertical: 5,
+        marginHorizontal:8,
+        marginTop:10}} onPress={handleDeleteProduct}>
+        <Text style={{
+          color: 'white',
+          textAlign: 'center',
+          fontSize:22}}>Sil</Text>
+
       </TouchableOpacity>
       )}
       {userId !== product.producerId && (
@@ -141,6 +191,9 @@ const SingleProductScreen = ({ route }) => {
     {/* Güncelleme Modalı */}
     <Modal visible={isUpdateModalVisible} animationType="slide">
         <View style={styles.modalContainer}>
+          <Text style={{fontSize:30, fontWeight:'700', marginBottom:40}}>Ürün Bilgilerini Güncelle</Text>
+         
+        <View style={{backgroundColor:'#cde8b5',borderRadius:15,width:'85%',padding:20, marginBottom:15}}>
           <TextInput
             style={styles.input}
             placeholder={name}
@@ -159,33 +212,68 @@ const SingleProductScreen = ({ route }) => {
             value={updatedProductCategory}
             onChangeText={setUpdatedProductCategory}
           />
+
+        <View style={{flexDirection:'row'}}>
           <TextInput
-            style={styles.input}
+            style={{
+              flex:0.5,
+              borderWidth: 1,
+              borderColor: 'gray',
+              borderRadius: 5,
+              padding: 10,
+              marginVertical:5,
+              fontSize:18
+              }}
             placeholder={qty.toString()}
             value={updatedProductQuantity}
             onChangeText={setUpdatedProductQuantity}
           />
           <TextInput
-            style={styles.input}
-            placeholder={minQty.toString()}
+            style={{
+              flex:0.5,
+              borderWidth: 1,
+              borderColor: 'gray',
+              borderRadius: 5,
+              padding: 10,
+              marginVertical: 5,
+              marginLeft:4,
+             
+              fontSize:18
+
+              }}
+            placeholder={ minQty.toString()}
             value={updatedMinOrderQuantity}
             onChangeText={setUpdatedMinOrderQuantity}
           />
+        </View>
+
           <TextInput
             style={styles.input}
             placeholder={price.toString()}
             value={updatedUnitPrice}
             onChangeText={setUpdatedUnitPrice}
           />
-          <TouchableOpacity style={styles.button} onPress={handleUpdateProduct}>
-            <Text style={{ color: 'white' }}>Güncelle</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={toggleUpdateModal}>
-            <Text style={{ color: 'white' }}>İptal</Text>
-          </TouchableOpacity>
+
+          </View>
+
+          <View style={{flexDirection:'row'}}>
+            <TouchableOpacity style={styles.button} onPress={handleUpdateProduct}>
+              <Text style={{ color: 'white',fontSize:22 }}>Güncelle</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{backgroundColor: 'red',
+              color: 'white',
+              textAlign: 'center',
+              padding: 10,
+              marginVertical: 5,
+              borderRadius: 5,
+              marginHorizontal:8,
+              marginTop:15}} onPress={toggleUpdateModal}>
+              <Text style={{ color: 'white', fontSize:22}}>İptal</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -197,6 +285,8 @@ const styles = StyleSheet.create({
         padding: 10,
         marginVertical: 5,
         borderRadius: 5,
+        marginHorizontal:8,
+        marginTop:15
       },
     modalContainer: {
       flex: 1,
@@ -209,8 +299,23 @@ const styles = StyleSheet.create({
       borderRadius: 5,
       padding: 10,
       marginVertical: 5,
-      width: '80%',
+      width: '100%',
+      fontSize:22
     },
+    productInfo:{
+      margin:10, 
+      padding:5, 
+      fontSize:22, 
+      borderColor:'gray',
+      borderRadius:5,
+    },
+    productHead:{
+      fontSize:22, 
+      fontWeight:'700',
+      marginTop:15, 
+      marginLeft:15
+
+    }
   });
   
   export default SingleProductScreen;

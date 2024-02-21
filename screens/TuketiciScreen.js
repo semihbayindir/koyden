@@ -62,7 +62,7 @@ const UreticiScreen = () => {
           options={{
             tabBarLabel: 'Sepet',
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name='plus-circle-outline' color={'#729c44'} size={40} />
+              <MaterialCommunityIcons name='cart-variant' color={'#729c44'} size={40} />
             ),
             tabBarActiveTintColor: 'green',
           }}

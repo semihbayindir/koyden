@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useUserIdDecoder } from './UserIdDecoder';
+import Loading from '../screens/Loading';
 
 
 const AddProduct = () => {
@@ -18,6 +19,8 @@ const AddProduct = () => {
     const [productImage, setProductImage] = useState(null);
     const [products, setProducts] = useState([]);
     const producerId = useUserIdDecoder();
+
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
       if (producerId) {
@@ -123,6 +126,8 @@ const AddProduct = () => {
       console.error('Error adding product:', error);
     }
     };
+
+
   
     return (
       <View style={styles.container}>
