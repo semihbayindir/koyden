@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
-import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, TextInput, ScrollView,Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, TextInput, ScrollView, Alert } from 'react-native';
 
 import axios from 'axios';
 import { useUserIdDecoder } from '../components/UserIdDecoder';
@@ -145,7 +144,7 @@ const SingleProductScreen = ({ route }) => {
 
        {/* Güncelleme Butonu */}
 
-    {userId == product.producerId && (
+      {userId == product.producerId && (
        <TouchableOpacity style={{
         backgroundColor: '#729c44',
         borderRadius:5,
@@ -164,7 +163,7 @@ const SingleProductScreen = ({ route }) => {
        )}
       {/* Silme Butonu */}
 
-      {userId == product.producerId && (
+    {userId == product.producerId && (
       <TouchableOpacity style={{
         backgroundColor: 'red',
         borderRadius:5,
@@ -178,9 +177,9 @@ const SingleProductScreen = ({ route }) => {
           color: 'white',
           textAlign: 'center',
           fontSize:22}}>Sil</Text>
+
       </TouchableOpacity>
       )}
-      
       {userId !== product.producerId && (
       // Sepete Ekle Butonu
       <TouchableOpacity onPress={handleAddToCart}>
