@@ -16,10 +16,12 @@ import { useNavigation } from '@react-navigation/native';
         <Image style={styles.roleImage} source={require("../assets/home/large-set-isolated-vegetables-white-background.png")} />
       </Pressable>
 
-      <TouchableOpacity style={styles.cardGreen}>
+      <Pressable style={styles.cardGreen}
+      onPress={() => navigation.navigate("Tuketici")}
+      >
         <Text style={styles.roleTitle}>TÜKETİCİ</Text>
         <Image style={styles.roleImage}  source={require("../assets/home/174209-basket-fresh-fruit-free-photo.png")} />
-      </TouchableOpacity>
+      </Pressable>
 
       <TouchableOpacity style={styles.cardGray}>
         <Text style={styles.roleTitle}>TAŞIYICI</Text>
