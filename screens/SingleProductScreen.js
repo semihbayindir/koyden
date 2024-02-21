@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, TextInput } from 'react-native';
 import axios from 'axios';
+import { useUserIdDecoder } from '../components/UserIdDecoder';
 
 const SingleProductScreen = ({ route }) => {
   const { productId } = route.params;
@@ -12,7 +13,8 @@ const SingleProductScreen = ({ route }) => {
   const [updatedProductQuantity, setUpdatedProductQuantity] = useState(qty);
   const [updatedMinOrderQuantity, setUpdatedMinOrderQuantity] = useState(minQty);
   const [updatedUnitPrice, setUpdatedUnitPrice] = useState(price);
-
+  const userId = useUserIdDecoder();
+  
   useEffect(() => {
     axios.get(`http://localhost:8000/products/${productId}`)
       .then(response => {
@@ -22,6 +24,7 @@ const SingleProductScreen = ({ route }) => {
         console.error('Error fetching product:', error);
       });
   }, [productId]);
+
 
   if (!product) {
     return (
@@ -76,14 +79,24 @@ const SingleProductScreen = ({ route }) => {
       <Text>Birim Fiyatı: {price} ₺</Text>
       <Image source={{ uri: images[0] }} style={{ width: 200, height: 200 }} />
        {/* Güncelleme Butonu */}
+       {userId == product.producerId && (
        <TouchableOpacity onPress={toggleUpdateModal}>
         <Text style={styles.button}>Güncelle</Text>
       </TouchableOpacity>
-
+       )}
       {/* Silme Butonu */}
+      {userId == product.producerId && (
       <TouchableOpacity onPress={handleDeleteProduct}>
         <Text style={styles.button}>Sil</Text>
       </TouchableOpacity>
+      )}
+      {userId !== product.producerId && (
+      // Sepete Ekle Butonu
+      <TouchableOpacity onPress={() => addToCart(product)}>
+        <Text style={styles.button}>Sepete Ekle</Text>
+      </TouchableOpacity>
+    )}
+
 
     {/* Güncelleme Modalı */}
     <Modal visible={isUpdateModalVisible} animationType="slide">
