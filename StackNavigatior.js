@@ -6,6 +6,7 @@ import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import HomeScreen from "./screens/HomeScreen";
 import UreticiScreen from "./screens/UreticiScreen";
+import SingleProductScreen from "./screens/SingleProductScreen";
 
 
 const StackNavigator = () => {
@@ -74,6 +75,21 @@ const StackNavigator = () => {
               fontWeight: 'bold',
             },        
           }}
+        />
+        <Stack.Screen
+        name="SingleProduct"
+        component={SingleProductScreen}
+        options={{
+          title: 'KÖYDEN',
+          headerBackTitle: '‎',
+          headerStyle: {
+            backgroundColor: '#729c44',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },        
+        }}
         />
       </Stack.Navigator>
     </NavigationContainer>

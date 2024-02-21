@@ -30,7 +30,7 @@ const UreticiScreen = () => {
     description: ''
   });
 
-  
+
   const base64UrlDecode = (input) => {
     const base64 = input.replace(/-/g, '+').replace(/_/g, '/');
     const decoded = atob(base64);
@@ -84,9 +84,10 @@ const UreticiScreen = () => {
     }
   };
 
- 
-  if(!verificationData){
-    return <Loading/>
+
+  if (!verificationData) {
+    return <Loading />; // Eğer verificationData henüz yüklenmemişse Loading bileşenini göster
+
   }
 
   return (
