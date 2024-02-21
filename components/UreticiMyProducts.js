@@ -48,7 +48,7 @@ const UreticiMyProducts = () => {
           <TouchableOpacity style={styles.butons}>
             <Text style={{fontSize:18}}>Ürünlerim</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.butons}>
+          <TouchableOpacity style={styles.butons} onPress={() => navigation.navigate('UreticiOrders')}>
             <Text style={{fontSize:18}}>Siparişlerim</Text>
           </TouchableOpacity>
         </View>
