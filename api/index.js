@@ -282,3 +282,55 @@ app.post('/upload', upload.single('image'), (req, res) => {
     return res.json({ imageUrl: data.Location });
   });
 });
+
+const Cart = require('./models/cart');
+
+// Kullanıcının sepetini almak için GET isteği
+app.get('/cart/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const cart = await Cart.findOne({ userId: userId }).populate('products.productId');
+    res.json(cart);
+  } catch (error) {
+    console.error('Error fetching cart:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Yeni bir sepet oluşturmak için POST isteği
+app.post('/cart/create', async (req, res) => {
+  const { userId } = req.body;
+  try {
+    const newCart = new Cart({ userId: userId, products: [] });
+    await newCart.save();
+    res.status(201).json(newCart);
+  } catch (error) {
+    console.error('Error creating cart:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Ürün eklemek için PUT isteği
+app.put('/cart/add/:userId', async (req, res) => {
+  const { productId } = req.body;
+  const userId = req.params.userId;
+  try {
+    let cart = await Cart.findOne({ userId: userId });
+    if (!cart) {
+      cart = new Cart({ userId: userId, products: [] });
+    }
+    const existingProductIndex = cart.products.findIndex(item => item.productId === productId);
+    if (existingProductIndex !== -1) {
+      // Ürün sepette zaten var, miktarını arttır
+      cart.products[existingProductIndex].quantity++;
+    } else {
+      // Yeni ürünü sepete ekle
+      cart.products.push({ productId: productId, quantity: 1 });
+    }
+    await cart.save();
+    res.status(200).json(cart);
+  } catch (error) {
+    console.error('Error adding product to cart:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});

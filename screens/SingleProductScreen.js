@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, TextInput, ScrollView } from 'react-native';
+
+import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, TextInput, ScrollView,Alert } from 'react-native';
+
 import axios from 'axios';
+import { useUserIdDecoder } from '../components/UserIdDecoder';
 
 const SingleProductScreen = ({ route }) => {
   const { productId } = route.params;
@@ -12,7 +15,8 @@ const SingleProductScreen = ({ route }) => {
   const [updatedProductQuantity, setUpdatedProductQuantity] = useState(qty);
   const [updatedMinOrderQuantity, setUpdatedMinOrderQuantity] = useState(minQty);
   const [updatedUnitPrice, setUpdatedUnitPrice] = useState(price);
-
+  const userId = useUserIdDecoder();
+  
   useEffect(() => {
     axios.get(`http://localhost:8000/products/${productId}`)
       .then(response => {
@@ -22,6 +26,47 @@ const SingleProductScreen = ({ route }) => {
         console.error('Error fetching product:', error);
       });
   }, [productId]);
+
+
+  const handleAddToCart = async () => {
+    try {
+      // Kullanıcının sepetini almak için GET isteği
+      const cartResponse = await axios.get(`http://localhost:8000/cart/${userId}`);
+      const userCart = cartResponse.data;
+      
+      // Eğer kullanıcının sepeti bulunamadıysa yeni bir sepet oluştur
+      if (!userCart) {
+        const createCartResponse = await axios.post(`http://localhost:8000/cart/create`, {
+          userId,
+          productId
+        });
+        const addToCartResponse = await axios.put(`http://localhost:8000/cart/add/${userId}`, {
+          productId
+        });
+        console.log('New cart created:', createCartResponse.data);
+        console.log('Product added to cart:', addToCartResponse.data);
+        Alert.alert('Ürün sepete eklendi.')
+        return;
+      }
+      
+      // Kullanıcının sepetinde eklemek istediği ürünü ara
+      const existingProductIndex = userCart.products.findIndex(product => product.productId === productId);
+      
+      // Eğer ürün sepete daha önce eklenmemişse, sepete ekle
+      if (existingProductIndex === -1) {
+        const addToCartResponse = await axios.put(`http://localhost:8000/cart/add/${userId}`, {
+          productId
+        });
+        console.log('Product added to cart:', addToCartResponse.data);
+        Alert.alert('Ürün sepete eklendi.')
+      } else {
+        Alert.alert('Ürün zaten sepetinizde bulunmaktadır.');
+      }
+    } catch (error) {
+      console.error('Error adding product to cart:', error);
+    }
+  };
+  
 
   if (!product) {
     return (
@@ -99,6 +144,8 @@ const SingleProductScreen = ({ route }) => {
 
 
        {/* Güncelleme Butonu */}
+
+    {userId == product.producerId && (
        <TouchableOpacity style={{
         backgroundColor: '#729c44',
         borderRadius:5,
@@ -112,9 +159,12 @@ const SingleProductScreen = ({ route }) => {
           color: 'white',
           textAlign: 'center',
           fontSize:22}} >Güncelle</Text>
-      </TouchableOpacity>
 
+      </TouchableOpacity>
+       )}
       {/* Silme Butonu */}
+
+      {userId == product.producerId && (
       <TouchableOpacity style={{
         backgroundColor: 'red',
         borderRadius:5,
@@ -129,6 +179,15 @@ const SingleProductScreen = ({ route }) => {
           textAlign: 'center',
           fontSize:22}}>Sil</Text>
       </TouchableOpacity>
+      )}
+      
+      {userId !== product.producerId && (
+      // Sepete Ekle Butonu
+      <TouchableOpacity onPress={handleAddToCart}>
+        <Text style={styles.button}>Sepete Ekle</Text>
+      </TouchableOpacity>
+    )}
+
 
     {/* Güncelleme Modalı */}
     <Modal visible={isUpdateModalVisible} animationType="slide">
