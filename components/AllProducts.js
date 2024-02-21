@@ -3,15 +3,19 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { useUserIdDecoder } from './UserIdDecoder';
+import SearchBar from './SearchBar';
+import { fuzzySearch } from './FuzzySearch';
 
-const UreticiMyProducts = () => {
+
+const AllProducts = () => {
   const navigation = useNavigation();
   const [products, setProducts] = useState([]);
+  const [searchKeyword, setSearchKeyword] = useState('');
   const userId = useUserIdDecoder();
 
   useEffect(() => {
     if (userId) {
-      axios.get(`http://localhost:8000/products/producer/${userId}`)
+      axios.get(`http://localhost:8000/products`)
         .then(response => {
           setProducts(response.data);
         })
@@ -25,42 +29,61 @@ const UreticiMyProducts = () => {
     navigation.navigate('SingleProduct', { productId: productId });
   };
 
-  const renderProductItem = ({ item }) => (
-    <TouchableOpacity style={styles.urunler} onPress={() => handleProductPress(item._id)}>
-      <Image style={styles.images} source={{ uri: item.images[0] }} /> 
-      <View style={styles.productInfo}>
-        <Text style={styles.productName}>{item.name}</Text>
-        <View style={styles.productDet}>
-          <Text style={styles.productQty}>{item.qty} kg</Text>
-          <Text style={styles.productPrice}>{item.price} ₺</Text>
+  const renderProductItem = ({ item }) => {
+    return (
+      <TouchableOpacity style={styles.urunler} onPress={() => handleProductPress(item._id)}>
+        {item.images && item.images.length > 0 ? (
+          <Image style={styles.images} source={{ uri: item.images[0] }} /> 
+        ) : (
+          <View />
+        )}
+        <View style={styles.productInfo}>
+          <Text style={styles.productName}>{item.name}</Text>
+          <View style={styles.productDet}>
+            <Text style={styles.productQty}>{item.qty} kg</Text>
+            <Text style={styles.productPrice}>{item.price} ₺</Text>
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
   
+  const filteredProducts = fuzzySearch(searchKeyword, products);
+
     return (
       <View style={styles.welcome}>
         
         <Text style={{textAlign:'left', fontWeight:200, fontSize:30, fontStyle:'italic'}}>Hoşgeldin
-        <Text style={{textAlign:'left', fontWeight:800, fontSize:30, fontStyle:'normal' }}>  ÜRETİCİ,</Text>
+        <Text style={{textAlign:'left', fontWeight:800, fontSize:30, fontStyle:'normal' }}>  TÜKETİCİ,</Text>
         </Text>
-        <View style={{flexDirection:'row', marginLeft:20, marginTop:10 }}>
+        <SearchBar
+        value={searchKeyword}
+        onChangeText={setSearchKeyword}
+        />
+          <View style={{flexDirection:'row', marginLeft:20, marginTop:10 }}>
           <TouchableOpacity style={styles.butons}>
-            <Text style={{fontSize:18}}>Ürünlerim</Text>
+            <Text style={{fontSize:18}}>Tümü</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.butons}>
+            <Text style={{fontSize:18}}>Bana özel</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.butons}>
             <Text style={{fontSize:18}}>Siparişlerim</Text>
           </TouchableOpacity>
-        </View>
-          <View>
-          <FlatList
-          data={products}
-          renderItem={renderProductItem}
-          keyExtractor={(item) => item._id.toString()}
-          numColumns={2}
-        />
           </View>
-        
+    {filteredProducts.length === 0 && (
+      <View>
+        <Text>Aranan ürün bulunamadı.</Text>
+      </View>
+    )}
+    {filteredProducts.length > 0 && (
+      <FlatList
+        data={filteredProducts}
+        renderItem={renderProductItem}
+        keyExtractor={(item) => item?._id?.toString() || Math.random().toString()}
+        numColumns={2}
+      />
+    )}  
       </View>
     );
   }
@@ -161,4 +184,4 @@ const UreticiMyProducts = () => {
     },
   });
 
-  export default UreticiMyProducts;
+  export default AllProducts;
