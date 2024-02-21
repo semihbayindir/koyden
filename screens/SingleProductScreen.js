@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, TextInput } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, TextInput, Alert } from 'react-native';
 import axios from 'axios';
 import { useUserIdDecoder } from '../components/UserIdDecoder';
 
@@ -25,6 +25,46 @@ const SingleProductScreen = ({ route }) => {
       });
   }, [productId]);
 
+
+  const handleAddToCart = async () => {
+    try {
+      // Kullanıcının sepetini almak için GET isteği
+      const cartResponse = await axios.get(`http://localhost:8000/cart/${userId}`);
+      const userCart = cartResponse.data;
+      
+      // Eğer kullanıcının sepeti bulunamadıysa yeni bir sepet oluştur
+      if (!userCart) {
+        const createCartResponse = await axios.post(`http://localhost:8000/cart/create`, {
+          userId,
+          productId
+        });
+        const addToCartResponse = await axios.put(`http://localhost:8000/cart/add/${userId}`, {
+          productId
+        });
+        console.log('New cart created:', createCartResponse.data);
+        console.log('Product added to cart:', addToCartResponse.data);
+        Alert.alert('Ürün sepete eklendi.')
+        return;
+      }
+      
+      // Kullanıcının sepetinde eklemek istediği ürünü ara
+      const existingProductIndex = userCart.products.findIndex(product => product.productId === productId);
+      
+      // Eğer ürün sepete daha önce eklenmemişse, sepete ekle
+      if (existingProductIndex === -1) {
+        const addToCartResponse = await axios.put(`http://localhost:8000/cart/add/${userId}`, {
+          productId
+        });
+        console.log('Product added to cart:', addToCartResponse.data);
+        Alert.alert('Ürün sepete eklendi.')
+      } else {
+        Alert.alert('Ürün zaten sepetinizde bulunmaktadır.');
+      }
+    } catch (error) {
+      console.error('Error adding product to cart:', error);
+    }
+  };
+  
 
   if (!product) {
     return (
@@ -92,7 +132,7 @@ const SingleProductScreen = ({ route }) => {
       )}
       {userId !== product.producerId && (
       // Sepete Ekle Butonu
-      <TouchableOpacity onPress={() => addToCart(product)}>
+      <TouchableOpacity onPress={handleAddToCart}>
         <Text style={styles.button}>Sepete Ekle</Text>
       </TouchableOpacity>
     )}
