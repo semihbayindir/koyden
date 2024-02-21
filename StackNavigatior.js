@@ -6,6 +6,7 @@ import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import HomeScreen from "./screens/HomeScreen";
 import UreticiScreen from "./screens/UreticiScreen";
+import TuketiciScreen from "./screens/TuketiciScreen";
 import SingleProductScreen from "./screens/SingleProductScreen";
 
 
@@ -64,6 +65,21 @@ const StackNavigator = () => {
         <Stack.Screen
           name="Uretici"
           component={UreticiScreen}
+          options={{
+            title: 'KÖYDEN',
+            headerBackTitle: '‎',
+            headerStyle: {
+              backgroundColor: '#729c44',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },        
+          }}
+        />
+        <Stack.Screen
+          name="Tuketici"
+          component={TuketiciScreen}
           options={{
             title: 'KÖYDEN',
             headerBackTitle: '‎',
