@@ -67,9 +67,10 @@ const AllProducts = () => {
           <TouchableOpacity style={styles.butons}>
             <Text style={{fontSize:18}}>Bana özel</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.butons}>
+          <TouchableOpacity style={styles.butons} onPress={() => navigation.navigate('Orders')}>
             <Text style={{fontSize:18}}>Siparişlerim</Text>
           </TouchableOpacity>
+
           </View>
     {filteredProducts.length === 0 && (
       <View>

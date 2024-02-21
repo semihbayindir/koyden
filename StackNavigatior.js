@@ -8,6 +8,8 @@ import HomeScreen from "./screens/HomeScreen";
 import UreticiScreen from "./screens/UreticiScreen";
 import TuketiciScreen from "./screens/TuketiciScreen";
 import SingleProductScreen from "./screens/SingleProductScreen";
+import Orders from "./components/Orders";
+import UreticiOrders from "./components/UreticiOrders";
 
 
 
@@ -111,6 +113,36 @@ const StackNavigator = () => {
         <Stack.Screen
         name="SingleProduct"
         component={SingleProductScreen}
+        options={{
+          title: 'KÖYDEN',
+          headerBackTitle: '‎',
+          headerStyle: {
+            backgroundColor: '#729c44',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },        
+        }}
+        />
+        <Stack.Screen
+        name="Orders"
+        component={Orders}
+        options={{
+          title: 'KÖYDEN',
+          headerBackTitle: '‎',
+          headerStyle: {
+            backgroundColor: '#729c44',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },        
+        }}
+        />
+        <Stack.Screen
+        name="UreticiOrders"
+        component={UreticiOrders}
         options={{
           title: 'KÖYDEN',
           headerBackTitle: '‎',

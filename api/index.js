@@ -334,3 +334,60 @@ app.put('/cart/add/:userId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+const Order = require('./models/order');
+//Sipariş Oluşturma (Tüketici tarafı):
+app.post('/orders/create', async (req, res) => {
+  try {
+    const { userId, producerId, products, totalPrice } = req.body;
+
+    const newOrder = new Order({
+      userId,
+      producerId,
+      products,
+      totalPrice
+    });
+
+    const savedOrder = await newOrder.save();
+
+    res.status(201).json(savedOrder);
+  } catch (error) {
+    console.error('Error creating order:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+//Tüm Siparişleri Almak (Tüketici tarafı):
+app.get('/orders/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const orders = await Order.find({ userId }).populate('products.productId');
+    res.json(orders);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+//Tüm Siparişleri Almak (Üretici tarafı):
+app.get('/orders/producer/:producerId', async (req, res) => {
+  const producerId = req.params.producerId;
+  try {
+    const orders = await Order.find({ producerId }).populate('products.productId');
+    res.json(orders);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+//Sipariş Durumunu Güncelleme (Üretici tarafı):
+app.put('/orders/update/:orderId', async (req, res) => {
+  const orderId = req.params.orderId;
+  const { status } = req.body;
+  try {
+    const updatedOrder = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
+    res.json(updatedOrder);
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
