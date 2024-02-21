@@ -10,6 +10,21 @@ import TuketiciScreen from "./screens/TuketiciScreen";
 import SingleProductScreen from "./screens/SingleProductScreen";
 
 
+
+// options={({ navigation, route }) => ({
+//   title: 'KÖYDEN',
+//   headerStyle: {
+//     backgroundColor: '#729c44',
+
+//   },
+//   headerTintColor: '#fff',
+//   headerTitleStyle: {
+//     fontWeight: 'bold',
+//   },
+//   headerTitleAlign:'center'
+//   })}
+
+
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
   return (
@@ -18,25 +33,26 @@ const StackNavigator = () => {
         <Stack.Screen
           name="Login"
           component={LoginScreen}
-          options={{
-            title: 'KÖYDEN',
-            headerLeft:null,
-            headerStyle: {
-              backgroundColor: '#729c44',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-            headerTitleAlign:'center'
-          }}
+          options={({ navigation, route }) => ({
+              title: 'KÖYDEN',
+              headerStyle: {
+                backgroundColor: '#729c44',
+
+              },
+              headerBackVisible: false,
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+              headerTitleAlign:'center'
+              })}
         />
         <Stack.Screen
           name="Register"
           component={RegisterScreen}
           
           options={{
-            headerLeft: (props) => null,
+            headerLeft: ()=> null,
             title: 'KÖYDEN',
             headerStyle: {
               backgroundColor: '#729c44',
