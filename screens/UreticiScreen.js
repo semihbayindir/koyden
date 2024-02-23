@@ -85,10 +85,7 @@ const UreticiScreen = () => {
   };
 
 
-  // if (!verificationData) {
-  //   return <Loading />; // Eğer verificationData henüz yüklenmemişse Loading bileşenini göster
-
-  // }
+ 
 
   return (
     <View style={{ flex: 1 }}>

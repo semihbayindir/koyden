@@ -1,12 +1,24 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable, ScrollView } from 'react-native';
-import React, {} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import Loading from './Loading';
+
   const HomeScreen = () => {
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+  })
 
   return (
-
     <ScrollView style={{backgroundColor:'#f9fbe5'}}>
+      {loading ? (
+        <Loading/>
+      ) : (
+        <>
     <View style={{backgroundColor:'#f9fbe5'}}>
     <View style={styles.container}>
       <Pressable style={styles.cardWhite}
@@ -29,7 +41,10 @@ import { useNavigation } from '@react-navigation/native';
       </TouchableOpacity>
     </View>
     </View>
+    </>
+      )}
     </ScrollView>
+    
   );
 };
 

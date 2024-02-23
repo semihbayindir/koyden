@@ -334,6 +334,20 @@ app.put('/cart/add/:userId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+// Sepeti silmek için DELETE isteği
+app.delete('/cart/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const deletedCart = await Cart.findOneAndDelete({ userId: userId });
+    if (!deletedCart) {
+      return res.status(404).json({ message: 'Cart not found' });
+    }
+    res.status(200).json(deletedCart);
+  } catch (error) {
+    console.error('Error deleting cart:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 const Order = require('./models/order');
 //Sipariş Oluşturma (Tüketici tarafı):
@@ -390,4 +404,7 @@ app.put('/orders/update/:orderId', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
+
+
 

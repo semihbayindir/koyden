@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, FlatList, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, StyleSheet, FlatList, Text, TextInput, TouchableOpacity, Image, ScrollView } from 'react-native';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useUserIdDecoder } from './UserIdDecoder';
 import Loading from '../screens/Loading';
+import { useNavigation } from '@react-navigation/native'; // React Navigation'ın useNavigation hook'u
+
 
 
 const AddProduct = () => {
@@ -19,6 +21,8 @@ const AddProduct = () => {
     const [productImage, setProductImage] = useState(null);
     const [products, setProducts] = useState([]);
     const producerId = useUserIdDecoder();
+
+    const navigation = useNavigation(); 
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -34,19 +38,7 @@ const AddProduct = () => {
       }
     }, [producerId]);
     
-  
-    const renderProductItem = ({ item }) => (
-      <TouchableOpacity style={styles.urunler}>
-        <Image style={styles.images} source={{ uri: item.images[0] }} /> 
-        <View style={styles.productInfo}>
-          <Text style={styles.productName}>{item.name}</Text>
-          <View style={styles.productDet}>
-            <Text style={styles.productQty}>{item.qty} kg</Text>
-            <Text style={styles.productPrice}>{item.price} ₺</Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
+
   
     const toggleModal = () => {
       setModalVisible(!isModalVisible);
@@ -78,29 +70,39 @@ const AddProduct = () => {
       console.error('Error picking image:', error);
     }
   };
+
+  const clearProductData = () => {
+    setProductName('');
+    setProductDescription('');
+    setProductCategory('');
+    setProductQuantity('');
+    setMinOrderQuantity('');
+    setUnitPrice('');
+    setProductImage(null);
+  };
   
   
-    const handleAddProduct = async () => {
-      try {
-        // AWS S3'ye görsel yüklemesi
-        const formData = new FormData();
-        // Tarih ve saat bilgisini kullanarak dosya adını oluştur
-        const timestamp = new Date().toISOString().replace(/:/g, '_');
-        const fileName = `product_image_${timestamp}.jpg`;
+  const handleAddProduct = async () => {
+    try {
+      // AWS S3'ye görsel yüklemesi
+      const formData = new FormData();
+      // Tarih ve saat bilgisini kullanarak dosya adını oluştur
+      const timestamp = new Date().toISOString().replace(/:/g, '_');
+      const fileName = `product_image_${timestamp}.jpg`;
   
-        formData.append('image', {
-          name: `product_image_${timestamp}.jpg`,
-          type: 'image/jpg',
-          uri: productImage,
-        });
-    
-        const s3Response = await axios.post('http://localhost:8000/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-    
-        const imageUrl = s3Response.data.imageUrl;
+      formData.append('image', {
+        name: `product_image_${timestamp}.jpg`,
+        type: 'image/jpg',
+        uri: productImage,
+      });
+  
+      const s3Response = await axios.post('http://localhost:8000/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      const imageUrl = s3Response.data.imageUrl;
   
       const productData = {
         name: productName,
@@ -112,63 +114,39 @@ const AddProduct = () => {
         price: unitPrice,
         producerId: producerId
       };
-    
+  
       // Sunucuya yeni ürünü ekle
       const response = await axios.post('http://localhost:8000/products', productData);
-      
-      // Güncel ürün listesini yeniden al
-      const updatedProductsResponse = await axios.get(`http://localhost:8000/products/producer/${producerId}`);
-      setProducts(updatedProductsResponse.data);
-
+  
       console.log('Product added successfully:', response.data);
       toggleModal();
+      clearProductData();
+      handleResetScreen();
+      // Ürün eklendikten sonra navigasyon işlemini gerçekleştir
     } catch (error) {
       console.error('Error adding product:', error);
     }
-    };
-
+  };
+  const handleResetScreen = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Uretici' }], // Yeniden yüklemek istediğiniz ekranın adı
+    });
+  };
 
   
     return (
       <View style={styles.container}>
-         
-      <View style={styles.welcome}>
-        <Text style={{textAlign:'left', fontWeight:200, fontSize:30, fontStyle:'italic'}}>Hoşgeldin
-        <Text style={{textAlign:'left', fontWeight:800, fontSize:30, fontStyle:'normal' }}>  ÜRETİCİ,</Text>
-        </Text>
-        <View style={{flexDirection:'row', marginLeft:20, marginTop:10 }}>
-          <TouchableOpacity style={styles.butons}>
-            <Text style={{fontSize:18}}>Tümü</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.butons}>
-            <Text style={{fontSize:18}}>Siparişlerim</Text>
-          </TouchableOpacity>
-        </View>
-        <View>
-        <FlatList
-          data={products}
-          renderItem={renderProductItem}
-          keyExtractor={(item) => item._id.toString()}
-          numColumns={2}
-        />
-        </View>
-        
-      </View>
-      <TouchableOpacity style={{marginLeft: 300, marginBottom:10}} onPress={toggleModal}>
-        <MaterialCommunityIcons  name='plus-box' color={'#729c44'} size={80} />
-        </TouchableOpacity>
-      
-        
-        <Modal isVisible={isModalVisible}>
-          <View style={styles.modalContainer}>
-                <View style={{flexDirection:'row'}}>
-                  <Text style={{textAlign:'left', fontSize:24, fontWeight:500, paddingTop:12}} >Yeni Bir Ürün Ekleyin</Text>
-                    <TouchableOpacity onPress={toggleModal}>
-                      <MaterialCommunityIcons style={{marginLeft: 45}} name='close-box' color={'#729c44'} size={50} />
-                    </TouchableOpacity>
-                </View>
+        <View isVisible={isModalVisible}>
+          <ScrollView style={styles.modalContainer}>
+             <Text style={{textAlign:'left', fontSize:32, fontWeight:700, paddingTop:12}} >Yeni Bir Ürün Ekleyin</Text>
+                  
+          
   
-                <TouchableOpacity style={styles.input} onPress={handleImagePick}>
+            <TouchableOpacity style={{ marginTop:15,
+              padding:9,
+              fontSize:22,
+              width:'100%'}} onPress={handleImagePick}>
   
                 <View style={{flexDirection:'row'}}>
                 <MaterialCommunityIcons style={{marginLeft: 5}} name='file-image-plus-outline' color={'#729c44'} size={80} />
@@ -176,7 +154,7 @@ const AddProduct = () => {
                   <Image source={{ uri: productImage }} style={{ width: 100, height: 100 }} />
                 )}
                 </View>
-              <Text>Ürün Fotoğrafı Ekleyin</Text>
+              <Text style={{marginTop:5}}>Ürün Fotoğrafı Ekleyin</Text>
               
             </TouchableOpacity>
   
@@ -186,11 +164,14 @@ const AddProduct = () => {
               style={styles.input}
               placeholder="Ürün Adı"
               value={productName}
+              multiline={true}
               onChangeText={(text) => setProductName(text)}
             />
             <TextInput
               style={styles.input}
               placeholder="Açıklama"
+              multiline={true}
+              textAlignVertical='top'
               value={productDescription}
               onChangeText={(text) => setProductDescription(text)}
             />
@@ -218,13 +199,12 @@ const AddProduct = () => {
               value={unitPrice}
               onChangeText={(text) => setUnitPrice(text)}
             />
-            <TouchableOpacity style={{marginLeft:210 ,borderWidth:1, borderRadius:7, borderColor: '#377d38' , backgroundColor:'#729c44', margin:10}} onPress={handleAddProduct}>
-              <Text style={{margin:5, color:'white', fontSize:18}}>Ürün Ekle</Text>
+            <TouchableOpacity style={{marginLeft:210, marginTop:25,borderWidth:1, borderRadius:7, borderColor: '#377d38' , backgroundColor:'#729c44', margin:10}} onPress={handleAddProduct}>
+              <Text style={{margin:12, color:'white', fontSize:22}}>Ürün Ekle</Text>
             </TouchableOpacity>
             
-          </View>
-        </Modal>
-       
+          </ScrollView>
+        </View>      
       </View>
       
     );
@@ -236,94 +216,36 @@ const AddProduct = () => {
       justifyContent: 'center',
       alignItems: 'center',
     },
-    welcome:{
-      flex:1,
-      margin:15,
-    },
+
     butons:{
       margin:10,
       borderWidth:2,
       borderRadius:10,
       borderColor:'#9ab863',
       paddingHorizontal:10,
-      padding:4
+      padding:4,
     },
-    urunler:{
-      backgroundColor:'#d8e3c3',
-      marginHorizontal:10,
-      borderWidth:2,
-      borderRadius:10,
-      borderColor:'#9ab863',
-      width: '45%',
-      justifyContent:'center',
-      marginBottom:10,
-    },
-    images: {
-      width: '100%',
-      height: 140,
-      marginTop:10,
-      resizeMode: 'contain',
-      
-    },
+
     input: {
       borderWidth:1,
       borderRadius:10,
       marginTop:15,
       padding:9,
+      fontSize:22,
+      width:'100%',
+      maxWidth:'100%',
+      alignSelf:'flex-start',
     },
+
     modalContainer: {
       backgroundColor: 'white',
       padding: 22,
-      justifyContent: 'flex-start',
-      alignItems: 'flex-start',
       borderRadius: 15,
+      flex:1,
       borderColor: 'rgba(0, 0, 0, 0.1)',
     },
-    productName:{
-      fontSize:18, 
-      padding:5,
-    },
-    productQty:{
-      fontSize:18, 
-      paddingLeft:20, 
-      paddingBottom:10,
-    },
-    productPrice:{
-      fontSize:18, 
-      paddingLeft:30, 
-      paddingBottom:10,
-    },
-    productDet:{
-      flexDirection:'row',
-    },
   
-  
-    profileHeader: {
-      alignItems: 'center',
-    },
-    avatar: {
-      width: 100,
-      height: 100,
-      borderRadius: 50,
-      marginBottom: 10,
-    },
-    username: {
-      fontSize: 20,
-      fontWeight: 'bold',
-    },
-    userInfo: {
-      marginTop: 20,
-    },
-    signOutButton: {
-      marginTop: 20,
-      backgroundColor: '#FF0000', // Customize the color as needed
-      padding: 10,
-      borderRadius: 5,
-    },
-    signOutText: {
-      color: '#FFFFFF', // Customize the color as needed
-      fontWeight: 'bold',
-    },
+
   });
 
   export default AddProduct;

@@ -1,4 +1,4 @@
-import { Button, Pressable, StyleSheet, Text, View } from "react-native";
+import { Button, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -10,6 +10,9 @@ import TuketiciScreen from "./screens/TuketiciScreen";
 import SingleProductScreen from "./screens/SingleProductScreen";
 import Orders from "./components/Orders";
 import UreticiOrders from "./components/UreticiOrders";
+import UreticiMyProducts from "./components/UreticiMyProducts";
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 
 
@@ -71,6 +74,7 @@ const StackNavigator = () => {
           component={HomeScreen}
           options={{
             title: 'KÖYDEN',
+            headerBackTitle: '‎',
             headerStyle: {
               backgroundColor: '#729c44',
             },
@@ -81,20 +85,25 @@ const StackNavigator = () => {
           }}
         />
         <Stack.Screen
-          name="Uretici"
-          component={UreticiScreen}
-          options={{
-            title: 'KÖYDEN',
-            headerBackTitle: '‎',
-            headerStyle: {
-              backgroundColor: '#729c44',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },        
-          }}
-        />
+  name="Uretici"
+  component={UreticiScreen}
+  options={({ navigation }) => ({
+    title: 'KÖYDEN',
+    headerBackTitle: '‎',
+    headerLeft: () => (
+      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        <MaterialCommunityIcons name="less-than" size={24} color="#fff" />
+      </TouchableOpacity>
+    ),
+    headerStyle: {
+      backgroundColor: '#729c44',
+    },
+    headerTintColor: '#fff',
+    headerTitleStyle: {
+      fontWeight: 'bold',
+    },        
+  })}
+/>
         <Stack.Screen
           name="Tuketici"
           component={TuketiciScreen}
@@ -143,6 +152,21 @@ const StackNavigator = () => {
         <Stack.Screen
         name="UreticiOrders"
         component={UreticiOrders}
+        options={{
+          title: 'KÖYDEN',
+          headerBackTitle: '‎',
+          headerStyle: {
+            backgroundColor: '#729c44',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },        
+        }}
+        />
+        <Stack.Screen
+        name="UreticiMyProducts"
+        component={UreticiMyProducts}
         options={{
           title: 'KÖYDEN',
           headerBackTitle: '‎',
