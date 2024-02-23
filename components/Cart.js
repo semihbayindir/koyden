@@ -75,12 +75,13 @@ const Cart = () => {
             const response = await axios.post('http://localhost:8000/orders/create', orderData);
             console.log('Order placed successfully:', response.data);
             // İşlem tamamlandıktan sonra uygun bir şekilde yönlendirme veya bildirim yapılabilir
+            // Sipariş verildikten sonra sepeti boşalt
+            await axios.delete(`http://localhost:8000/cart/${userId}`);
+            setCartItems([]);
         } catch (error) {
             console.error('Error placing order:', error);
         }
     };
-    
-    
 
     return (
         <View>
@@ -94,7 +95,7 @@ const Cart = () => {
                     keyExtractor={(item, index) => index.toString()} // veya unique bir değeri kullanabilirsiniz
                 />
             )}
-                                <Button title="Sipariş Ver" onPress={handleOrder} />
+            <Button title="Sipariş Ver" onPress={handleOrder} />
 
         </View>
     );

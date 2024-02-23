@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useUserIdDecoder } from './UserIdDecoder';
 import SearchBar from './SearchBar';
 import { fuzzySearch } from './FuzzySearch';
+import Loading from '../screens/Loading';
 
 
 const AllProducts = () => {
@@ -12,6 +13,7 @@ const AllProducts = () => {
   const [products, setProducts] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const userId = useUserIdDecoder();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (userId) {
@@ -21,6 +23,11 @@ const AllProducts = () => {
         })
         .catch(error => {
           console.error('Error fetching products:', error);
+        }).finally(() => {
+          // Ürünler yüklendiğinde bekleme süresini başlat
+          setTimeout(() => {
+            setLoading(false);
+          }, 3000);
         });
     }
   }, [userId]);
@@ -50,44 +57,48 @@ const AllProducts = () => {
   
   const filteredProducts = fuzzySearch(searchKeyword, products);
 
-    return (
-      <View style={styles.welcome}>
-        
-        <Text style={{textAlign:'left', fontWeight:200, fontSize:30, fontStyle:'italic'}}>Hoşgeldin
-        <Text style={{textAlign:'left', fontWeight:800, fontSize:30, fontStyle:'normal' }}>  TÜKETİCİ,</Text>
-        </Text>
-        <SearchBar
-        value={searchKeyword}
-        onChangeText={setSearchKeyword}
-        />
+  return (
+    <View style={styles.welcome}>
+      {loading ? (
+        <Loading/>
+      ) : (
+        <>
+          <Text style={{textAlign:'left', fontWeight:200, fontSize:30, fontStyle:'italic'}}>Hoşgeldin
+            <Text style={{textAlign:'left', fontWeight:800, fontSize:30, fontStyle:'normal'}}>  TÜKETİCİ,</Text>
+          </Text>
+          <SearchBar
+            value={searchKeyword}
+            onChangeText={setSearchKeyword}
+          />
           <View style={{flexDirection:'row', marginLeft:20, marginTop:10 }}>
-          <TouchableOpacity style={styles.butons}>
-            <Text style={{fontSize:18}}>Tümü</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.butons}>
-            <Text style={{fontSize:18}}>Bana özel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.butons} onPress={() => navigation.navigate('Orders')}>
-            <Text style={{fontSize:18}}>Siparişlerim</Text>
-          </TouchableOpacity>
-
+            <TouchableOpacity style={styles.butons}>
+              <Text style={{fontSize:18}}>Tümü</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.butons}>
+              <Text style={{fontSize:18}}>Bana özel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.butons} onPress={() => navigation.navigate('Orders')}>
+              <Text style={{fontSize:18}}>Siparişlerim</Text>
+            </TouchableOpacity>
           </View>
-    {filteredProducts.length === 0 && (
-      <View>
-        <Text>Aranan ürün bulunamadı.</Text>
-      </View>
-    )}
-    {filteredProducts.length > 0 && (
-      <FlatList
-        data={filteredProducts}
-        renderItem={renderProductItem}
-        keyExtractor={(item) => item?._id?.toString() || Math.random().toString()}
-        numColumns={2}
-      />
-    )}  
-      </View>
-    );
-  }
+          {filteredProducts.length === 0 && (
+            <View>
+              <Text>Aranan ürün bulunamadı.</Text>
+            </View>
+          )}
+          {filteredProducts.length > 0 && (
+            <FlatList
+              data={filteredProducts}
+              renderItem={renderProductItem}
+              keyExtractor={(item) => item?._id?.toString() || Math.random().toString()}
+              numColumns={2}
+            />
+          )}
+        </>
+      )}
+    </View>
+  );
+}  
 
   const styles = StyleSheet.create({
     container: {
