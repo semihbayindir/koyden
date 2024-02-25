@@ -70,7 +70,7 @@ const AllProducts = () => {
             value={searchKeyword}
             onChangeText={setSearchKeyword}
           />
-          <View style={{flexDirection:'row', marginLeft:20, marginTop:10 }}>
+          <View style={{flexDirection:'row', alignItems:'center', marginTop:5, marginBottom:10 }}>
             <TouchableOpacity style={styles.butons}>
               <Text style={{fontSize:18}}>Tümü</Text>
             </TouchableOpacity>

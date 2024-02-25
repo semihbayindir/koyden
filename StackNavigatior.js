@@ -78,6 +78,7 @@ const StackNavigator = () => {
             headerStyle: {
               backgroundColor: '#729c44',
             },
+            headerBackVisible: false,
             headerTintColor: '#fff',
             headerTitleStyle: {
               fontWeight: 'bold',
