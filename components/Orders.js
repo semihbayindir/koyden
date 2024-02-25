@@ -25,14 +25,23 @@ const Orders = () => {
 
   const renderOrderItem = ({ item }) => {
     return (
-      <TouchableOpacity style={styles.order} onPress={() => handleOrderPress(item._id)}>
-        <Text style={styles.orderText}>{item.totalPrice} ₺</Text>
-        <Text style={styles.orderText}>{item.orderDate}</Text>
-        <Text style={styles.orderText}>{item.status}</Text>
+      <TouchableOpacity style={styles.order}>
+        <Text style={styles.orderText}>Total Price: {item.totalPrice} ₺</Text>
+        <Text style={styles.orderText}>Order Date: {item.orderDate}</Text>
+        <Text style={styles.orderText}>Status: {item.status}</Text>
+        
+        {item.products.map((product, index) => (
+          <View key={`${product.productId}-${index}`}>
+          <Text style={styles.orderText}>Ürün adı: {product.productId.name}</Text>
+          <Image source={{ uri: product.productId.images[0] }} style={{ width: 100, height: 100}} />
+            <Text style={styles.orderText}>Quantity: {product.quantity}</Text>
+            <Text style={styles.orderText}>Price: {product.price}</Text>            
+          </View>
+        ))}
       </TouchableOpacity>
     );
   };
-
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Siparişlerim</Text>
