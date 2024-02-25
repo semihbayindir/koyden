@@ -35,7 +35,8 @@ const Orders = () => {
           <Text style={styles.orderText}>Ürün adı: {product.productId.name}</Text>
           <Image source={{ uri: product.productId.images[0] }} style={{ width: 100, height: 100}} />
             <Text style={styles.orderText}>Quantity: {product.quantity}</Text>
-            <Text style={styles.orderText}>Price: {product.price}</Text>            
+            <Text style={styles.orderText}>Price: {product.price}</Text> 
+            <Text style={styles.orderText}>ProducerId: {product.productId.producerId}</Text>           
           </View>
         ))}
       </TouchableOpacity>
