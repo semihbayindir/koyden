@@ -63,12 +63,14 @@ const Cart = () => {
                 price: item.productId.price // Ürün fiyatını cartItems içinden alıyoruz
             }));
     
+            const totalPrice = cartItems.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
+
             // Sipariş veri modeli
             const orderData = {
                 userId: userId,
                 producerId: cartItems[0].productId.producerId, // İlk ürünün üreticisinin ID'si
                 products: products,
-                totalPrice: 1 // Sepetin toplam fiyatını hesapla
+                totalPrice: totalPrice // Sepetin toplam fiyatını hesapla
             };
         
             // Sipariş oluştur
