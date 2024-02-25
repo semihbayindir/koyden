@@ -20,8 +20,9 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     backgroundColor: '#e0e0e0',
     borderRadius: 5,
-    marginHorizontal: 20,
+    marginHorizontal: 12,
     marginVertical: 10,
+    marginTop:15
   },
   input: {
     fontSize: 16,

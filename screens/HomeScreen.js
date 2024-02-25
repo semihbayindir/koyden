@@ -14,9 +14,9 @@ import Loading from './Loading';
   })
 
   return (
-    <ScrollView style={{backgroundColor:'#f9fbe5'}}>
+    <ScrollView >
       {loading ? (
-        <Loading/>
+        <View style={{alignContent:'center',marginTop:200}}><Loading/></View>
       ) : (
         <>
     <View style={{backgroundColor:'#f9fbe5'}}>

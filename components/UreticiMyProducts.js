@@ -65,7 +65,7 @@ const UreticiMyProducts = () => {
           <Text style={{ textAlign: 'left', fontWeight: 200, fontSize: 30, fontStyle: 'italic' }}>Hoşgeldin
             <Text style={{ textAlign: 'left', fontWeight: 800, fontSize: 30, fontStyle: 'normal' }}>  ÜRETİCİ,</Text>
           </Text>
-          <View style={{ flexDirection: 'row', marginLeft: 20, marginTop: 10 }}>
+          <View style={{ flexDirection: 'row', alignItems:'center', marginTop: 10 }}>
             <TouchableOpacity style={styles.butons}>
               <Text style={{ fontSize: 18 }}>Ürünlerim</Text>
             </TouchableOpacity>
