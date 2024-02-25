@@ -353,13 +353,15 @@ const Order = require('./models/order');
 //Sipariş Oluşturma (Tüketici tarafı):
 app.post('/orders/create', async (req, res) => {
   try {
-    const { userId, producerId, products, totalPrice } = req.body;
+    const { userId, producerId, products, totalPrice, from, to } = req.body;
 
     const newOrder = new Order({
       userId,
       producerId,
       products,
-      totalPrice
+      totalPrice,
+      from,
+      to
     });
 
     const savedOrder = await newOrder.save();
