@@ -3,13 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { useUserIdDecoder } from './UserIdDecoder';
-import SearchBar from './SearchBar';
-import { fuzzySearch } from './FuzzySearch';
 
 const Orders = () => {
   const navigation = useNavigation();
   const [orders, setOrders] = useState([]);
   const userId = useUserIdDecoder();
+  const [producerInfo, setProducerInfo] = useState(null);
 
   useEffect(() => {
     if (userId) {
@@ -19,9 +18,34 @@ const Orders = () => {
         })
         .catch(error => {
           console.error('Error fetching orders:', error);
-        });
+        });   
     }
   }, [userId]);
+
+  // useEffect to fetch producer information
+  useEffect(() => {
+    const fetchProducerInfo = async () => {
+      try {
+        if (orders && orders.length > 0) {
+          // Tüm siparişlerde döngü yap
+          for (let i = 0; i < orders.length; i++) {
+            const order = orders[i];
+            // Her bir siparişin ürünlerinde döngü yap
+            for (let j = 0; j < order.products.length; j++) {
+              const product = order.products[j];
+              // Her bir ürünün üreticisine ait bilgiyi getir
+              const response = await axios.get(`http://localhost:8000/api/users/${product.productId.producerId}`);
+              setProducerInfo(response.data);
+              console.log(producerInfo.verification.producerAddress.city)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching producer information:', error);
+      }
+    };
+    fetchProducerInfo();
+  }, [orders]);
 
   const renderOrderItem = ({ item }) => {
     return (
@@ -35,7 +59,9 @@ const Orders = () => {
           <Text style={styles.orderText}>Ürün adı: {product.productId.name}</Text>
           <Image source={{ uri: product.productId.images[0] }} style={{ width: 100, height: 100}} />
             <Text style={styles.orderText}>Quantity: {product.quantity}</Text>
-            <Text style={styles.orderText}>Price: {product.price}</Text>            
+            <Text style={styles.orderText}>Price: {product.price}</Text>
+            <Text style={styles.orderText}>Producer Id: {product.productId.producerId}</Text>
+            <Text style={styles.orderText}>Şehir : {producerInfo.verification.producerAddress.street}</Text>
           </View>
         ))}
       </TouchableOpacity>
