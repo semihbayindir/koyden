@@ -16,6 +16,7 @@ const UreticiScreen = () => {
   const [verificationData, setVerificationData] = useState(null);
   const [userId, setUserId] = useState(null);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [verificationInput, setVerificationInput] = useState({
     producerAddress: {
@@ -85,10 +86,21 @@ const UreticiScreen = () => {
   };
 
 
- 
+ useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000); // 3 saniye
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
+    
     <View style={{ flex: 1 }}>
+      {loading ? (
+      <Loading/>
+    ) : (
+      <>
       <Tab.Navigator 
         screenOptions={{ headerShown: false, tabBarStyle: { backgroundColor: '#e2eed6' } }}
       >
@@ -126,6 +138,8 @@ const UreticiScreen = () => {
           }}
         />
       </Tab.Navigator>
+      </>
+    )}
 
       {/* Verification modal */}
       <Modal
@@ -206,7 +220,7 @@ const UreticiScreen = () => {
             <TouchableOpacity style={{alignItems:'center', marginHorizontal:100, borderWidth:1, borderRadius:7, borderColor: '#377d38' , backgroundColor:'#729c44', margin:15}} onPress={handleAddVerification}>
               <Text style={{margin:7, color:'white', fontSize:18}}>KAYDET</Text>
             </TouchableOpacity>
-
+            
           </View>
         </View>
       </Modal>

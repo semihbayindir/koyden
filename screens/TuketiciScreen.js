@@ -12,10 +12,12 @@ import Loading from './Loading';
 import Cart from '../components/Cart';
 
 
+
 const Tab = createBottomTabNavigator();
 const UreticiScreen = () => {
   const [verificationData, setVerificationData] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const base64UrlDecode = (input) => {
     const base64 = input.replace(/-/g, '+').replace(/_/g, '/');
@@ -39,9 +41,20 @@ const UreticiScreen = () => {
   
     fetchUsers();
   }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000); // 3 saniye
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
+      {loading ? (
+      <Loading/>
+    ) : (
+      <>
       <Tab.Navigator 
         screenOptions={{ headerShown: false, tabBarStyle: { backgroundColor: '#e2eed6' } }}
       >
@@ -79,6 +92,8 @@ const UreticiScreen = () => {
           }}
         />
       </Tab.Navigator>
+      </>
+      )}
     </View>
   );
 };
