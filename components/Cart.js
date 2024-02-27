@@ -7,7 +7,9 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
     const userId = useUserIdDecoder();
-
+    const [from,setFrom] = useState('Sakarya');
+    const [to,setTo] = useState('İstanbul');
+    
     useEffect(() => {
         if (userId) {
             const fetchCartItems = async () => {
@@ -101,7 +103,9 @@ const Cart = () => {
                 userId: userId,
                 producerId: cartItems[0].productId.producerId, // İlk ürünün üreticisinin ID'si
                 products: products,
-                totalPrice: totalPrice // Sepetin toplam fiyatını hesapla
+                totalPrice: totalPrice, // Sepetin toplam fiyatını hesapla
+                from: from,
+                to: to
             };
         
             // Sipariş oluştur

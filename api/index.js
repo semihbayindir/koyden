@@ -353,13 +353,15 @@ const Order = require('./models/order');
 //Sipariş Oluşturma (Tüketici tarafı):
 app.post('/orders/create', async (req, res) => {
   try {
-    const { userId, producerId, products, totalPrice } = req.body;
+    const { userId, producerId, products, totalPrice, from, to } = req.body;
 
     const newOrder = new Order({
       userId,
       producerId,
       products,
-      totalPrice
+      totalPrice,
+      from,
+      to
     });
 
     const savedOrder = await newOrder.save();
@@ -401,6 +403,16 @@ app.put('/orders/update/:orderId', async (req, res) => {
     res.json(updatedOrder);
   } catch (error) {
     console.error('Error updating order status:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+//Tüm siparişleri getirme
+app.get("/orders", async (req, res) => {
+  try {
+    const orders = await Order.find().populate('products.productId');
+    res.json(orders);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });

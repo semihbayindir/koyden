@@ -35,10 +35,12 @@ import Loading from './Loading';
         <Image style={styles.roleImage}  source={require("../assets/home/174209-basket-fresh-fruit-free-photo.png")} />
       </Pressable>
 
-      <TouchableOpacity style={styles.cardGray}>
+      <Pressable style={styles.cardGray}
+      onPress={() => navigation.navigate("Tasiyici")}
+      >
         <Text style={styles.roleTitle}>TAŞIYICI</Text>
         <Image style={styles.roleImage} source={require("../assets/home/Trucking-Background-PNG.png")} />
-      </TouchableOpacity>
+      </Pressable>
     </View>
     </View>
     </>
@@ -97,3 +99,4 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+
