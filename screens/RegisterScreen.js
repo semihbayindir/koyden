@@ -7,6 +7,7 @@ import {
   Pressable,
   Alert,
   ScrollView,
+  Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -145,10 +146,9 @@ const RegisterScreen = () => {
               onChangeText={(text) => setName(text)}
               style={{
                 fontSize: email ? 18 : 18,
-                borderColor:"black",
                 borderRadius:5,
                 padding:12,
-                borderWidth:1, borderColor:"black",
+                borderWidth:1, borderColor:"gray",
                 borderRadius:5,
                 padding:12,
                 borderWidth:1,
@@ -170,7 +170,7 @@ const RegisterScreen = () => {
               onChangeText={(text) => setSurname(text)}
               style={{
                 fontSize: email ? 18 : 18,
-                borderColor:"black",
+                borderColor:"gray",
                 borderRadius:5,
                 padding:12,
                 borderWidth:1,
@@ -193,7 +193,7 @@ const RegisterScreen = () => {
               style={{
                 fontSize: email ? 18 : 18,
                 borderBottomColor: "gray",
-                borderColor:"black",
+                borderColor:"gray",
                 borderRadius:5,
                 padding:12,
                 borderWidth:1,
@@ -215,7 +215,7 @@ const RegisterScreen = () => {
               onChangeText={(text) => setPhone(text)}
               style={{
                 fontSize: email ? 18 : 18,
-                borderColor:"black",
+                borderColor:"gray",
                 borderRadius:5,
                 padding:12,
                 borderWidth:1,
@@ -238,7 +238,7 @@ const RegisterScreen = () => {
               secureTextEntry={true}
               style={{
                 fontSize: email ? 18 : 18,
-                borderColor:"black",
+                borderColor:"gray",
                 borderRadius:5,
                 padding:12,
                 borderWidth:1,
@@ -254,7 +254,7 @@ const RegisterScreen = () => {
             onPress={handleRegister}
             style={{
               width: 200,
-              backgroundColor: "#729c44",
+              backgroundColor: "#304D30",
               padding: 15,
               marginTop: 20,
               marginLeft: "auto",
@@ -284,19 +284,25 @@ const RegisterScreen = () => {
           </Pressable>
           {/* <Text>{JSON.stringify(userInfo,null,2)}</Text> */}
 
-          <Pressable style={{marginTop:15}}>
-          
-            <FontAwesome.Button name="google" backgroundColor='red' onPress={() => promptAsync({ redirectUri: 'http://localhost:8081' })}
-              style={{
-                padding: 10,
-                marginBottom: 5,
-                borderRadius: 6,
-                textAlign:'center',
-                justifyContent:'center',
-              }}>
-            Google ile Giriş Yap
-          </FontAwesome.Button>
-          </Pressable>
+          <Pressable style={{marginTop:15}} onPress={() => promptAsync({ redirectUri: 'http://localhost:8081' })}>
+  <FontAwesome.Button 
+    backgroundColor='#fff' 
+    borderWidth='1'
+    borderColor='gray'
+    onPress={() => promptAsync({ redirectUri: 'http://localhost:8081' })}
+    style={{
+      padding: 10,
+      marginBottom: 5,
+      borderRadius: 6,
+      textAlign:'center',
+      justifyContent:'center',
+    }}>
+      <View style={{flexDirection:'row'}}>
+    <Image source={require('../assets/search.png')} style={{width: 24, height: 24}} />
+    <Text style={{padding:5,marginLeft:5}}>Google ile Kayıt Ol</Text>
+    </View>
+  </FontAwesome.Button>
+</Pressable>
 
         </View>
         </ScrollView>

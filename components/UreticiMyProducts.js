@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { useUserIdDecoder } from './UserIdDecoder';
-import Loading from '../screens/Loading';
+
 
 
 const UreticiMyProducts = () => {

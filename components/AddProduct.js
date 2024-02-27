@@ -5,7 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useUserIdDecoder } from './UserIdDecoder';
-import Loading from '../screens/Loading';
+
 import { useNavigation } from '@react-navigation/native'; // React Navigation'ın useNavigation hook'u
 
 
