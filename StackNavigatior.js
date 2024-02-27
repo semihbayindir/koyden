@@ -1,6 +1,3 @@
-
-
-
 import { Button, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
@@ -94,24 +91,24 @@ const StackNavigator = () => {
           }}
         />
         <Stack.Screen
-  name="Uretici"
-  component={UreticiScreen}
-  options={({ navigation }) => ({
-    title: 'KÖYDEN',
-    headerBackTitle: '‎',
-    headerLeft: () => (
-      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+          name="Uretici"
+          component={UreticiScreen}
+          options={({ navigation }) => ({
+            title: 'KÖYDEN',
+            headerBackTitle: '‎',
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.navigate('Home')}>
 
-        <Ionicons name="chevron-back" size={34} color="#fff" />
+                <Ionicons name="chevron-back" size={34} color="#fff" />
 
-      </TouchableOpacity>
-    ),
-    headerStyle: {
-      backgroundColor: '#729c44',
-    },
-    headerTintColor: '#fff',
-    headerTitleStyle: {
-      fontWeight: 'bold',
+              </TouchableOpacity>
+            ),
+            headerStyle: {
+              backgroundColor: '#729c44',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
     },        
   })}
 />

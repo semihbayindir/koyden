@@ -14,7 +14,7 @@ import Loading from './Loading';
   })
 
   return (
-    <ScrollView style={styles.container} >
+    <ScrollView  >
       {loading ? (
         <View style={{alignContent:'center',marginTop:200}}><Loading/></View>
       ) : (

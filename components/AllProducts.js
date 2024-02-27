@@ -106,7 +106,8 @@ const AllProducts = () => {
     },
     welcome:{
       flex:1,
-      margin:15,
+      marginTop:15,
+      marginHorizontal:15
     },
     butons:{
       margin:10,
