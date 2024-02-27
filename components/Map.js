@@ -133,22 +133,24 @@ const Map = () => {
 
   async function getCoordinatesFromAddress(address) {
     try {
-        const response = await axios.get('https://nominatim.openstreetmap.org/search', {
-            params: {
-              q: address,
-              format: 'json',
-            },
-          });
-      if (response.data && response.data.length > 0) {
-        const { lat, lon } = response.data[0];
-        return { latitude: parseFloat(lat), longitude: parseFloat(lon) };
+      const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+        params: {
+          address: address,
+          key: GOOGLE_API_KEY,
+        },
+      });
+      if (response.data && response.data.results && response.data.results.length > 0) {
+        const { lat, lng } = response.data.results[0].geometry.location;
+        return { latitude: lat, longitude: lng };
       } else {
         throw new Error('No coordinates found for the address');
       }
     } catch (error) {
+      console.error('Error fetching coordinates from address:', error);
       return null;
     }
   }
+  
 
   // Fonksiyon, iki koordinat arasındaki mesafeyi hesaplar
 function calculateDistance(coord1, coord2) {
