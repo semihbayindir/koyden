@@ -6,6 +6,8 @@ import {
   Dimensions,
   Text,
   TouchableOpacity,
+  Modal,
+  Button,
 } from "react-native";
 import {
   GooglePlacesAutocomplete,
@@ -64,19 +66,34 @@ const Map = () => {
   const mapRef = useRef(null);
   const [orders, setOrders] = useState([]);
   const [producerInfo, setProducerInfo] = useState(null);
+  const [stopFetchingOrders, setStopFetchingOrders] = useState(false);
+  const [selectedMarker, setSelectedMarker] = useState(null); // Seçili marker'ı saklamak için state
+  const [selectedMarkerInfo, setSelectedMarkerInfo] = useState([])
 
   useEffect(() => {
-      axios.get(`http://localhost:8000/orders/`)
-        .then(response => {
-          setOrders(response.data);
-        //   console.log(orders);
-        })
-        .catch(error => {
-          console.error('Error fetching orders:', error);
-        });   
-  });
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/orders/`);
+        setOrders(response.data);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
+    };
   
-  // useEffect to fetch producer information
+    // İlk açılışta ve orders değiştiğinde siparişleri çek
+    fetchOrders();
+  
+    // Daha sonra 1 dakika aralıklarla siparişleri çek
+    const fetchInterval = setInterval(() => {
+      if (!stopFetchingOrders) {
+        fetchOrders();
+      }
+    }, 60000); // Her 1 dakikada bir siparişleri çek
+  
+    // Komponent sona erdiğinde zamanlayıcıyı temizle
+    return () => clearInterval(fetchInterval);
+  }, [stopFetchingOrders]);
+  
   useEffect(() => {
     const fetchProducerInfo = async () => {
       try {
@@ -225,6 +242,10 @@ function calculateDistance(coord1, coord2) {
       moveTo(position);
     };
 
+    const handleMarkerPress = (marker) => {
+      setSelectedMarker(marker); // Seçili marker'ı state'e ata
+    };
+
   return (
     <View style={styles.container}>
       <MapView
@@ -242,6 +263,7 @@ function calculateDistance(coord1, coord2) {
             key={marker.id}
             coordinate={marker.coordinate}
             title={`Marker ${marker.id}`}
+            onPress={() => handleMarkerPress(marker)} // Marker'a tıklandığında handleMarkerPress fonksiyonunu çağır
           />
         ))}
 
@@ -256,7 +278,7 @@ function calculateDistance(coord1, coord2) {
           />
         )}
       </MapView>
-      <View style={styles.searchContainer}>
+      {/* <View style={styles.searchContainer}>
         <InputAutocomplete
           label="Origin"
           onPlaceSelected={(details) => {
@@ -278,7 +300,29 @@ function calculateDistance(coord1, coord2) {
             <Text>Duration: {Math.ceil(duration)} min</Text>
           </View>
         ) : null}
-      </View>
+      </View> */}
+
+      {/* Modal bileşeni */}
+      <Modal visible={selectedMarker !== null} animationType="slide" transparent>
+  <View style={styles.modalContainer}>
+    {selectedMarker && (
+      <>
+        <Text>Marker Information</Text>
+        {/* <Text>{`Marker ID: ${selectedMarker.id}`}</Text> */}
+        {/* Her bir ürün için bilgileri göster */}
+        {orders[selectedMarker.id]?.products.map((product, productIndex) => (
+          <View key={productIndex}>
+            <Text>{`Product ${productIndex + 1}`}</Text>
+            <Text>{`Product Name: ${product.productId.name}`}</Text>
+            <Text>{`Product Price: ${product.price}`}</Text>
+          </View>
+        ))}
+        <Button title="Close" onPress={() => setSelectedMarker(null)} />
+      </>
+    )}
+  </View>
+</Modal>
+
     </View>
   );
 }
@@ -321,6 +365,24 @@ const styles = StyleSheet.create({
   buttonText: {
     textAlign: "center",
   },
+  modalContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -3,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 3,
+  }
 });
 
 export default Map;
