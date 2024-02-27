@@ -16,6 +16,7 @@ const Tab = createBottomTabNavigator();
 const UreticiScreen = () => {
   const [verificationData, setVerificationData] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const base64UrlDecode = (input) => {
     const base64 = input.replace(/-/g, '+').replace(/_/g, '/');
@@ -40,45 +41,71 @@ const UreticiScreen = () => {
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000); // 5 saniye
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <View style={{ flex: 1 }}>
+      {loading ? (
+        <View style={{alignContent:'center',marginTop:300}}><Loading/></View>
+      ) : (
+        <>
       <Tab.Navigator 
-        screenOptions={{ headerShown: false, tabBarStyle: { backgroundColor: '#e2eed6' } }}
-      >
-        <Tab.Screen 
-          name="Tüketici" 
-          component={AllProducts}
-          options={{
-            tabBarLabel: 'Ürünler',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name='food-apple' color={'#729c44'} size={40} />
-            ),
-            tabBarActiveTintColor: 'green',
+  screenOptions={{ headerShown: false, tabBarStyle: { height:90 ,backgroundColor: '#e2eed6' } }}
+>
+  <Tab.Screen 
+    name="Tüketici" 
+    component={AllProducts}
+    options={{
+      tabBarLabel: 'Ürünler',
+      tabBarIcon: ({ color, size, focused }) => (
+        <MaterialCommunityIcons name='food-apple'  color={focused ? '#729c44' : 'gray'} size={50} />
+      ),
+      tabBarActiveTintColor: 'green',
+    }}
+  />
+  <Tab.Screen 
+    name="Cart" 
+    component={Cart}
+    options={{
+      tabBarLabel: '',
+      tabBarIcon: ({ color, size, focused }) => (
+        <View
+          style={{
+            width: 90,
+            height: 90,
+            borderRadius: 80,
+            backgroundColor: focused ? '#fff' : '#729c44', // Change the background color as needed
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: -20 // Adjust this value according to your need
           }}
-        />
-        <Tab.Screen 
-          name="Cart" 
-          component={Cart}
-          options={{
-            tabBarLabel: 'Sepet',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name='cart-variant' color={'#729c44'} size={40} />
-            ),
-            tabBarActiveTintColor: 'green',
-          }}
-        />
-        <Tab.Screen 
-          name="Profile" 
-          component={ProfileScreen}
-          options={{
-            tabBarLabel: 'Profil',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name='account' color={'#729c44'} size={45} />
-            ),
-            tabBarActiveTintColor: 'green',
-          }}
-        />
-      </Tab.Navigator>
+        >
+          <MaterialCommunityIcons name='cart-variant' color={focused ? '#729c44' : '#fff'} size={60} />
+        </View>
+      ),
+      tabBarActiveTintColor: 'green',
+    }}
+  />
+  <Tab.Screen 
+    name="Profile" 
+    component={ProfileScreen}
+    options={{
+      tabBarLabel: 'Profil',
+      tabBarIcon: ({ color, size , focused}) => (
+        <MaterialCommunityIcons name='account'  color={focused ? '#729c44' : 'gray'} size={55} />
+      ),
+      tabBarActiveTintColor: 'green',
+    }}
+  />
+</Tab.Navigator>
+</>
+      )}
     </View>
   );
 };

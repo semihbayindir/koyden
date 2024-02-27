@@ -12,6 +12,7 @@ import Orders from "./components/Orders";
 import UreticiOrders from "./components/UreticiOrders";
 import UreticiMyProducts from "./components/UreticiMyProducts";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Ionicons } from '@expo/vector-icons';
 
 
 
@@ -93,7 +94,7 @@ const StackNavigator = () => {
     headerBackTitle: '‎',
     headerLeft: () => (
       <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-        <MaterialCommunityIcons name="less-than" size={24} color="#fff" />
+        <Ionicons name="chevron-back" size={34} color="#fff" />
       </TouchableOpacity>
     ),
     headerStyle: {

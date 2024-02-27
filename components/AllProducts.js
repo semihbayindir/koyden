@@ -38,6 +38,7 @@ const AllProducts = () => {
 
   const renderProductItem = ({ item }) => {
     return (
+    
       <TouchableOpacity style={styles.urunler} onPress={() => handleProductPress(item._id)}>
         {item.images && item.images.length > 0 ? (
           <Image style={styles.images} source={{ uri: item.images[0] }} /> 
@@ -52,6 +53,7 @@ const AllProducts = () => {
           </View>
         </View>
       </TouchableOpacity>
+  
     );
   };
   
