@@ -36,7 +36,7 @@ const Orders = () => {
               // Her bir ürünün üreticisine ait bilgiyi getir
               const response = await axios.get(`http://localhost:8000/api/users/${product.productId.producerId}`);
               setProducerInfo(response.data);
-              console.log(producerInfo.verification.producerAddress.city)
+              // console.log(producerInfo.verification.producerAddress.city)
             }
           }
         }
@@ -61,7 +61,6 @@ const Orders = () => {
             <Text style={styles.orderText}>Quantity: {product.quantity}</Text>
             <Text style={styles.orderText}>Price: {product.price}</Text>
             <Text style={styles.orderText}>Producer Id: {product.productId.producerId}</Text>
-            <Text style={styles.orderText}>Şehir : {producerInfo.verification.producerAddress.street}</Text>
           </View>
         ))}
       </TouchableOpacity>
