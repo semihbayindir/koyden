@@ -16,6 +16,7 @@ const UreticiScreen = () => {
   const [verificationData, setVerificationData] = useState(null);
   const [userId, setUserId] = useState(null);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [verificationInput, setVerificationInput] = useState({
     producerAddress: {
@@ -85,47 +86,77 @@ const UreticiScreen = () => {
   };
 
 
- 
+ useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000); // 3 saniye
+
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
+    
     <View style={{ flex: 1 }}>
+      {loading ? (
+
+      <Loading/>
+    ) : (
+      <>
+
       <Tab.Navigator 
-        screenOptions={{ headerShown: false, tabBarStyle: { backgroundColor: '#e2eed6' } }}
+        screenOptions={{ headerShown: false, tabBarStyle: { height:90, backgroundColor: '#e2eed6' } }}
+        
       >
-        <Tab.Screen 
-          name="Üretici" 
-          component={UreticiMyProducts}
-          options={{
-            tabBarLabel: 'Ürünler',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name='food-apple' color={'#729c44'} size={40} />
-            ),
-            tabBarActiveTintColor: 'green',
-          }}
-        />
-        <Tab.Screen 
-          name="AddProduct" 
-          component={AddProduct}
-          options={{
-            tabBarLabel: 'Ürün Ekle',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name='plus-circle-outline' color={'#729c44'} size={40} />
-            ),
-            tabBarActiveTintColor: 'green',
-          }}
-        />
-        <Tab.Screen 
-          name="Profile" 
-          component={ProfileScreen}
-          options={{
-            tabBarLabel: 'Profil',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name='account' color={'#729c44'} size={45} />
-            ),
-            tabBarActiveTintColor: 'green',
-          }}
-        />
-      </Tab.Navigator>
+          <Tab.Screen 
+            name="Üretici" 
+            component={UreticiMyProducts}
+            options={{
+              tabBarLabel: 'Ürünler',
+              tabBarIcon: ({ color, size, focused }) => (
+                <MaterialCommunityIcons name='food-apple' color={focused ? '#729c44' : 'gray'} size={50} />
+              ),
+              tabBarActiveTintColor: 'green',
+            }}
+          />
+          <Tab.Screen 
+            name="AddProduct" 
+            component={AddProduct}
+            options={{
+              tabBarLabel: '',
+              tabBarIcon: ({ color, size, focused }) => (
+                <View
+                  style={{
+                    width: 90,
+                    height: 90,
+                    borderRadius: 90,
+                    backgroundColor: focused ? '#fff' : '#729c44', // Change the background color as needed
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginTop: -20 // Adjust this value according to your need
+                  }}
+                >
+                  <MaterialCommunityIcons name='plus-circle-outline' color={focused ? '#729c44' : '#fff'} size={80} />
+                </View>
+              ),
+          
+            }}
+          />
+          <Tab.Screen 
+            name="Profile" 
+            component={ProfileScreen}
+            options={{
+              tabBarLabel: 'Profil',
+              tabBarIcon: ({ color, size, focused }) => (
+                <MaterialCommunityIcons name='account' color={focused ? '#729c44' : 'gray'} size={55} />
+              ),
+              tabBarActiveTintColor: '#729c44',
+            }}
+          />
+        </Tab.Navigator>
+        </>
+      )}
+
 
       {/* Verification modal */}
       <Modal
@@ -206,7 +237,7 @@ const UreticiScreen = () => {
             <TouchableOpacity style={{alignItems:'center', marginHorizontal:100, borderWidth:1, borderRadius:7, borderColor: '#377d38' , backgroundColor:'#729c44', margin:15}} onPress={handleAddVerification}>
               <Text style={{margin:7, color:'white', fontSize:18}}>KAYDET</Text>
             </TouchableOpacity>
-
+            
           </View>
         </View>
       </Modal>
@@ -227,7 +258,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 5, 
   },
-
   heading: {
     fontSize: 30,
     fontWeight: 'bold',

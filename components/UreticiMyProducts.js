@@ -33,14 +33,7 @@ const UreticiMyProducts = () => {
   const handleProductPress = (productId) => {
     navigation.navigate('SingleProduct', { productId: productId });
   };
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 5000); // 5 saniye
 
-    return () => clearTimeout(timer);
-  }, []);
 
   const renderProductItem = ({ item }) => (
     <TouchableOpacity style={styles.urunler} onPress={() => handleProductPress(item._id)}>
@@ -58,10 +51,7 @@ const UreticiMyProducts = () => {
 
   return (
     <View style={styles.welcome}>
-      {loading ? (
-        <Loading/>
-      ) : (
-        <>
+      
           <Text style={{ textAlign: 'left', fontWeight: 200, fontSize: 30, fontStyle: 'italic' }}>Hoşgeldin
             <Text style={{ textAlign: 'left', fontWeight: 800, fontSize: 30, fontStyle: 'normal' }}>  ÜRETİCİ,</Text>
           </Text>
@@ -79,8 +69,7 @@ const UreticiMyProducts = () => {
             keyExtractor={(item) => item._id.toString()}
             numColumns={2}
           />
-        </>
-      )}
+      
     </View>
   );
 }
@@ -93,7 +82,8 @@ const styles = StyleSheet.create({
   },
   welcome:{
     flex:1,
-    margin:15,
+    marginTop:15,
+    marginHorizontal:15
   },
   butons:{
     margin:10,

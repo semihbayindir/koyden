@@ -38,6 +38,7 @@ const AllProducts = () => {
 
   const renderProductItem = ({ item }) => {
     return (
+    
       <TouchableOpacity style={styles.urunler} onPress={() => handleProductPress(item._id)}>
         {item.images && item.images.length > 0 ? (
           <Image style={styles.images} source={{ uri: item.images[0] }} /> 
@@ -52,6 +53,7 @@ const AllProducts = () => {
           </View>
         </View>
       </TouchableOpacity>
+  
     );
   };
   
@@ -59,10 +61,7 @@ const AllProducts = () => {
 
   return (
     <View style={styles.welcome}>
-      {loading ? (
-        <Loading/>
-      ) : (
-        <>
+      
           <Text style={{textAlign:'left', fontWeight:200, fontSize:30, fontStyle:'italic'}}>Hoşgeldin
             <Text style={{textAlign:'left', fontWeight:800, fontSize:30, fontStyle:'normal'}}>  TÜKETİCİ,</Text>
           </Text>
@@ -94,8 +93,7 @@ const AllProducts = () => {
               numColumns={2}
             />
           )}
-        </>
-      )}
+      
     </View>
   );
 }  
@@ -108,7 +106,8 @@ const AllProducts = () => {
     },
     welcome:{
       flex:1,
-      margin:15,
+      marginTop:15,
+      marginHorizontal:15
     },
     butons:{
       margin:10,
