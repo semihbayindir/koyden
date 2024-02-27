@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import Loading from './Loading';
+import Loading from './loadings/Loading';
 
   const HomeScreen = () => {
   const navigation = useNavigation();
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   },
   cardGray: {
     backgroundColor: '#d6d7cf',
-    marginBottom: 15,
+    marginBottom: 80,
     marginLeft: '5%',
     width: '90%',
     shadowColor: '#000',

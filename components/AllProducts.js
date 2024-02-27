@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useUserIdDecoder } from './UserIdDecoder';
 import SearchBar from './SearchBar';
 import { fuzzySearch } from './FuzzySearch';
-import Loading from '../screens/Loading';
+
 
 
 const AllProducts = () => {

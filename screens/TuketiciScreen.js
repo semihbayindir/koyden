@@ -8,7 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 import { decode as atob } from 'base-64';
 import { Text, View, Modal, TextInput, Button, StyleSheet } from 'react-native';
-import Loading from './Loading';
+import Loading from './loadings/Loading';
 import Cart from '../components/Cart';
 
 
