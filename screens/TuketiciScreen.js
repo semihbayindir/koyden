@@ -12,6 +12,7 @@ import Loading from './Loading';
 import Cart from '../components/Cart';
 
 
+
 const Tab = createBottomTabNavigator();
 const UreticiScreen = () => {
   const [verificationData, setVerificationData] = useState(null);
@@ -40,6 +41,13 @@ const UreticiScreen = () => {
   
     fetchUsers();
   }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000); // 3 saniye
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -52,9 +60,10 @@ const UreticiScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       {loading ? (
-        <View style={{alignContent:'center',marginTop:300}}><Loading/></View>
-      ) : (
-        <>
+
+      <Loading/>
+    ) : (
+      <>
       <Tab.Navigator 
   screenOptions={{ headerShown: false, tabBarStyle: { height:90 ,backgroundColor: '#e2eed6' } }}
 >
@@ -85,6 +94,7 @@ const UreticiScreen = () => {
             alignItems: 'center',
             marginTop: -20 // Adjust this value according to your need
           }}
+
         >
           <MaterialCommunityIcons name='cart-variant' color={focused ? '#729c44' : '#fff'} size={60} />
         </View>
@@ -105,6 +115,7 @@ const UreticiScreen = () => {
   />
 </Tab.Navigator>
 </>
+
       )}
     </View>
   );

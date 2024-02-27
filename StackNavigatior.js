@@ -94,7 +94,9 @@ const StackNavigator = () => {
     headerBackTitle: '‎',
     headerLeft: () => (
       <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+
         <Ionicons name="chevron-back" size={34} color="#fff" />
+
       </TouchableOpacity>
     ),
     headerStyle: {

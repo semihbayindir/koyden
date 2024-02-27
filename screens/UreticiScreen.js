@@ -85,20 +85,25 @@ const UreticiScreen = () => {
     }
   };
 
-  useEffect(() => {
+
+ useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 3000); // 5 saniye
+    }, 3000); // 3 saniye
+
 
     return () => clearTimeout(timer);
   }, []);
 
   return (
+    
     <View style={{ flex: 1 }}>
       {loading ? (
-        <View style={{alignContent:'center',marginTop:200}}><Loading/></View>
-      ) : (
-        <>
+
+      <Loading/>
+    ) : (
+      <>
+
       <Tab.Navigator 
         screenOptions={{ headerShown: false, tabBarStyle: { height:90, backgroundColor: '#e2eed6' } }}
         
@@ -151,6 +156,7 @@ const UreticiScreen = () => {
         </Tab.Navigator>
         </>
       )}
+
 
       {/* Verification modal */}
       <Modal
@@ -231,7 +237,7 @@ const UreticiScreen = () => {
             <TouchableOpacity style={{alignItems:'center', marginHorizontal:100, borderWidth:1, borderRadius:7, borderColor: '#377d38' , backgroundColor:'#729c44', margin:15}} onPress={handleAddVerification}>
               <Text style={{margin:7, color:'white', fontSize:18}}>KAYDET</Text>
             </TouchableOpacity>
-
+            
           </View>
         </View>
       </Modal>

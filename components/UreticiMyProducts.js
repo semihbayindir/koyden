@@ -58,10 +58,7 @@ const UreticiMyProducts = () => {
 
   return (
     <View style={styles.welcome}>
-      {loading ? (
-        <Loading/>
-      ) : (
-        <>
+      
           <Text style={{ textAlign: 'left', fontWeight: 200, fontSize: 30, fontStyle: 'italic' }}>Hoşgeldin
             <Text style={{ textAlign: 'left', fontWeight: 800, fontSize: 30, fontStyle: 'normal' }}>  ÜRETİCİ,</Text>
           </Text>
@@ -79,8 +76,7 @@ const UreticiMyProducts = () => {
             keyExtractor={(item) => item._id.toString()}
             numColumns={2}
           />
-        </>
-      )}
+      
     </View>
   );
 }

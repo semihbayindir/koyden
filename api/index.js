@@ -405,6 +405,29 @@ app.put('/orders/update/:orderId', async (req, res) => {
   }
 });
 
+// Ürünü sepette bulunan kullanıcının sepetinden silmek için DELETE isteği
+app.delete('/cart/:userId/product/:productId', async (req, res) => {
+  const userId = req.params.userId;
+  const productId = req.params.productId;
+  try {
+    let cart = await Cart.findOne({ userId: userId });
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found' });
+    }
+    const productIndex = cart.products.findIndex(item => item.productId === productId);
+    if (productIndex === -1) {
+      return res.status(404).json({ message: 'Product not found in cart' });
+    }
+    // Ürünü sepetten kaldır
+    cart.products.splice(productIndex, 1);
+    await cart.save();
+    res.status(200).json(cart);
+  } catch (error) {
+    console.error('Error deleting product from cart:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 
 
 
