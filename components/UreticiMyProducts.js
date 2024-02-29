@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { useUserIdDecoder } from './UserIdDecoder';
-import Loading from '../screens/Loading';
+
 
 
 const UreticiMyProducts = () => {
@@ -33,14 +33,7 @@ const UreticiMyProducts = () => {
   const handleProductPress = (productId) => {
     navigation.navigate('SingleProduct', { productId: productId });
   };
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 3000); // 5 saniye
 
-    return () => clearTimeout(timer);
-  }, []);
 
   const renderProductItem = ({ item }) => (
     <TouchableOpacity style={styles.urunler} onPress={() => handleProductPress(item._id)}>
@@ -89,7 +82,8 @@ const styles = StyleSheet.create({
   },
   welcome:{
     flex:1,
-    margin:15,
+    marginTop:15,
+    marginHorizontal:15
   },
   butons:{
     margin:10,

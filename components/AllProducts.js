@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useUserIdDecoder } from './UserIdDecoder';
 import SearchBar from './SearchBar';
 import { fuzzySearch } from './FuzzySearch';
-import Loading from '../screens/Loading';
+
 
 
 const AllProducts = () => {
@@ -106,7 +106,8 @@ const AllProducts = () => {
     },
     welcome:{
       flex:1,
-      margin:15,
+      marginTop:15,
+      marginHorizontal:15
     },
     butons:{
       margin:10,

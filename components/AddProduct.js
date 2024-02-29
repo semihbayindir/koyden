@@ -5,7 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useUserIdDecoder } from './UserIdDecoder';
-import Loading from '../screens/Loading';
+
 import { useNavigation } from '@react-navigation/native'; // React Navigation'ın useNavigation hook'u
 
 
@@ -141,8 +141,6 @@ const AddProduct = () => {
           <ScrollView style={styles.modalContainer}>
              <Text style={{textAlign:'left', fontSize:32, fontWeight:700, paddingTop:12}} >Yeni Bir Ürün Ekleyin</Text>
                   
-          
-  
             <TouchableOpacity style={{ marginTop:15,
               padding:9,
               fontSize:22,
@@ -157,9 +155,7 @@ const AddProduct = () => {
               <Text style={{marginTop:5}}>Ürün Fotoğrafı Ekleyin</Text>
               
             </TouchableOpacity>
-  
-            
-  
+       
             <TextInput
               style={styles.input}
               placeholder="Ürün Adı"

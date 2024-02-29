@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import Loading from './Loading';
+import Loading from './loadings/Loading';
 
   const HomeScreen = () => {
   const navigation = useNavigation();
@@ -16,6 +16,7 @@ import Loading from './Loading';
   return (
 <>
     {loading ? (
+
         <View style={{alignContent:'center',marginTop:200}}><Loading/></View>
       ) : (
         <>
