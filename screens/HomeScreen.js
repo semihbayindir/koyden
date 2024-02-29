@@ -51,8 +51,7 @@ import Loading from './loadings/Loading';
 const styles = StyleSheet.create({
   container: {
     backgroundColor:'#f9fbe5',
-    height:'100%',
-    justifyContent:'center'
+    flex:1
   },
   roleTitle: {
     paddingLeft:20,
@@ -62,10 +61,11 @@ const styles = StyleSheet.create({
   },
   cardWhite: {
     backgroundColor: '#fff',
-    marginBottom: 15,
-    marginTop:15,
+    marginBottom: '3%',
     marginLeft: '5%',
+    marginTop:7,
     width: '90%',
+    height: '31%',
     shadowColor: '#000',
     borderRadius: 30,
     padding: 10,
@@ -73,28 +73,34 @@ const styles = StyleSheet.create({
   },
   cardGreen: {
     backgroundColor: '#cde8b5',
-    marginBottom: 15,
+    marginBottom: '3%',
     marginLeft: '5%',
+    height: '31%',
     width: '90%',
     shadowColor: '#000',
     borderRadius: 30,
-    padding: 10,
-    overflow: 'hidden'
+    padding: 5,
+    overflow: 'hidden',
+    
   },
   cardGray: {
     backgroundColor: '#d6d7cf',
     marginLeft: '5%',
     width: '90%',
+    marginBottom: '3%',
     shadowColor: '#000',
+    height: '31%',
     borderRadius: 30,
     padding: 10,
     overflow: 'hidden',
   },
   roleImage: {
-    width: '100%',
-    height: 180,
+    width: '90%',
+    height: undefined,
+    aspectRatio: 16/9,
     resizeMode: 'cover',
-    overflow: 'visible'
+    overflow: 'visible',
+    marginLeft:15
   },
 });
 
