@@ -113,14 +113,17 @@ const Map = () => {
                   const address = `${district}, Turkey`;
                   const coordinates = await getCoordinatesFromAddress(address);
                   if (coordinates) {
-                    allCoordinates.push(coordinates);
-                  }
+                  
+                    if (!allCoordinates.some(coord => coord.latitude === coordinates.latitude && coord.longitude === coordinates.longitude)) {
+                      allCoordinates.push(coordinates);
+                    }                  }
                 }
               }
             }
           }
           // Tüm koordinatları aldıktan sonra marker'ları güncelle
           setMarkers(allCoordinates.map((coordinate, index) => ({ id: index, coordinate })));
+          console.log(markers)
         }
       } catch (error) {
         console.error('Error fetching producer information:', error);
