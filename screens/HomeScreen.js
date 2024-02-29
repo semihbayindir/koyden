@@ -14,12 +14,11 @@ import Loading from './Loading';
   })
 
   return (
-    <ScrollView style={styles.container} >
-      {loading ? (
+<>
+    {loading ? (
         <View style={{alignContent:'center',marginTop:200}}><Loading/></View>
       ) : (
         <>
-    <View style={{backgroundColor:'#f9fbe5'}}>
     <View style={styles.container}>
       <Pressable style={styles.cardWhite}
       onPress={() => navigation.navigate("Uretici")}
@@ -42,17 +41,17 @@ import Loading from './Loading';
         <Image style={styles.roleImage} source={require("../assets/home/Trucking-Background-PNG.png")} />
       </Pressable>
     </View>
-    </View>
     </>
       )}
-    </ScrollView>
-    
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 15,
+    backgroundColor:'#f9fbe5',
+    height:'100%',
+    justifyContent:'center'
   },
   roleTitle: {
     paddingLeft:20,
@@ -63,6 +62,7 @@ const styles = StyleSheet.create({
   cardWhite: {
     backgroundColor: '#fff',
     marginBottom: 15,
+    marginTop:15,
     marginLeft: '5%',
     width: '90%',
     shadowColor: '#000',
@@ -82,7 +82,6 @@ const styles = StyleSheet.create({
   },
   cardGray: {
     backgroundColor: '#d6d7cf',
-    marginBottom: 15,
     marginLeft: '5%',
     width: '90%',
     shadowColor: '#000',
