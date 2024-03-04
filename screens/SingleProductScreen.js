@@ -1,7 +1,7 @@
 // SingleProductScreen.js
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView, Modal, StyleSheet, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, Modal, StyleSheet, Alert, TextInput, Button } from 'react-native';
 import axios from 'axios';
 import { useUserIdDecoder } from '../components/UserIdDecoder';
 import UpdateProduct from '../components/UpdateProduct';
@@ -10,9 +10,11 @@ import { useNavigation } from '@react-navigation/native'; // React Navigation'ı
 
 const SingleProductScreen = ({ route }) => {
   const { productId } = route.params;
+  const userType = route.params.userType;
   const [product, setProduct] = useState(null);
   const [isUpdateModalVisible, setUpdateModalVisible] = useState(false);
   const userId = useUserIdDecoder();
+  const [priceOffer,setPriceOffer] = useState(null);
   
   const navigation = useNavigation(); 
 
@@ -87,6 +89,14 @@ const SingleProductScreen = ({ route }) => {
     });
   };
 
+  const handlePriceOfferChange = (price) =>{
+    setPriceOffer(price);
+  }
+
+  const handlePriceOffer = () => {
+
+  }
+
   if (!product) {
     return (
       <View>
@@ -128,26 +138,46 @@ const SingleProductScreen = ({ route }) => {
         </View>
       </View>
 
-      {/* Güncelleme ve Silme Butonları */}
-      {userId == product.producerId && (
+      {userType === 'tasiyici' && (
+      <>
+      <Text>  TAŞIYICI KISMI BURAYA GELECEK -- TEKLİF VER</Text>
+      <View style={styles.inputContainer}>
+      <TextInput
+      placeholder="Fiyat Teklifi"
+      onChangeText={handlePriceOfferChange}
+      value={priceOffer}
+      keyboardType="numeric"
+      style={styles.input}
+      />
+      <Text style={styles.currencySymbol}>₺</Text>
+      </View>      
+      <Button title="Fiyat Teklifi Ver" onPress={handlePriceOffer} />
+      </>
+      )}
+      
+
+      {userType !== 'tasiyici' && (
+        <>
+        {userId == product.producerId && (
         <TouchableOpacity style={styles.button} onPress={toggleUpdateModal}>
           <Text style={{ color: 'white', fontSize:22 }}>Güncelle</Text>
         </TouchableOpacity>
       )}
 
-      {userId == product.producerId && (
+        {userId == product.producerId && (
         <TouchableOpacity style={styles.button} onPress={handleDeleteProduct}>
           <Text style={{ color: 'white', fontSize:22 }}>Sil</Text>
         </TouchableOpacity>
       )}
 
       {/* Sepete Ekle Butonu */}
-      {userId !== product.producerId && (
+        {userId !== product.producerId && (
         <TouchableOpacity style={styles.button} onPress={handleAddToCart}>
           <Text style={{ color: 'white', fontSize:22 }}>Sepete Ekle</Text>
         </TouchableOpacity>
       )}
-
+        </>
+      )}
       {/* Güncelleme Modalı */}
       <Modal visible={isUpdateModalVisible} animationType="slide">
         <UpdateProduct
@@ -183,7 +213,25 @@ const styles = StyleSheet.create({
     fontWeight:'700',
     marginTop:15, 
     marginLeft:15
-  }
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    paddingVertical: 10,
+  },
+  currencySymbol: {
+    marginLeft: 10,
+    fontSize: 25,
+    fontWeight: 'bold',
+    
+  },
 });
 
 export default SingleProductScreen;

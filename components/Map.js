@@ -16,6 +16,7 @@ import {
 // import Constants from "expo-constants";
 import MapViewDirections from "react-native-maps-directions";
 import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -57,6 +58,7 @@ function InputAutocomplete({
 }
 
 const Map = () => {
+  const navigation = useNavigation();
   const [origin, setOrigin] = useState(null);
   const [destination, setDestination] = useState(null);
   const [showDirections, setShowDirections] = useState(false);
@@ -249,6 +251,10 @@ function calculateDistance(coord1, coord2) {
       setSelectedMarker(marker); // Seçili marker'ı state'e ata
     };
 
+    const handleProductPress = (productId) => {
+      navigation.navigate('SingleProduct', { userType :'tasiyici', productId: productId  });
+    };
+
   return (
     <View style={styles.container}>
       <MapView
@@ -318,6 +324,8 @@ function calculateDistance(coord1, coord2) {
             <Text>{`Product ${productIndex + 1}`}</Text>
             <Text>{`Product Name: ${product.productId.name}`}</Text>
             <Text>{`Product Price: ${product.price}`}</Text>
+            <Text>{`Product Id: ${product.productId._id}`}</Text>
+            <Button title="Ürün Sayfası" onPress={() => handleProductPress(product.productId._id)} />
           </View>
         ))}
         <Button title="Close" onPress={() => setSelectedMarker(null)} />
