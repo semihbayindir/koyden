@@ -12,7 +12,7 @@ const Orders = () => {
 
   useEffect(() => {
     if (userId) {
-      axios.get(`http://localhost:8000/orders/${userId}`)
+      axios.get(`http://localhost:8000/singleOrders/${userId}`)
         .then(response => {
           setOrders(response.data);
         })

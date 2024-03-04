@@ -18,7 +18,6 @@ const Cart = () => {
                     if (response.data && response.data.products) {
                         const groupedCartItems = groupCartItems(response.data.products);
                         setCartItems(groupedCartItems);
-                        console.log(cartItems[0].productId)
                         logProducerIds(groupedCartItems); // Üretici ID'lerini konsola yazdır
                     } else {
                         setCartItems([]);
@@ -89,6 +88,52 @@ const Cart = () => {
     );
     const handleOrder = async () => {
         try {
+            const orders = {}; // Her üretici için bir sipariş nesnesi oluşturmak için kullanılacak bir nesne
+    
+            // Sepetteki her ürün için döngü
+            cartItems.forEach(item => {
+                const producerId = item.productId.producerId;
+    
+                // Eğer bu üretici için bir sipariş nesnesi yoksa oluştur
+                if (!orders[producerId]) {
+                    orders[producerId] = {
+                        userId: userId,
+                        producerId: producerId,
+                        products: [],
+                        totalPrice: 0, // Başlangıçta toplam fiyatı sıfır olarak ayarla
+                        from: from,
+                        to: to
+                    };
+                }
+    
+                // Ürünü bu üreticiye ait siparişe ekle
+                orders[producerId].products.push({
+                    productId: item.productId._id,
+                    quantity: item.quantity,
+                    price: item.productId.price
+                });
+    
+                // Toplam fiyata ürünün fiyatını ekle
+                orders[producerId].totalPrice += item.quantity * item.productId.price;
+            });
+    
+            // Oluşturulan siparişleri gönder
+            for (const producerId in orders) {
+                const orderData = orders[producerId];
+                const response = await axios.post('http://localhost:8000/orders/create', orderData);
+                console.log('Order placed successfully:', response.data);
+            }
+            handleSingleOrder();
+            // Sepeti temizle
+            await axios.delete(`http://localhost:8000/cart/${userId}`);
+            setCartItems([]);
+        } catch (error) {
+            console.error('Error placing order:', error);
+        }
+    };
+
+    const handleSingleOrder = async () => {
+        try {
             // Tüm ürünleri ve toplam fiyatı içeren bir liste oluştur
             const products = cartItems.map(item => ({
                 productId: item.productId._id,
@@ -109,17 +154,12 @@ const Cart = () => {
             };
         
             // Sipariş oluştur
-            const response = await axios.post('http://localhost:8000/orders/create', orderData);
-            console.log('Order placed successfully:', response.data);
-            // İşlem tamamlandıktan sonra uygun bir şekilde yönlendirme veya bildirim yapılabilir
-            // Sipariş verildikten sonra sepeti boşalt
-            await axios.delete(`http://localhost:8000/cart/${userId}`);
-            setCartItems([]);
+            const response = await axios.post('http://localhost:8000/singleOrders/create', orderData);
+            console.log('singleOrder placed successfully:', response.data);
         } catch (error) {
-            console.error('Error placing order:', error);
+            console.error('Error placing singleOrder:', error);
         }
     };
-
 
     cartItems.length > 0 && cartItems.map((cartItem, index) => {
         return (
