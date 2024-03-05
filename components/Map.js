@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   Button,
+  TextInput
 } from "react-native";
 import {
   GooglePlacesAutocomplete,
@@ -69,6 +70,7 @@ const Map = () => {
   const [stopFetchingOrders, setStopFetchingOrders] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState(null); // Seçili marker'ı saklamak için state
   const [selectedMarkerInfo, setSelectedMarkerInfo] = useState([])
+  const [offer,setOffer] = useState();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -249,6 +251,10 @@ function calculateDistance(coord1, coord2) {
       setSelectedMarker(marker); // Seçili marker'ı state'e ata
     };
 
+    const handleOffer = () => {
+      
+    }
+
   return (
     <View style={styles.container}>
       <MapView
@@ -320,6 +326,13 @@ function calculateDistance(coord1, coord2) {
             <Text>{`Product Price: ${product.price}`}</Text>
           </View>
         ))}
+        <TextInput 
+        style={styles.offerInput}
+        value={offer}
+        onChangeText={(offer) => setOffer(offer)}
+        placeholder="Teklif Ver."
+        keyboardType="numeric"/>
+        <Button title="Teklif Yap"/>
         <Button title="Close" onPress={() => setSelectedMarker(null)} />
       </>
     )}
@@ -385,7 +398,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 3,
-  }
+  },
+  offerInput: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+  },
 });
 
 export default Map;
