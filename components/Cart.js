@@ -9,6 +9,8 @@ const Cart = () => {
     const userId = useUserIdDecoder();
     const [from,setFrom] = useState('Sakarya');
     const [to,setTo] = useState('İstanbul');
+    const [offer,setOffer] = useState(0);
+    const [isOfferAccept, setIsOfferAccept] = useState(false);
     
     useEffect(() => {
         if (userId) {
@@ -18,6 +20,7 @@ const Cart = () => {
                     if (response.data && response.data.products) {
                         const groupedCartItems = groupCartItems(response.data.products);
                         setCartItems(groupedCartItems);
+
                         logProducerIds(groupedCartItems); // Üretici ID'lerini konsola yazdır
                     } else {
                         setCartItems([]);
@@ -88,49 +91,62 @@ const Cart = () => {
     );
     const handleOrder = async () => {
         try {
-            const orders = {}; // Her üretici için bir sipariş nesnesi oluşturmak için kullanılacak bir nesne
+
+            // Üretici bazında ürünleri gruplamak için bir obje kullanacağız
+            const groupedProducts = {};
     
-            // Sepetteki her ürün için döngü
+            // Sepetteki her ürün için
             cartItems.forEach(item => {
+                const productId = item.productId._id;
                 const producerId = item.productId.producerId;
     
-                // Eğer bu üretici için bir sipariş nesnesi yoksa oluştur
-                if (!orders[producerId]) {
-                    orders[producerId] = {
-                        userId: userId,
-                        producerId: producerId,
-                        products: [],
-                        totalPrice: 0, // Başlangıçta toplam fiyatı sıfır olarak ayarla
-                        from: from,
-                        to: to
-                    };
+                // Üretici bazında ürünleri grupla
+                if (!groupedProducts[producerId]) {
+                    // Üretici ID'si henüz gruplanmamışsa, yeni bir grup oluştur
+                    groupedProducts[producerId] = [];
                 }
     
-                // Ürünü bu üreticiye ait siparişe ekle
-                orders[producerId].products.push({
-                    productId: item.productId._id,
+                // Ürünü ilgili üretici grubuna ekle
+                groupedProducts[producerId].push({
+                    productId: productId,
                     quantity: item.quantity,
                     price: item.productId.price
                 });
-    
-                // Toplam fiyata ürünün fiyatını ekle
-                orders[producerId].totalPrice += item.quantity * item.productId.price;
             });
     
-            // Oluşturulan siparişleri gönder
-            for (const producerId in orders) {
-                const orderData = orders[producerId];
+            // Her bir üretici için ayrı sipariş oluştur
+            for (const producerId of Object.keys(groupedProducts)) {
+                const products = groupedProducts[producerId];
+                const totalPrice = products.reduce((total, item) => total + (item.price * item.quantity), 0);
+    
+                // Sipariş veri modeli
+                const orderData = {
+                    userId: userId,
+                    producerId: producerId,
+                    products: products,
+                    totalPrice: totalPrice,
+                    offer: offer,
+                    isOfferAccept: isOfferAccept,
+                    from: from,
+                    to: to
+                };
+    
+                // Sipariş oluştur
                 const response = await axios.post('http://localhost:8000/orders/create', orderData);
-                console.log('Order placed successfully:', response.data);
+                console.log('Order placed successfully for producer', producerId, ':', response.data);
             }
+    
+            // İşlem tamamlandıktan sonra uygun bir şekilde yönlendirme veya bildirim yapılabilir
+            // Sipariş verildikten sonra sepeti boşalt
             handleSingleOrder();
-            // Sepeti temizle
+
             await axios.delete(`http://localhost:8000/cart/${userId}`);
             setCartItems([]);
         } catch (error) {
             console.error('Error placing order:', error);
         }
     };
+
 
     const handleSingleOrder = async () => {
         try {
@@ -210,9 +226,9 @@ const Cart = () => {
                                     {/* Diğer ürün bilgilerini buraya ekleyin */}
                                 </View>
                             ))}
-                            <TouchableOpacity onPress={() => handleDeleteCartItem(cartItem.productId._id)}>
+                            {/* <TouchableOpacity onPress={() => handleDeleteCartItem(cartItem.productId._id)}>
                                 <Text style={{ color: 'red', marginLeft: 20, marginTop: 10 }}>Sepetten Kaldır</Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                         </View>
                     ))
                 ) : (

@@ -18,7 +18,7 @@ category: {
     required: true 
 },
 qty: { 
-    type: Number,
+    type: String,
     required: true 
 },
 minQty: { 
