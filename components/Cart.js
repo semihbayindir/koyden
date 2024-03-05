@@ -20,7 +20,7 @@ const Cart = () => {
                     if (response.data && response.data.products) {
                         const groupedCartItems = groupCartItems(response.data.products);
                         setCartItems(groupedCartItems);
-                        // console.log(cartItems[0].productId)
+
                         logProducerIds(groupedCartItems); // Üretici ID'lerini konsola yazdır
                     } else {
                         setCartItems([]);
@@ -91,6 +91,7 @@ const Cart = () => {
     );
     const handleOrder = async () => {
         try {
+
             // Üretici bazında ürünleri gruplamak için bir obje kullanacağız
             const groupedProducts = {};
     
@@ -138,13 +139,15 @@ const Cart = () => {
             // İşlem tamamlandıktan sonra uygun bir şekilde yönlendirme veya bildirim yapılabilir
             // Sipariş verildikten sonra sepeti boşalt
             handleSingleOrder();
+
             await axios.delete(`http://localhost:8000/cart/${userId}`);
             setCartItems([]);
         } catch (error) {
             console.error('Error placing order:', error);
         }
     };
-    
+
+
     const handleSingleOrder = async () => {
         try {
             // Tüm ürünleri ve toplam fiyatı içeren bir liste oluştur

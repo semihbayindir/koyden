@@ -348,6 +348,39 @@ app.delete('/cart/:userId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+const SingleOrder = require('./models/singleOrder');
+app.post('/singleOrders/create', async (req, res) => {
+  try {
+    const { userId, producerId, products, totalPrice, from, to } = req.body;
+
+    const newOrder = new SingleOrder({
+      userId,
+      producerId,
+      products,
+      totalPrice,
+      from,
+      to
+    });
+
+    const savedOrder = await newOrder.save();
+
+    res.status(201).json(savedOrder);
+  } catch (error) {
+    console.error('Error creating order:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+app.get('/singleOrders/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const orders = await SingleOrder.find({ userId }).populate('products.productId');
+    res.json(orders);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
 
 const SingleOrder = require('./models/singleOrder');
 app.post('/singleOrders/create', async (req, res) => {
