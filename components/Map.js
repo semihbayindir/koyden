@@ -254,9 +254,18 @@ function calculateDistance(coord1, coord2) {
     };
 
 
-    const handleOffer = () => {
-      
-    }
+    const handleOffer = async () => {
+      try {
+        if (selectedMarker !== null) {
+          const orderId = orders[selectedMarker.id]._id; // Seçili markere göre siparişin ID'sini al
+          const response = await axios.put(`http://localhost:8000/orders/update/offer/${orderId}`, { offer });
+          console.log('Offer updated successfully:', response.data);
+        }
+      } catch (error) {
+        console.error('Error updating offer:', error);
+      }
+    };
+    
 
 
   return (
@@ -338,7 +347,7 @@ function calculateDistance(coord1, coord2) {
         onChangeText={(offer) => setOffer(offer)}
         placeholder="Teklif Ver."
         keyboardType="numeric"/>
-        <Button title="Teklif Yap"/>
+        <Button title="Teklif Yap" onPress={() => handleOffer()}/>
         <Button title="Close" onPress={() => setSelectedMarker(null)} />
       </>
     )}

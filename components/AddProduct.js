@@ -87,7 +87,6 @@ const AddProduct = () => {
             const timestamp = new Date().toISOString().replace(/:/g, '_');
             const fileName = `product_image_${timestamp}.jpg`;
 
-            const formattedQuantity = `${productQuantity} ${selectedUnit}`;
 
             formData.append('image', {
                 name: `product_image_${timestamp}.jpg`,
@@ -108,7 +107,8 @@ const AddProduct = () => {
                 description: productDescription,
                 images: [imageUrl], // AWS S3'den alınan URL
                 category: productCategory,
-                qty: formattedQuantity,
+                qty: productQuantity,
+                qtyFormat: selectedUnit,
                 minQty: minOrderQuantity,
                 price: unitPrice,
                 producerId: producerId
