@@ -162,9 +162,9 @@ const Product = require("./models/product");
 
 // ÜRÜN EKLEME
 app.post("/products", (req, res) => {
-  const { name, description, images, category, qty, minQty, price,producerId } = req.body;
+  const { name, description, images, category, qty, qtyFormat, minQty, price,producerId } = req.body;
 
-  const newProduct = new Product({ name, description, images, category, qty, minQty, price,producerId  });
+  const newProduct = new Product({ name, description, images, category, qty, qtyFormat, minQty, price,producerId  });
 
   newProduct
     .save()
@@ -382,40 +382,6 @@ app.get('/singleOrders/:userId', async (req, res) => {
   }
 });
 
-const SingleOrder = require('./models/singleOrder');
-app.post('/singleOrders/create', async (req, res) => {
-  try {
-    const { userId, producerId, products, totalPrice, from, to } = req.body;
-
-    const newOrder = new SingleOrder({
-      userId,
-      producerId,
-      products,
-      totalPrice,
-      from,
-      to
-    });
-
-    const savedOrder = await newOrder.save();
-
-    res.status(201).json(savedOrder);
-  } catch (error) {
-    console.error('Error creating order:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
-});
-
-app.get('/singleOrders/:userId', async (req, res) => {
-  const userId = req.params.userId;
-  try {
-    const orders = await SingleOrder.find({ userId }).populate('products.productId');
-    res.json(orders);
-  } catch (error) {
-    console.error('Error fetching orders:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
-});
-
 const Order = require('./models/order');
 //Sipariş Oluşturma (Tüketici tarafı):
 app.post('/orders/create', async (req, res) => {
@@ -475,6 +441,29 @@ app.put('/orders/update/:orderId', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+app.put('/orders/update/offer/:orderId', async (req, res) => {
+  const orderId = req.params.orderId;
+  const { offer } = req.body;
+  try {
+    const updatedOrder = await Order.findByIdAndUpdate(orderId, { offer }, { new: true });
+    res.json(updatedOrder);
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+app.put('/orders/update/isOfferAccept/:orderId', async (req, res) => {
+  const orderId = req.params.orderId;
+  const { isOfferAccept } = req.body;
+  try {
+    const updatedOrder = await Order.findByIdAndUpdate(orderId, { isOfferAccept }, { new: true });
+    res.json(updatedOrder);
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 //Tüm siparişleri getirme
 app.get("/orders", async (req, res) => {
   try {

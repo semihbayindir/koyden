@@ -12,7 +12,7 @@ const Orders = () => {
 
   useEffect(() => {
     if (userId) {
-      axios.get(`http://localhost:8000/singleOrders/${userId}`)
+      axios.get(`http://localhost:8000/orders/${userId}`)
         .then(response => {
           setOrders(response.data);
         })
@@ -53,7 +53,8 @@ const Orders = () => {
         <Text style={styles.orderText}>Total Price: {item.totalPrice} ₺</Text>
         <Text style={styles.orderText}>Order Date: {item.orderDate}</Text>
         <Text style={styles.orderText}>Status: {item.status}</Text>
-        
+        <Text style={styles.orderText}>Offer: {item.offer}</Text>
+      
         {item.products.map((product, index) => (
           <View key={`${product.productId}-${index}`}>
           <Text style={styles.orderText}>Ürün adı: {product.productId.name}</Text>
@@ -63,8 +64,29 @@ const Orders = () => {
             <Text style={styles.orderText}>Producer Id: {product.productId.producerId}</Text>
           </View>
         ))}
+
+        {item.offer > 0 && ( // Teklif 0'dan büyükse, kabul et ve reddet butonlarını göster
+        <View>
+          <TouchableOpacity style={styles.button} onPress={() => handleAcceptOffer(item._id)}>
+            <Text style={{ color: 'green' }}>Kabul Et</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => handleRejectOffer(item._id)}>
+            <Text style={{ color: 'red' }}>Reddet</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       </TouchableOpacity>
     );
+  };
+
+  const handleAcceptOffer = async (orderId) => {
+    const isOfferAccept = true;
+    try {
+        const response = await axios.put(`http://localhost:8000/orders/update/isOfferAccept/${orderId}`, { isOfferAccept });
+        console.log('Offer updated successfully:', response.data);
+      } catch (error) {
+      console.error('Error updating offer:', error);
+    }
   };
   
   return (

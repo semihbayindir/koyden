@@ -41,7 +41,7 @@ const UreticiMyProducts = () => {
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.name}</Text>
         <View style={styles.productDet}>
-          <Text style={styles.productQty}>{item.qty} kg</Text>
+          <Text style={styles.productQty}>{item.qty} {item.qtyFormat}</Text>
           <Text style={styles.productPrice}>{item.price} ₺</Text>
         </View>
       </View>

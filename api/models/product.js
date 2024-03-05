@@ -18,8 +18,12 @@ category: {
     required: true 
 },
 qty: { 
-    type: String,
+    type: Number,
     required: true 
+},
+qtyFormat:{
+    type: String,
+    required: true
 },
 minQty: { 
     type: Number,
