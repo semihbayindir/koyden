@@ -6,6 +6,8 @@ import axios from 'axios';
 import { useUserIdDecoder } from '../components/UserIdDecoder';
 import UpdateProduct from '../components/UpdateProduct';
 import { useNavigation } from '@react-navigation/native'; // React Navigation'ın useNavigation hook'u
+import ModalDropdown from 'react-native-modal-dropdown'; 
+
 
 
 const SingleProductScreen = ({ route }) => {
@@ -18,6 +20,17 @@ const SingleProductScreen = ({ route }) => {
   
   const navigation = useNavigation(); 
 
+
+
+  const [orderQuantity, setOrderQuantity] = useState('1'); // Sipariş miktarı state'i
+  const [quantityOptions, setQuantityOptions] = useState([]);
+
+  const handleOrderQuantityChange = (quantity) => {
+    setOrderQuantity(quantity);
+  };
+
+
+
   useEffect(() => {
     axios.get(`http://localhost:8000/products/${productId}`)
       .then(response => {
@@ -28,9 +41,26 @@ const SingleProductScreen = ({ route }) => {
       });
   }, [productId]);
 
+  useEffect(() => {
+    if (product) {
+      const stockQuantity = parseInt(product.qty); // Ürün stok miktarı
+      const options = Array.from({ length: stockQuantity }, (_, i) => (i + 1).toString()); // 1'den stok miktarına kadar olan sayıları oluştur
+      setQuantityOptions(options); // Seçenekleri güncelle
+    }
+  }, [product]);
+
+
+
+
 
   const handleAddToCart = async () => {
     try {
+
+
+       // Dropdown'dan seçilen miktarı al
+      const quantity = parseInt(orderQuantity);
+
+
       // Kullanıcının sepetini almak için GET isteği
       const cartResponse = await axios.get(`http://localhost:8000/cart/${userId}`);
       const userCart = cartResponse.data;
@@ -42,7 +72,8 @@ const SingleProductScreen = ({ route }) => {
           productId
         });
         const addToCartResponse = await axios.put(`http://localhost:8000/cart/add/${userId}`, {
-          productId
+          productId,
+          quantity
         });
         console.log('New cart created:', createCartResponse.data);
         console.log('Product added to cart:', addToCartResponse.data);
@@ -136,6 +167,19 @@ const SingleProductScreen = ({ route }) => {
           <Text style={styles.productHead}>Birim Fiyatı: </Text>
           <Text style={styles.productInfo}>{price} ₺</Text>
         </View>
+        <View style={styles.inputContainer}>
+        <Text style={{ fontSize: 22, fontWeight: 'bold' }}>Sipariş Miktarı:</Text>
+        <ModalDropdown
+          options={quantityOptions}
+          defaultValue={orderQuantity}
+          onSelect={(index, value) => handleOrderQuantityChange(value)}
+          style={{ fontSize: 22, marginBottom:5, marginLeft:10}}
+          textStyle={{ fontSize: 22, color: 'gray', borderWidth: 1, borderRadius: 10, padding: 9, backgroundColor:'white' }}
+          dropdownStyle={{ fontSize: 22, height: 200}}
+          dropdownTextStyle={{ fontSize: 22 }} 
+          dropdownTextHighlightStyle={{ color: 'green' }} 
+        />
+      </View>
       </View>
 
       {userType === 'tasiyici' && (
@@ -221,10 +265,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   input: {
-    flex: 1,
+    width:'20%',
     borderWidth: 1,
     borderColor: '#ccc',
     paddingVertical: 10,
+    backgroundColor:'white'
   },
   currencySymbol: {
     marginLeft: 10,

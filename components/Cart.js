@@ -3,6 +3,7 @@ import { Text, View, FlatList, Button, TouchableOpacity } from "react-native";
 import axios from "axios";
 import { useUserIdDecoder } from "./UserIdDecoder";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation } from '@react-navigation/native';
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -11,6 +12,8 @@ const Cart = () => {
     const [to,setTo] = useState('İstanbul');
     const [offer,setOffer] = useState(0);
     const [isOfferAccept, setIsOfferAccept] = useState(false);
+
+    const navigation = useNavigation(); 
     
     useEffect(() => {
         if (userId) {
@@ -34,6 +37,29 @@ const Cart = () => {
         }
     }, [userId]);
     
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            refreshCart(); // Ekran odaklandığında sepeti yenile
+        });
+    
+        // Component unmounted olduğunda listener'ı temizle
+        return unsubscribe;
+    }, [navigation]);
+    
+    const refreshCart = async () => {
+        try {
+            const response = await axios.get(`http://localhost:8000/cart/${userId}`);
+            if (response.data && response.data.products) {
+                const groupedCartItems = groupCartItems(response.data.products);
+                setCartItems(groupedCartItems);
+            } else {
+                setCartItems([]);
+            }
+        } catch (error) {
+            console.error('Error refreshing cart:', error);
+        }
+    };
 
 
 
