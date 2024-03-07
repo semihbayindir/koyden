@@ -44,7 +44,8 @@ const SingleProductScreen = ({ route }) => {
   useEffect(() => {
     if (product) {
       const stockQuantity = parseInt(product.qty); // Ürün stok miktarı
-      const options = Array.from({ length: stockQuantity }, (_, i) => (i + 1).toString()); // 1'den stok miktarına kadar olan sayıları oluştur
+      const minStock = parseInt(product.minQty);
+      const options = Array.from({ length: stockQuantity }, (_, i) => (i + minQty).toString()); // 1'den stok miktarına kadar olan sayıları oluştur
       setQuantityOptions(options); // Seçenekleri güncelle
     }
   }, [product]);
