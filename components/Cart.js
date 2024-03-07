@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, FlatList, Button, TouchableOpacity } from "react-native";
+import { Text, View, FlatList, Button, TouchableOpacity, Image } from "react-native";
 import axios from "axios";
 import { useUserIdDecoder } from "./UserIdDecoder";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
+import { isSearchBarAvailableForCurrentPlatform } from "react-native-screens";
+
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -135,7 +137,7 @@ const Cart = () => {
                 groupedProducts[producerId].push({
                     productId: productId,
                     quantity: cartItem.quantity, // Dropdown'dan alınan sipariş miktarını kullan
-                    price: cartItem.productId.price
+                    price: cartItem.productId.price,
                 });
     
                 // Ürün miktarını azalt
@@ -257,23 +259,28 @@ const Cart = () => {
     
     return (
         <View>
-            <Text style={{ fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }}>Sepet</Text>
+            <Text style={{ margin:'3%' ,textAlign: 'left', fontWeight: 800, fontSize: 30, fontStyle: 'normal' }}>Sepet</Text>
             <View>
                 {cartItems.length > 0 ? (
                     cartItems.map((cartItem, index) => (
-                        <View key={index} style={{ marginBottom: 20 }}>
-                            <Text style={{ fontWeight: 'bold' }}>Ürün Adı: {cartItem.productId.name}</Text>
-                            <Text>Miktar: {cartItem.quantity}</Text>
+                        <View style={{flexDirection:'row', borderWidth:1, borderRadius:20, marginHorizontal:'3%', marginVertical:'2%',backgroundColor:'#f9fbe5'}}>
+                        <View key={index} style={{ margin: '3%' ,flex:0.90, padding:9}}>
+                            <Text style={{ fontWeight: 'bold', fontSize:22 }}>{cartItem.productId.name}</Text>
+                            <Text style={{  fontSize:18 }}>Miktar: {cartItem.quantity} {cartItem.quantityFormat}</Text>
                             {/* Her bir cartItem içindeki ürünleri döngü kullanarak listeleyin */}
                             {cartItem.products && cartItem.products.map((product, productIndex) => (
-                                <View key={productIndex} style={{ marginLeft: 20 }}>
+                                <View key={productIndex} >
                                     <Text>Ürün Adı: {product.name}</Text>
+                                    
                                     {/* Diğer ürün bilgilerini buraya ekleyin */}
                                 </View>
                             ))}
-                            <TouchableOpacity onPress={() => handleDeleteCartItem(cartItem.productId._id)}>
-                                <Text style={{ color: 'red', marginLeft: 20, marginTop: 10 }}>Sepetten Kaldır</Text>
-                            </TouchableOpacity>
+                            </View>
+                            <View style={{flex:0.09,margin: '8%'}}>
+                                <TouchableOpacity onPress={() => handleDeleteCartItem(cartItem.productId._id)}>
+                                     <MaterialCommunityIcons name='delete' size={30} color={'red'}/>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     ))
                 ) : (
@@ -281,7 +288,7 @@ const Cart = () => {
                 )}
             </View>
             <TouchableOpacity style={{ backgroundColor: '#729c44', padding: 10, marginHorizontal: 50, marginTop: 10, borderRadius: 5, alignContent: 'center' }} onPress={handleOrder}>
-                <Text style={{ textAlign: 'center', color: 'white', fontSize: 18 }}>Sipariş Ver</Text>
+                <Text style={{ textAlign: 'center', color: 'white', fontSize: 22 }}>Sipariş Ver</Text>
             </TouchableOpacity>
         </View>
     );
