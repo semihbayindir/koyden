@@ -17,7 +17,7 @@ const SingleProductScreen = ({ route }) => {
   const [isUpdateModalVisible, setUpdateModalVisible] = useState(false);
   const userId = useUserIdDecoder();
   const [priceOffer,setPriceOffer] = useState(null);
-  
+  const [refreshFlag,setRefreshFlag] = useState(false);
   const navigation = useNavigation(); 
 
 
@@ -39,7 +39,7 @@ const SingleProductScreen = ({ route }) => {
       .catch(error => {
         console.error('Error fetching product:', error);
       });
-  }, [productId]);
+  }, [productId,refreshFlag]);
 
   useEffect(() => {
     if (product) {
@@ -55,16 +55,13 @@ const SingleProductScreen = ({ route }) => {
 
   const handleAddToCart = async () => {
     try {
-
-
-       // Dropdown'dan seçilen miktarı al
+      // Dropdown'dan seçilen miktarı al
       const quantity = parseInt(orderQuantity);
-
-
+  
       // Kullanıcının sepetini almak için GET isteği
       const cartResponse = await axios.get(`http://localhost:8000/cart/${userId}`);
       const userCart = cartResponse.data;
-      
+  
       // Eğer kullanıcının sepeti bulunamadıysa yeni bir sepet oluştur
       if (!userCart) {
         const createCartResponse = await axios.post(`http://localhost:8000/cart/create`, {
@@ -80,17 +77,19 @@ const SingleProductScreen = ({ route }) => {
         Alert.alert('Ürün sepete eklendi.')
         return;
       }
-      
+  
       // Kullanıcının sepetinde eklemek istediği ürünü ara
       const existingProductIndex = userCart.products.findIndex(product => product.productId === productId);
-      
+  
       // Eğer ürün sepete daha önce eklenmemişse, sepete ekle
       if (existingProductIndex === -1) {
         const addToCartResponse = await axios.put(`http://localhost:8000/cart/add/${userId}`, {
-          productId
+          productId,
+          quantity
         });
         console.log('Product added to cart:', addToCartResponse.data);
         Alert.alert('Ürün sepete eklendi.')
+        handleResetScreen();
       } else {
         Alert.alert('Ürün zaten sepetinizde bulunmaktadır.');
       }
@@ -98,6 +97,9 @@ const SingleProductScreen = ({ route }) => {
       console.error('Error adding product to cart:', error);
     }
   };
+  
+
+
   function toggleUpdateModal(){
     setUpdateModalVisible(!isUpdateModalVisible);
 
@@ -113,12 +115,9 @@ const SingleProductScreen = ({ route }) => {
       }
   };
 
-  const handleResetScreen = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Uretici' }], // Yeniden yüklemek istediğiniz ekranın adı
-    });
-  };
+const handleResetScreen = () => {
+    setRefreshFlag(prevState => !prevState);
+};
 
   const handlePriceOfferChange = (price) =>{
     setPriceOffer(price);
@@ -217,7 +216,7 @@ const SingleProductScreen = ({ route }) => {
       {/* Sepete Ekle Butonu */}
         {userId !== product.producerId && (
         <TouchableOpacity style={styles.button} onPress={handleAddToCart}>
-          <Text style={{ color: 'white', fontSize:22 }}>Sepete Ekle</Text>
+          <Text style={{ color: 'white', fontSize:22 , textAlign:'center',padding:10}}>Sepete Ekle</Text>
         </TouchableOpacity>
       )}
         </>
@@ -237,13 +236,11 @@ const SingleProductScreen = ({ route }) => {
 const styles = StyleSheet.create({
   button: {
     backgroundColor: '#729c44',
-    color: 'white',
-    textAlign: 'center',
-    padding: 10,
-    marginVertical: 5,
+    marginVertical: 9,
     borderRadius: 5,
-    marginHorizontal: 8,
-    marginTop: 15
+    marginHorizontal: '20%',
+    marginTop: 10,
+    marginBottom:20,
   },
   productInfo:{
     margin:10, 

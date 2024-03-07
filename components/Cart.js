@@ -38,14 +38,14 @@ const Cart = () => {
     }, [userId]);
     
 
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
-            refreshCart(); // Ekran odaklandığında sepeti yenile
-        });
+    // useEffect(() => {
+    //     const unsubscribe = navigation.addListener('focus', () => {
+    //         refreshCart(); // Ekran odaklandığında sepeti yenile
+    //     });
     
-        // Component unmounted olduğunda listener'ı temizle
-        return unsubscribe;
-    }, [navigation]);
+    //     // Component unmounted olduğunda listener'ı temizle
+    //     return unsubscribe;
+    // }, [navigation]);
     
     const refreshCart = async () => {
         try {
@@ -103,7 +103,7 @@ const Cart = () => {
 
     const logProducerIds = (items) => {
         items.forEach(item => {
-            console.log(item.productId.producerId); // Üretici ID'lerini konsola yazdır
+            // console.log(item.productId.producerId); // Üretici ID'lerini konsola yazdır
            
         });
     };
@@ -117,7 +117,9 @@ const Cart = () => {
     );
     const handleOrder = async () => {
         try {
-
+            // Dropdown'dan seçilen miktarı al
+            const orderQuantity = parseInt(orderQuantity);
+    
             // Üretici bazında ürünleri gruplamak için bir obje kullanacağız
             const groupedProducts = {};
     
@@ -135,7 +137,7 @@ const Cart = () => {
                 // Ürünü ilgili üretici grubuna ekle
                 groupedProducts[producerId].push({
                     productId: productId,
-                    quantity: item.quantity,
+                    quantity: orderQuantity, // Dropdown'dan alınan sipariş miktarını kullan
                     price: item.productId.price
                 });
             });
@@ -161,6 +163,8 @@ const Cart = () => {
                 const response = await axios.post('http://localhost:8000/orders/create', orderData);
                 console.log('Order placed successfully for producer', producerId, ':', response.data);
             }
+    
+    
     
             // İşlem tamamlandıktan sonra uygun bir şekilde yönlendirme veya bildirim yapılabilir
             // Sipariş verildikten sonra sepeti boşalt

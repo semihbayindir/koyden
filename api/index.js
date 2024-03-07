@@ -313,19 +313,20 @@ app.post('/cart/create', async (req, res) => {
 // Ürün eklemek için PUT isteği
 app.put('/cart/add/:userId', async (req, res) => {
   const { productId } = req.body;
+  const { quantity } = req.body;
   const userId = req.params.userId;
   try {
     let cart = await Cart.findOne({ userId: userId });
     if (!cart) {
       cart = new Cart({ userId: userId, products: [] });
     }
-    const existingProductIndex = cart.products.findIndex(item => item.productId === productId);
+    const existingProductIndex = cart.products.findIndex(item => item.productId === productId );
     if (existingProductIndex !== -1) {
       // Ürün sepette zaten var, miktarını arttır
       cart.products[existingProductIndex].quantity++;
     } else {
       // Yeni ürünü sepete ekle
-      cart.products.push({ productId: productId, quantity: 1 });
+      cart.products.push({ productId: productId, quantity: quantity });
     }
     await cart.save();
     res.status(200).json(cart);
