@@ -117,13 +117,11 @@ const Cart = () => {
     );
     const handleOrder = async () => {
         try {
-            // Dropdown'dan seçilen miktarı al
-            const orderQuantity = parseInt(orderQuantity);
-    
-            // Üretici bazında ürünleri gruplamak için bir obje kullanacağız
+
+
             const groupedProducts = {};
-    
-            // Sepetteki her ürün için
+            const orderIds = [];
+            // Sepetteki her ürün için            
             cartItems.forEach(item => {
                 const productId = item.productId._id;
                 const producerId = item.productId.producerId;
@@ -162,14 +160,16 @@ const Cart = () => {
                 // Sipariş oluştur
                 const response = await axios.post('http://localhost:8000/orders/create', orderData);
                 console.log('Order placed successfully for producer', producerId, ':', response.data);
+                orderIds.push({ orderId: response.data._id });
             }
-    
-    
-    
-            // İşlem tamamlandıktan sonra uygun bir şekilde yönlendirme veya bildirim yapılabilir
-            // Sipariş verildikten sonra sepeti boşalt
-            handleSingleOrder();
 
+
+
+            // SingleOrder oluşturma ve her bir orderId'yi ekleyerek kaydetme
+            console.log(orderIds)
+            await handleSingleOrder(orderIds);
+
+            // İşlem tamamlandıktan sonra uygun bir şekilde yönlendirme veya bildirim yapılabilir
             await axios.delete(`http://localhost:8000/cart/${userId}`);
             setCartItems([]);
         } catch (error) {
@@ -178,7 +178,7 @@ const Cart = () => {
     };
 
 
-    const handleSingleOrder = async () => {
+    const handleSingleOrder = async (orderIds) => {
         try {
             // Tüm ürünleri ve toplam fiyatı içeren bir liste oluştur
             const products = cartItems.map(item => ({
@@ -193,6 +193,7 @@ const Cart = () => {
             const orderData = {
                 userId: userId,
                 producerId: cartItems[0].productId.producerId, // İlk ürünün üreticisinin ID'si
+                orderIds: orderIds,
                 products: products,
                 totalPrice: totalPrice, // Sepetin toplam fiyatını hesapla
                 from: from,
