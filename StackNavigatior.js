@@ -16,6 +16,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { Ionicons } from '@expo/vector-icons';
 
 import TasiyiciScreen from "./screens/TasiyiciScreen";
+import OrderDetails from "./components/OrderDetails";
 
 
 
@@ -190,6 +191,21 @@ const StackNavigator = () => {
         <Stack.Screen
         name="UreticiMyProducts"
         component={UreticiMyProducts}
+        options={{
+          title: 'KÖYDEN',
+          headerBackTitle: '‎',
+          headerStyle: {
+            backgroundColor: '#729c44',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },        
+        }}
+        />
+        <Stack.Screen
+        name="OrderDetails"
+        component={OrderDetails}
         options={{
           title: 'KÖYDEN',
           headerBackTitle: '‎',
