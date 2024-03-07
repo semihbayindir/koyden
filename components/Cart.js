@@ -117,14 +117,13 @@ const Cart = () => {
     );
     const handleOrder = async () => {
         try {
-
-
             const groupedProducts = {};
             const orderIds = [];
-            // Sepetteki her ürün için            
-            cartItems.forEach(item => {
-                const productId = item.productId._id;
-                const producerId = item.productId.producerId;
+    
+            // Sepetteki her ürün için
+            for (const cartItem of cartItems) {
+                const productId = cartItem.productId._id;
+                const producerId = cartItem.productId.producerId;
     
                 // Üretici bazında ürünleri grupla
                 if (!groupedProducts[producerId]) {
@@ -135,10 +134,13 @@ const Cart = () => {
                 // Ürünü ilgili üretici grubuna ekle
                 groupedProducts[producerId].push({
                     productId: productId,
-                    quantity: orderQuantity, // Dropdown'dan alınan sipariş miktarını kullan
-                    price: item.productId.price
+                    quantity: cartItem.quantity, // Dropdown'dan alınan sipariş miktarını kullan
+                    price: cartItem.productId.price
                 });
-            });
+    
+                // Ürün miktarını azalt
+                await decreaseProductQuantity(productId, cartItem.quantity);
+            }
     
             // Her bir üretici için ayrı sipariş oluştur
             for (const producerId of Object.keys(groupedProducts)) {
@@ -162,13 +164,11 @@ const Cart = () => {
                 console.log('Order placed successfully for producer', producerId, ':', response.data);
                 orderIds.push({ orderId: response.data._id });
             }
-
-
-
+    
             // SingleOrder oluşturma ve her bir orderId'yi ekleyerek kaydetme
             console.log(orderIds)
             await handleSingleOrder(orderIds);
-
+    
             // İşlem tamamlandıktan sonra uygun bir şekilde yönlendirme veya bildirim yapılabilir
             await axios.delete(`http://localhost:8000/cart/${userId}`);
             setCartItems([]);
@@ -176,7 +176,20 @@ const Cart = () => {
             console.error('Error placing order:', error);
         }
     };
+    
 
+    // Ürün miktarını azaltan yardımcı fonksiyon
+    const decreaseProductQuantity = async (productId, quantityToDecrease) => {
+        try {
+            // Ürün miktarını azaltmak için istek gönder
+            const response = await axios.put(`http://localhost:8000/products/${productId}/decreaseQuantity`, {
+                quantityToDecrease: quantityToDecrease
+            });
+            console.log('Product quantity decreased successfully:', response.data);
+        } catch (error) {
+            console.error('Error decreasing product quantity:', error);
+        }
+    };
 
     const handleSingleOrder = async (orderIds) => {
         try {
@@ -221,11 +234,12 @@ const Cart = () => {
     const handleDeleteCartItem = async (productId) => {
         try {
             const existingCartItem = cartItems.find(item => item.productId._id === productId);
+            console.log("Existing Cart Item : "+existingCartItem.productId._id)
             if (!existingCartItem) {
                 console.error('Error deleting product: Product not found in cart');
                 return;
             }
-    
+         
             const response = await axios.delete(`http://localhost:8000/cart/${userId}/product/${productId}`);
             console.log('Product deleted successfully:', response.data);
     
@@ -257,9 +271,9 @@ const Cart = () => {
                                     {/* Diğer ürün bilgilerini buraya ekleyin */}
                                 </View>
                             ))}
-                            {/* <TouchableOpacity onPress={() => handleDeleteCartItem(cartItem.productId._id)}>
+                            <TouchableOpacity onPress={() => handleDeleteCartItem(cartItem.productId._id)}>
                                 <Text style={{ color: 'red', marginLeft: 20, marginTop: 10 }}>Sepetten Kaldır</Text>
-                            </TouchableOpacity> */}
+                            </TouchableOpacity>
                         </View>
                     ))
                 ) : (

@@ -219,8 +219,6 @@ app.get("/products/producer/:producerId", (req, res) => {
         res.status(500).json({ message: "Error fetching product" });
       });
   });
-
-
 // ÜRÜNLERİ GÜNCELLEME VE SİLME
 app.put("/products/:productId", (req, res) => {
   const productId = req.params.productId;
@@ -251,6 +249,28 @@ app.delete("/products/:productId", (req, res) => {
       console.log("Error deleting product", err);
       res.status(500).json({ message: "Error deleting the product" });
     });
+});
+
+app.put("/products/:productId/decreaseQuantity", async (req, res) => {
+  const productId = req.params.productId;
+  const quantityToDecrease = req.body.quantityToDecrease;
+
+  try {
+      // İlgili ürünü bul ve miktarını azalt
+      const product = await Product.findById(productId);
+      if (!product) {
+          return res.status(404).json({ message: "Product not found" });
+      }
+
+      // Ürün miktarını azalt
+      product.qty -= quantityToDecrease;
+      await product.save();
+
+      res.status(200).json({ message: "Product quantity decreased successfully" });
+  } catch (error) {
+      console.error('Error decreasing product quantity:', error);
+      res.status(500).json({ message: "Error decreasing product quantity" });
+  }
 });
 
 // AWS S3 konfigürasyonu
@@ -493,7 +513,6 @@ app.get("/orders", async (req, res) => {
   }
 });
 
-// Ürünü sepette bulunan kullanıcının sepetinden silmek için DELETE isteği
 app.delete('/cart/:userId/product/:productId', async (req, res) => {
   const userId = req.params.userId;
   const productId = req.params.productId;
@@ -502,7 +521,7 @@ app.delete('/cart/:userId/product/:productId', async (req, res) => {
     if (!cart) {
       return res.status(404).json({ message: 'Cart not found' });
     }
-    const productIndex = cart.products.findIndex(item => item.productId === productId);
+    const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
     if (productIndex === -1) {
       return res.status(404).json({ message: 'Product not found in cart' });
     }
@@ -515,6 +534,7 @@ app.delete('/cart/:userId/product/:productId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 
 
 
