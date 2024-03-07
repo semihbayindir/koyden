@@ -10,6 +10,7 @@ import { decode as atob } from 'base-64';
 import { Text, View, Modal, TextInput, Button, StyleSheet } from 'react-native';
 import Loading from './loadings/Loading';
 import Cart from '../components/Cart';
+import { useNavigation } from '@react-navigation/native';
 
 
 
@@ -18,6 +19,7 @@ const UreticiScreen = () => {
   const [verificationData, setVerificationData] = useState(null);
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   const base64UrlDecode = (input) => {
     const base64 = input.replace(/-/g, '+').replace(/_/g, '/');
@@ -57,6 +59,15 @@ const UreticiScreen = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleCartPress = () => {
+    // Cart ekranını sıfırla ve yeniden yükle
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Cart' }],
+    });
+  };
+
   return (
     <View style={{ flex: 1 }}>
       {loading ? (
@@ -76,6 +87,7 @@ const UreticiScreen = () => {
         <MaterialCommunityIcons name='food-apple'  color={focused ? '#729c44' : 'gray'} size={50} />
       ),
       tabBarActiveTintColor: 'green',
+      unmountOnBlur: true
     }}
   />
   <Tab.Screen 
@@ -94,12 +106,14 @@ const UreticiScreen = () => {
             alignItems: 'center',
             marginTop: -20 // Adjust this value according to your need
           }}
-
         >
-          <MaterialCommunityIcons name='cart-variant' color={focused ? '#729c44' : '#fff'} size={60} />
+          <MaterialCommunityIcons name='cart-variant' color={focused ? '#729c44' : '#fff'} size={60} 
+                    onPress={handleCartPress} // onPress olayını kullanarak handleCartPress fonksiyonunu çağırın
+                    />
         </View>
       ),
       tabBarActiveTintColor: 'green',
+      
     }}
   />
   <Tab.Screen 
