@@ -351,12 +351,13 @@ app.delete('/cart/:userId', async (req, res) => {
 const SingleOrder = require('./models/singleOrder');
 app.post('/singleOrders/create', async (req, res) => {
   try {
-    const { userId, producerId, products, totalPrice, from, to } = req.body;
+    const { userId, producerId, products, orderIds, totalPrice, from, to } = req.body;
 
     const newOrder = new SingleOrder({
       userId,
       producerId,
       products,
+      orderIds,
       totalPrice,
       from,
       to
@@ -407,6 +408,22 @@ app.post('/orders/create', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
+app.get('/orders/:orderId', async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    // İlgili orderId'ye sahip olan order'ı veritabanından bul
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    res.status(200).json(order);
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 //Tüm Siparişleri Almak (Tüketici tarafı):
 app.get('/orders/:userId', async (req, res) => {
   const userId = req.params.userId;
