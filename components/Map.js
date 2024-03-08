@@ -23,7 +23,7 @@ const { width, height } = Dimensions.get("window");
 
 const GOOGLE_API_KEY = "AIzaSyCnB7axdJK9e345w6f1c-Da6pzxPpA0uD8";
 
-const MAX_DISTANCE = 1000;
+const MAX_DISTANCE = 100*1000; // METRE HESABI
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.02;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
@@ -92,7 +92,7 @@ const Map = () => {
       if (!stopFetchingOrders) {
         fetchOrders();
       }
-    }, 60000); // Her 1 dakikada bir siparişleri çek
+    }, 600000); // Her 10 dakikada bir siparişleri çek
   
     // Komponent sona erdiğinde zamanlayıcıyı temizle
     return () => clearInterval(fetchInterval);
@@ -127,7 +127,7 @@ const Map = () => {
           }
           // Tüm koordinatları aldıktan sonra marker'ları güncelle
           setMarkers(allCoordinates.map((coordinate, index) => ({ id: index, coordinate })));
-          console.log(markers)
+          // console.log(markers)
         }
       } catch (error) {
         console.error('Error fetching producer information:', error);
@@ -209,27 +209,41 @@ function calculateDistance(coord1, coord2) {
       left: edgePaddingValue,
     };
   
-    const traceRouteOnReady = (result) => {
-      // console.log("Route details:", result);
+    const traceRouteOnReady = async (result) => {
       if (result) {
-      const routePoints = result.coordinates;
-      const nearbyMarkers = [];
-      markers.forEach((marker) => {
-        let minDistance = MAX_DISTANCE;
-        for (let i = 0; i < routePoints.length; i++) {
-          const routePoint = routePoints[i];
-          const distance = calculateDistance(routePoint, marker.coordinate);
-          if (distance < minDistance) {
-            minDistance = distance;
-          }
-        }
-        if (minDistance < MAX_DISTANCE) {
-          nearbyMarkers.push(marker);
-        }
-      });
-    //   console.log("Yakın markerlar:", nearbyMarkers);
+          const routePoints = result.coordinates;
+          const nearbyMarkers = [];
+          markers.forEach((marker) => {
+              let minDistance = MAX_DISTANCE;
+              for (let i = 0; i < routePoints.length; i++) {
+                  const routePoint = routePoints[i];
+                  const distance = calculateDistance(routePoint, marker.coordinate);
+                  if (distance < minDistance) {
+                      minDistance = distance;
+                  }
+              }
+              if (minDistance < MAX_DISTANCE) {
+                  nearbyMarkers.push(marker);
+              }
+          });
+          console.log("Yakın markerlar:", nearbyMarkers);
+          // Yakın markerlar bulunduğunda ilgili sipariş bilgilerini al
+    const markerInfos = [];
+    for (const marker of nearbyMarkers) {
+      try {
+        const orderId = orders[marker.id]._id;
+        const response = await axios.get(`http://localhost:8000/orders/${orderId}`);
+        const orderInfo = response.data;
+        markerInfos.push({ marker, orderInfo });
+      } catch (error) {
+        console.error('Error fetching order info:', error);
+      }
     }
-  };
+    setSelectedMarkerInfo(markerInfos);
+    console.log(markerInfos)
+    console.log("selectedMarkerInfo : "+selectedMarkerInfo)
+  }
+};
   
   
   const traceRoute = () => {
@@ -300,29 +314,37 @@ function calculateDistance(coord1, coord2) {
           />
         )}
       </MapView>
-      {/* <View style={styles.searchContainer}>
+      <View style={styles.searchContainer}>
         <InputAutocomplete
-          label="Origin"
+          label="Başlangıç"
           onPlaceSelected={(details) => {
             onPlaceSelected(details, "origin");
           }}
         />
         <InputAutocomplete
-          label="Destination"
+          label="Varış"
           onPlaceSelected={(details) => {
             onPlaceSelected(details, "destination");
           }}
         />
         <TouchableOpacity style={styles.button} onPress={traceRoute}>
-          <Text style={styles.buttonText}>Trace route</Text>
+          <Text style={styles.buttonText}>Rota Oluştur</Text>
         </TouchableOpacity>
+        {selectedMarkerInfo.map((markerInfo, index) => (
+          <View key={index}>
+            <Text>Yakın Siparişler:</Text>
+            {markerInfo.orderInfo.products.map((product, productIndex) => (
+            <Text key={productIndex}>Ürün ID: {product.productId}</Text>
+        ))}
+        </View>
+))}
         {distance && duration ? (
           <View>
             <Text>Distance: {distance.toFixed(2)}</Text>
             <Text>Duration: {Math.ceil(duration)} min</Text>
           </View>
         ) : null}
-      </View> */}
+      </View>
 
       {/* Modal bileşeni */}
       <Modal visible={selectedMarker !== null} animationType="slide" transparent>
@@ -352,16 +374,14 @@ function calculateDistance(coord1, coord2) {
       </>
     )}
   </View>
-</Modal>
-
-    </View>
+      </Modal>
+</View>
   );
 }
 
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
