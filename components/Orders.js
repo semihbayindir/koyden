@@ -63,10 +63,10 @@ const Orders = () => {
   const renderOrderItem = ({ item }) => {
     return (
       <TouchableOpacity style={styles.order}>
-        <Text style={styles.orderText}>Total Price: {item.totalPrice} ₺</Text>
-        <Text style={styles.orderText}>Order Date: {item.orderDate}</Text>
-        <Text style={styles.orderText}>Status: {item.status}</Text>
-        <Text style={styles.orderText}>Offer: {item.offer}</Text>
+        <Text style={styles.orderText}>Sepet Tutarı: {item.totalPrice} ₺</Text>
+        <Text style={styles.orderText}>Sipariş Tarihi: {item.orderDate}</Text>
+        <Text style={styles.orderText}>Durum: {item.status}</Text>
+        <Text style={styles.orderText}>Teklif: {item.offer}</Text>
       
         {item.products.map((product, index) => (
           <View key={`${product.productId}-${index}`}>
@@ -93,11 +93,41 @@ const Orders = () => {
   };
 
   const renderSingleOrderItem = ({ item }) => {
+    let statusColor = '';
+  
+    switch (item.status) {
+      case 'Hazırlanıyor':
+        statusColor = '#2285a1'; // Yeşil renk
+        break;
+      case 'Kargoya Verildi':
+        statusColor = 'orange'; // Mavi renk
+        break;
+      case 'Teslim Edildi':
+        statusColor = 'green'; // Yeşil renk
+        break;
+      default:
+        statusColor = 'black'; // Varsayılan olarak siyah renk
+    }
+  
+
+    const formatOrderDate = (date) => {
+      const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+      return new Date(date).toLocaleDateString('tr-TR', options);
+    };
     return (
       <TouchableOpacity style={styles.order} onPress={() => handleSingleOrderPress(item)}>
-        <Text style={styles.orderText}>Total Price: {item.totalPrice} ₺</Text>
-        <Text style={styles.orderText}>Order Date: {item.orderDate}</Text>
-        <Text style={styles.orderText}>Status: {item.status}</Text>
+        
+        <Text style={styles.orderText }>Sepet Tutarı: {item.totalPrice} ₺</Text>
+        <Text style={styles.orderText}>Sipariş Tarihi: {formatOrderDate(item.orderDate)}</Text>
+        
+        <View style={{flexDirection:'row'}}>
+        {item.products.map((product, index) => (
+          <View style={{flexDirection:'row', borderWidth:1, borderRadius:5, backgroundColor:'white', padding:5, marginBottom:10, marginRight: 10}}>
+          <Image source={{ uri: product.productId.images[0] }} style={{ width: 60, height: 60}} />
+          </View>
+          ))}
+          </View>
+          <Text style={[styles.orderText, { color: statusColor }]}>{item.status}</Text>
       </TouchableOpacity>
     );
   };
@@ -108,12 +138,12 @@ const Orders = () => {
       return (
         <View key={index} style={styles.orderDetail}>
           <Text style={styles.orderDetailText}>Order ID: {orderData._id}</Text>
-          <Text style={styles.orderDetailText}>Total Price: {orderData.totalPrice} ₺</Text>
-          <Text style={styles.orderDetailText}>Order Date: {orderData.orderDate}</Text>
-          <Text style={styles.orderDetailText}>Status: {orderData.status}</Text>
+          <Text style={styles.orderDetailText}>Sepet Tutarı: {orderData.totalPrice} ₺</Text>
+          <Text style={styles.orderDetailText}>Sipariş Tarihi: {orderData.orderDate}</Text>
+          <Text style={styles.orderDetailText}>Durum: {orderData.status}</Text>
           <Text style={styles.orderDetailText}>From: {orderData.from}</Text>
           <Text style={styles.orderDetailText}>To: {orderData.to}</Text>
-          <Text style={styles.orderDetailText}>Products:</Text>
+          <Text style={styles.orderDetailText}>Ürünler:</Text>
           {orderData.products.map((product, productIndex) => (
             <View key={productIndex} style={styles.productDetail}>
               <Image source={{ uri: product.productId.images[0] }} style={styles.productImage} />
@@ -176,7 +206,7 @@ const Orders = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Siparişlerim</Text>
+      {/* <Text style={styles.title}>Siparişlerim</Text> */}
       {singleOrders.length === 0 ? (
         <Text style={styles.noOrders}>Henüz sipariş vermemişsiniz.</Text>
       ) : (
@@ -231,12 +261,14 @@ const styles = StyleSheet.create({
   },
   order: {
     borderWidth: 1,
+    borderRadius:15,
     borderColor: 'lightgrey',
+    backgroundColor:'#f9fbe5',
     padding: 10,
     marginBottom: 10,
   },
   orderText: {
-    fontSize: 16,
+    fontSize: 20,
     marginBottom: 5,
   },
 });

@@ -22,7 +22,7 @@ const SingleProductScreen = ({ route }) => {
 
 
 
-  const [orderQuantity, setOrderQuantity] = useState('1'); // Sipariş miktarı state'i
+  const [orderQuantity, setOrderQuantity] = useState('2'); // Sipariş miktarı state'i
   const [quantityOptions, setQuantityOptions] = useState([]);
 
   const handleOrderQuantityChange = (quantity) => {
@@ -204,13 +204,17 @@ const handleResetScreen = () => {
         <>
         {userId == product.producerId && (
         <TouchableOpacity style={styles.button} onPress={toggleUpdateModal}>
-          <Text style={{ color: 'white', fontSize:22 }}>Güncelle</Text>
+          <Text style={{color: 'white', fontSize:22 , textAlign:'center',padding:10 }}>Güncelle</Text>
         </TouchableOpacity>
       )}
 
         {userId == product.producerId && (
-        <TouchableOpacity style={styles.button} onPress={handleDeleteProduct}>
-          <Text style={{ color: 'white', fontSize:22 }}>Sil</Text>
+        <TouchableOpacity style={{backgroundColor: 'red',
+        marginVertical: 9,
+        borderRadius: 5,
+        marginHorizontal: '20%',
+        marginBottom:20,}} onPress={handleDeleteProduct}>
+          <Text style={{ color: 'white', fontSize:22 , textAlign:'center',padding:10 }}>Sil</Text>
         </TouchableOpacity>
       )}
 
@@ -241,7 +245,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginHorizontal: '20%',
     marginTop: 10,
-    marginBottom:20,
+    marginBottom:10,
   },
   productInfo:{
     margin:10, 

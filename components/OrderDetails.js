@@ -6,6 +6,9 @@ const OrderDetails = ({ route }) => {
   const { orderDetails } = route.params;
   const [productDetails, setProductDetails] = useState([]);
 
+
+  let totalOrderPrice = 0;
+
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -25,24 +28,40 @@ const OrderDetails = ({ route }) => {
     fetchProductDetails();
   }, [orderDetails]);
 
+
+  const formatOrderDate = (date) => {
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+    return new Date(date).toLocaleDateString('tr-TR', options);
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.orderDetail}>
-      <View style={styles.orderInfo}>
-        <Text style={styles.orderInfoText}>Toplam Tutar: {item.order.totalPrice}</Text>
-        <Text style={styles.orderInfoText}>Sipariş Tarihi: {item.order.orderDate}</Text>
-        <Text style={styles.orderInfoText}>Durum: {item.order.status}</Text>
-        <Text style={styles.orderInfoText}>Gönderen: {item.order.from}</Text>
-        <Text style={styles.orderInfoText}>Alıcı: {item.order.to}</Text>
-        <Text style={styles.orderInfoText}>Offer: {item.order.offer}</Text>
-      </View>
       {item.products.map((product, index) => (
-        <View key={index} style={styles.productDetail}>
-          <Text style={styles.productDetailText}>Ürün Adı: {product.name}    </Text>
-          <Image source={{ uri: product.images[0] }} style={styles.productImage} />
-          <Text style={styles.productDetailText}>Miktar: {product.qty} {product.qtyFormat}</Text>
-          <Text style={styles.productDetailText}>Fiyat: {product.price}</Text>
+        <View key={index}>
+          
+          <Text style={[styles.productDetailText,{fontSize:22, fontWeight:800, marginBottom:10}]}> {product.name}    </Text>
+          <View style={styles.productDetail}>
+            <View style={{borderWidth:1, borderRadius:15, backgroundColor:'white', padding:5}}>
+            <Image source={{ uri: product.images[0] }} style={styles.productImage} />
+            </View>
+            <View style={{marginLeft:10}}>
+              <Text style={styles.productDetailText}>Miktar: {product.qty} {product.qtyFormat}   </Text>
+              <Text style={styles.productDetailText}>Fiyat: {item.order.totalPrice} ₺ </Text>
+              <Text style={styles.orderInfoText}>Gönderen: {item.order.from}</Text>
+              <Text style={[styles.orderInfoText, { color: item.order.status === 'Hazırlanıyor' ? '#2285a1' : 'green' }]}> {item.order.status}</Text>
+
+            </View>
+          </View>
         </View>
       ))}
+      {/* <View style={styles.orderInfo}>
+        <Text style={styles.orderInfoText}>Sipariş Tarihi: {item.order.orderDate}</Text>
+        
+        <Text style={styles.orderInfoText}>Alıcı: {item.order.to}</Text>
+        <Text style={styles.orderInfoText}>Teklif: {item.order.offer}</Text>
+        <Text style={styles.orderInfoText}>Tutar: {item.order.totalPrice} ₺</Text>
+      </View> */}
+    
       {item.order.offer > 0 && ( // Teklif 0'dan büyükse, kabul et ve reddet butonlarını göster
         <View>
           <TouchableOpacity style={styles.button} onPress={() => handleAcceptOffer(item.order._id)}>
@@ -67,8 +86,19 @@ const OrderDetails = ({ route }) => {
   };
 
   return (
+    
     <View style={styles.container}>
-      <Text style={styles.title}>Sipariş Detayları</Text>
+      
+      {/* <Text style={styles.title}>Sipariş Detayları</Text> */}
+      
+        {productDetails.length > 0 && (
+          <View style={{borderWidth:1, borderRadius:15, borderColor:'#ccc', backgroundColor:'#f9fbe5', padding:7, marginBottom:10}}>
+            <Text style={{fontSize:18}}>Sipariş Tarihi:{formatOrderDate(productDetails[0].order.orderDate)}</Text>
+            <Text style={{fontSize:18}}>Sipariş Durumu: {productDetails[0].order.status}</Text>
+            <Text style={{fontSize:18}}>Toplam Tutarı: {productDetails.reduce((total, item) => total + item.order.totalPrice, 0)} ₺</Text>
+          </View>
+        )}
+          
       <FlatList
         data={productDetails}
         renderItem={renderItem}
@@ -84,13 +114,15 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 25,
     fontWeight: 'bold',
     marginBottom: 20,
   },
   orderDetail: {
     marginBottom: 20,
     borderWidth: 1,
+    borderRadius:15,
+    backgroundColor:'#f9fbe5',
     borderColor: '#ccc',
     padding: 10,
   },
@@ -98,20 +130,22 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   orderInfoText: {
-    fontSize: 16,
+    fontSize: 18,
     marginBottom: 5,
   },
   productDetail: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 10
   },
   productImage: {
-    width: 50,
-    height: 50,
-    marginRight: 10,
+    width: 90,
+    height: 90,
+    borderRadius:5,
+    alignSelf:'center',
   },
   productDetailText: {
-    fontSize: 16,
+    fontSize: 18,
     marginBottom: 5,
   },
 });
