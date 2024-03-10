@@ -45,7 +45,7 @@ const AllOrders = () => {
             <Text style={{textAlign:'left', fontWeight:800, fontSize:30, fontStyle:'normal'}}>  TAŞIYICI,</Text>
           </Text>
           <View style={{flexDirection:'row', alignItems:'center', marginTop:5, marginBottom:10 }}>
-            <TouchableOpacity style={styles.butons} onPress={() => navigation.navigate('Orders')}>
+            <TouchableOpacity style={styles.butons} onPress={() => navigation.navigate('TasiyiciOrders')}>
               <Text style={{fontSize:18}}>Siparişlerim</Text>
             </TouchableOpacity>
           </View>

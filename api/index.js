@@ -405,18 +405,18 @@ app.get('/singleOrders/:userId', async (req, res) => {
 });
 
 const Order = require('./models/order');
+const TransportDetails = require("./models/transport_details");
 //Sipariş Oluşturma (Tüketici tarafı):
 app.post('/orders/create', async (req, res) => {
   try {
-    const { userId, producerId, products, totalPrice, offer, isOfferAccept, from, to } = req.body;
+    const { userId, producerId, transportDetailsId, products, totalPrice, from, to } = req.body;
 
     const newOrder = new Order({
       userId,
       producerId,
+      transportDetailsId,
       products,
       totalPrice,
-      offer,
-      isOfferAccept,
       from,
       to
     });
@@ -535,6 +535,43 @@ app.delete('/cart/:userId/product/:productId', async (req, res) => {
   }
 });
 
+// Teklif oluşturma endpointi
+app.post('/transportDetails/offer', async (req, res) => {
+  try {
+    const { orderId, transporterId, offer } = req.body;
+
+    // Yeni bir TransportDetails belgesi oluştur
+    const transportDetails = new TransportDetails({
+      orderId,
+      transporterId,
+      offer,
+      isOfferAccept: false // Başlangıçta teklif kabul edilmemiş olarak işaretlenir
+    });
+
+    // TransportDetails belgesini kaydet
+    await transportDetails.save();
+
+    // Sipariş belgesini bul ve transportDetailsId alanını güncelle
+    await Order.findByIdAndUpdate(orderId, { transportDetailsId: transportDetails._id });
+
+    res.status(201).send(transportDetails);
+  } catch (error) {
+    console.error('Error creating offer:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// GET all transport details
+app.get('/transportDetails/:transporterId', async (req, res) => {
+  const transporterId = req.params.transporterId;
+  try {
+    const transportDetails = await TransportDetails.find({ transporterId });
+    res.json(transportDetails);
+  } catch (error) {
+    console.error('Error fetching transport details by transporterId:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 
 

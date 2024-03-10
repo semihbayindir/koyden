@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Siparişi veren kullanıcının ID'si
   producerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Üreticinin ID'si
+  transportDetailsId: { type: mongoose.Schema.Types.ObjectId, ref: 'TransportDetails', required: true },
   products: [
     {
       productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true }, // Ürünün ID'si
@@ -12,8 +13,6 @@ const orderSchema = new mongoose.Schema({
   ],
   totalPrice: { type: Number, required: true }, // Toplam fiyat
   orderDate: { type: Date, default: Date.now }, // Sipariş tarihi
-  offer: { type: Number, required: true },
-  isOfferAccept: { type: Boolean, require: true},
   from: { type: String, required: true },
   to: { type: String, required: true }, 
   status: { type: String, enum: ['Hazırlanıyor', 'Kargoya Verildi', 'Teslim Edildi'], default: 'Hazırlanıyor' }, // Sipariş durumu

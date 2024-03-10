@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import TasiyiciScreen from "./screens/TasiyiciScreen";
 import OrderDetails from "./components/OrderDetails";
+import TasiyiciOrders from "./components/TasiyiciOrders";
 
 
 
@@ -230,6 +231,22 @@ const StackNavigator = () => {
         <Stack.Screen
         name="OrderDetails"
         component={OrderDetails}
+        options={{
+          //title: 'KÖYDEN',
+          headerTitle: (props) => <LogoTitle {...props} />,
+          headerBackTitle: '‎',
+          headerStyle: {
+            backgroundColor: '#729c44',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },        
+        }}
+        />
+        <Stack.Screen
+        name="TasiyiciOrders"
+        component={TasiyiciOrders}
         options={{
           //title: 'KÖYDEN',
           headerTitle: (props) => <LogoTitle {...props} />,
