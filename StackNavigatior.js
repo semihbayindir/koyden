@@ -184,8 +184,8 @@ const StackNavigator = () => {
         name="Orders"
         component={Orders}
         options={{
-         // title: 'KÖYDEN',
-          headerTitle: (props) => <LogoTitle {...props} />,
+          title: 'Siparişlerim',
+         // headerTitle: (props) => <LogoTitle {...props} />,
           headerBackTitle: '‎',
           headerStyle: {
             backgroundColor: '#729c44',
@@ -193,6 +193,7 @@ const StackNavigator = () => {
           headerTintColor: '#fff',
           headerTitleStyle: {
             fontWeight: 'bold',
+            fontSize: 22
           },        
         }}
         />
@@ -232,8 +233,8 @@ const StackNavigator = () => {
         name="OrderDetails"
         component={OrderDetails}
         options={{
-          //title: 'KÖYDEN',
-          headerTitle: (props) => <LogoTitle {...props} />,
+          title: 'Sipariş Detay',
+         // headerTitle: (props) => <LogoTitle {...props} />,
           headerBackTitle: '‎',
           headerStyle: {
             backgroundColor: '#729c44',
@@ -241,6 +242,7 @@ const StackNavigator = () => {
           headerTintColor: '#fff',
           headerTitleStyle: {
             fontWeight: 'bold',
+            fontSize:20,
           },        
         }}
         />

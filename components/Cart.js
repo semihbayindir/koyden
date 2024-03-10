@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, FlatList, Button, TouchableOpacity, Image } from "react-native";
+import { Text, View, FlatList, Button, TouchableOpacity, Image, StyleSheet } from "react-native";
 import axios from "axios";
 import { useUserIdDecoder } from "./UserIdDecoder";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -256,27 +256,34 @@ const Cart = () => {
             }
         }
     };
+    const uniqueProductsInCart = [...new Set(cartItems.map(item => item.productId._id))];
+    const totalUniqueProductsInCart = uniqueProductsInCart.length;
     
     return (
         <View>
-            <Text style={{ margin:'3%' ,textAlign: 'left', fontWeight: 800, fontSize: 30, fontStyle: 'normal' }}>Sepet</Text>
+            <Text style={{ margin:'3%' ,textAlign: 'center', fontWeight: 800, fontSize: 30, fontStyle: 'normal' }}>Sepet ({totalUniqueProductsInCart})</Text>
             <View>
                 {cartItems.length > 0 ? (
                     cartItems.map((cartItem, index) => (
                         <View style={{flexDirection:'row', borderWidth:1, borderRadius:20, marginHorizontal:'3%', marginVertical:'2%',backgroundColor:'#f9fbe5'}}>
+                             <View style={{borderWidth:1, borderRadius:15, backgroundColor:'white', padding:5, margin: 5}}>
+                            <Image source={{ uri: cartItem.productId.images[0] }} style={styles.productImage} />
+                        </View>
                         <View key={index} style={{ margin: '3%' ,flex:0.90, padding:9}}>
+               
                             <Text style={{ fontWeight: 'bold', fontSize:22 }}>{cartItem.productId.name}</Text>
                             <Text style={{  fontSize:18 }}>Miktar: {cartItem.quantity} {cartItem.quantityFormat}</Text>
                             {/* Her bir cartItem içindeki ürünleri döngü kullanarak listeleyin */}
                             {cartItem.products && cartItem.products.map((product, productIndex) => (
                                 <View key={productIndex} >
+
                                     <Text>Ürün Adı: {product.name}</Text>
                                     
                                     {/* Diğer ürün bilgilerini buraya ekleyin */}
                                 </View>
                             ))}
                             </View>
-                            <View style={{flex:0.09,margin: '8%'}}>
+                            <View style={{flex:0.25,margin: '8%'}}>
                                 <TouchableOpacity onPress={() => handleDeleteCartItem(cartItem.productId._id)}>
                                      <MaterialCommunityIcons name='delete' size={30} color={'red'}/>
                                 </TouchableOpacity>
@@ -284,7 +291,7 @@ const Cart = () => {
                         </View>
                     ))
                 ) : (
-                    <Text style={{ textAlign: 'center' }}>Sepetiniz Boş</Text>
+                    <Text style={{ textAlign: 'center', fontSize:20, marginBottom:20 }}>Sepetiniz Boş</Text>
                 )}
             </View>
             <TouchableOpacity style={{ backgroundColor: '#729c44', padding: 10, marginHorizontal: 50, marginTop: 10, borderRadius: 5, alignContent: 'center' }} onPress={handleOrder}>
@@ -325,5 +332,14 @@ const Cart = () => {
 //         </View>
 //     );
  };
+
+ const styles = StyleSheet.create({
+    productImage: {
+        width: 70,
+        height: 70,
+        borderRadius:5,
+        alignSelf:'center',
+      },
+ })
 
 export default Cart;
