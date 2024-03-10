@@ -18,6 +18,7 @@ import {
 import MapViewDirections from "react-native-maps-directions";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import { useUserIdDecoder } from "./UserIdDecoder";
 
 const { width, height } = Dimensions.get("window");
 
@@ -73,8 +74,11 @@ const Map = () => {
   const [selectedMarker, setSelectedMarker] = useState(null); // Seçili marker'ı saklamak için state
   const [selectedMarkerInfo, setSelectedMarkerInfo] = useState([])
   const [offer,setOffer] = useState();
+  const [waypoints, setWaypoints] = useState([]);
+  const userId = useUserIdDecoder();
 
   useEffect(() => {
+    if(userId){
     const fetchOrders = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/orders/`);
@@ -96,7 +100,8 @@ const Map = () => {
   
     // Komponent sona erdiğinde zamanlayıcıyı temizle
     return () => clearInterval(fetchInterval);
-  }, [stopFetchingOrders]);
+    }
+  }, [stopFetchingOrders,userId]);
   
   useEffect(() => {
     const fetchProducerInfo = async () => {
@@ -240,8 +245,6 @@ function calculateDistance(coord1, coord2) {
       }
     }
     setSelectedMarkerInfo(markerInfos);
-    console.log(markerInfos)
-    console.log("selectedMarkerInfo : "+selectedMarkerInfo)
   }
 };
   
@@ -272,16 +275,26 @@ function calculateDistance(coord1, coord2) {
       try {
         if (selectedMarker !== null) {
           const orderId = orders[selectedMarker.id]._id; // Seçili markere göre siparişin ID'sini al
-          const response = await axios.put(`http://localhost:8000/orders/update/offer/${orderId}`, { offer });
-          console.log('Offer updated successfully:', response.data);
+          const transporterId = userId; // Taşıyıcı ID'si, değiştirilmeli
+          const response = await axios.post(`http://localhost:8000/transportDetails/offer`, {
+            orderId,
+            transporterId,
+            offer
+          });
+          console.log('Offer created successfully:', response.data);
         }
       } catch (error) {
-        console.error('Error updating offer:', error);
+        console.error('Error creating offer:', error);
       }
     };
     
+    
 
-
+    const addMarkerRoute = async (coordinate) => {
+      // console.log(coordinate)
+    //  setWaypoints(coordinate);
+    };
+    
   return (
     <View style={styles.container}>
       <MapView
@@ -308,6 +321,7 @@ function calculateDistance(coord1, coord2) {
             origin={origin}
             destination={destination}
             apikey={GOOGLE_API_KEY}
+            waypoints={waypoints}
             strokeColor="#6644ff"
             strokeWidth={4}
             onReady={traceRouteOnReady}
@@ -330,11 +344,17 @@ function calculateDistance(coord1, coord2) {
         <TouchableOpacity style={styles.button} onPress={traceRoute}>
           <Text style={styles.buttonText}>Rota Oluştur</Text>
         </TouchableOpacity>
+        <Text>Yakın Siparişler:</Text>
         {selectedMarkerInfo.map((markerInfo, index) => (
           <View key={index}>
-            <Text>Yakın Siparişler:</Text>
             {markerInfo.orderInfo.products.map((product, productIndex) => (
+              <>
+              {/* {console.log(markerInfo.marker.coordinate)} */}
             <Text key={productIndex}>Ürün ID: {product.productId}</Text>
+            <TouchableOpacity onPress={() => setWaypoints(markerInfo.marker.coordinate)}>
+              <Text>Rotaya ekle</Text>
+            </TouchableOpacity>
+            </>
         ))}
         </View>
 ))}
