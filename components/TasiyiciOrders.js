@@ -70,8 +70,6 @@ const TasiyiciOrders = () => {
         {/* <Text>Order Id: {order._id}</Text> */}
         <Text>From: {order.from}</Text>
         <Text>To: {order.to}</Text>
-        {console.log(transportDetails[index].isOfferAccept)}
-        {transportDetails[index].isOfferAccept === "false"}
         <Text>isOfferAccept: {transportDetails[index].isOfferAccept}</Text>
 
         {/* Ürünlerin bilgisini products state'inden al */}
