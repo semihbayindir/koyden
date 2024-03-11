@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Siparişi veren kullanıcının ID'si
   producerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Üreticinin ID'si
-  transportDetailsId: { type: mongoose.Schema.Types.ObjectId, ref: 'TransportDetails', required: true },
+  transportDetailsId: { type: mongoose.Schema.Types.ObjectId, ref: 'TransportDetails', required: false },
   products: [
     {
       productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true }, // Ürünün ID'si
