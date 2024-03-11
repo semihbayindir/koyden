@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, FlatList, Button, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { Text, View, TouchableOpacity, Image, StyleSheet } from "react-native";
 import axios from "axios";
 import { useUserIdDecoder } from "./UserIdDecoder";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from '@react-navigation/native';
-import { isSearchBarAvailableForCurrentPlatform } from "react-native-screens";
 
 
 const Cart = () => {
@@ -12,10 +10,8 @@ const Cart = () => {
     const userId = useUserIdDecoder();
     const [from,setFrom] = useState('Sakarya');
     const [to,setTo] = useState('İstanbul');
-    const [offer,setOffer] = useState(0);
-    const [isOfferAccept, setIsOfferAccept] = useState(false);
 
-    const navigation = useNavigation(); 
+
     
     useEffect(() => {
         if (userId) {
@@ -155,8 +151,6 @@ const Cart = () => {
                     producerId: producerId,
                     products: products,
                     totalPrice: totalPrice,
-                    offer: offer,
-                    isOfferAccept: isOfferAccept,
                     from: from,
                     to: to
                 };
