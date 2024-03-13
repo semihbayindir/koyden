@@ -291,8 +291,8 @@ function calculateDistance(coord1, coord2) {
     
 
     const addMarkerRoute = async (coordinate) => {
-      // console.log(coordinate)
-    //  setWaypoints(coordinate);
+      const newWaypoints = [...waypoints, coordinate]; // Mevcut waypoints dizisine yeni koordinatı ekleyin
+      setWaypoints(newWaypoints); // Yeniden oluşturulan waypoints dizisini ayarlayın
     };
     
   return (
@@ -351,9 +351,9 @@ function calculateDistance(coord1, coord2) {
               <>
               {/* {console.log(markerInfo.marker.coordinate)} */}
             <Text key={productIndex}>Ürün ID: {product.productId}</Text>
-            <TouchableOpacity onPress={() => setWaypoints(markerInfo.marker.coordinate)}>
-              <Text>Rotaya ekle</Text>
-            </TouchableOpacity>
+            <TouchableOpacity onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
+  <Text>Rotaya ekle</Text>
+</TouchableOpacity>
             </>
         ))}
         </View>
