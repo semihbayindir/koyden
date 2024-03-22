@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import TasiyiciScreen from "./screens/TasiyiciScreen";
 import OrderDetails from "./components/OrderDetails";
 import TasiyiciOrders from "./components/TasiyiciOrders";
+import Route from "./components/Route";
 
 
 
@@ -61,7 +62,7 @@ const StackNavigator = () => {
           component={LoginScreen}
           options={({ navigation, route }) => ({
               title: 'KÖYDEN',
-              headerTitle: (props) => <LogoTitle {...props} />,
+             // headerTitle: (props) => <LogoTitle {...props} />,
               headerStyle: {
                 backgroundColor: '#729c44',
 
@@ -81,7 +82,7 @@ const StackNavigator = () => {
           options={{
             headerLeft: ()=> null,
             title: 'KÖYDEN',
-            headerTitle: (props) => <LogoTitle {...props} />,
+            //headerTitle: (props) => <LogoTitle {...props} />,
             headerStyle: {
               backgroundColor: '#729c44',
             },
@@ -96,8 +97,8 @@ const StackNavigator = () => {
           name="Home"
           component={HomeScreen}
           options={{
-           // title: 'KÖYDEN',
-            headerTitle: (props) => <LogoTitle {...props} />,
+            title: 'KÖYDEN',
+           // headerTitle: (props) => <LogoTitle {...props} />,
             headerBackTitle: '‎',
             headerStyle: {
               backgroundColor: '#729c44',
@@ -113,8 +114,8 @@ const StackNavigator = () => {
           name="Uretici"
           component={UreticiScreen}
           options={({ navigation }) => ({
-           // title: 'KÖYDEN',
-            headerTitle: (props) => <LogoTitle {...props} />,
+            title: 'KÖYDEN',
+           // headerTitle: (props) => <LogoTitle {...props} />,
             headerBackTitle: '‎',
             headerLeft: () => (
               <TouchableOpacity onPress={() => navigation.navigate('Home')}>
@@ -136,8 +137,8 @@ const StackNavigator = () => {
           name="Tuketici"
           component={TuketiciScreen}
           options={{
-           // title: 'KÖYDEN',
-            headerTitle: (props) => <LogoTitle {...props} />,
+            title: 'KÖYDEN',
+            //headerTitle: (props) => <LogoTitle {...props} />,
             headerBackTitle: '‎',
             headerStyle: {
               backgroundColor: '#729c44',
@@ -152,8 +153,8 @@ const StackNavigator = () => {
         name="Tasiyici"
         component={TasiyiciScreen}
         options={{
-         // title: 'KÖYDEN',
-          headerTitle: (props) => <LogoTitle {...props} />,
+          title: 'KÖYDEN',
+         // headerTitle: (props) => <LogoTitle {...props} />,
           headerBackTitle: '‎',
           headerStyle: {
             backgroundColor: '#729c44',
@@ -168,8 +169,8 @@ const StackNavigator = () => {
         name="SingleProduct"
         component={SingleProductScreen}
         options={{
-         // title: 'KÖYDEN',
-          headerTitle: (props) => <LogoTitle {...props} />,
+          title: 'KÖYDEN',
+          //headerTitle: (props) => <LogoTitle {...props} />,
           headerBackTitle: '‎',
           headerStyle: {
             backgroundColor: '#729c44',
@@ -201,8 +202,8 @@ const StackNavigator = () => {
         name="UreticiOrders"
         component={UreticiOrders}
         options={{
-          //title: 'KÖYDEN',
-          headerTitle: (props) => <LogoTitle {...props} />,
+          title: 'KÖYDEN',
+          //headerTitle: (props) => <LogoTitle {...props} />,
           headerBackTitle: '‎',
           headerStyle: {
             backgroundColor: '#729c44',
@@ -217,8 +218,8 @@ const StackNavigator = () => {
         name="UreticiMyProducts"
         component={UreticiMyProducts}
         options={{
-         // title: 'KÖYDEN',
-          headerTitle: (props) => <LogoTitle {...props} />,
+          title: 'KÖYDEN',
+          //headerTitle: (props) => <LogoTitle {...props} />,
           headerBackTitle: '‎',
           headerStyle: {
             backgroundColor: '#729c44',
@@ -250,7 +251,22 @@ const StackNavigator = () => {
         name="TasiyiciOrders"
         component={TasiyiciOrders}
         options={{
-          //title: 'KÖYDEN',
+          title: 'KÖYDEN',
+          //headerTitle: (props) => <LogoTitle {...props} />,
+          headerBackTitle: '‎',
+          headerStyle: {
+            backgroundColor: '#729c44',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },        
+        }}
+        />
+        <Stack.Screen
+        name="Route"
+        component={Route}
+        options={{
           headerTitle: (props) => <LogoTitle {...props} />,
           headerBackTitle: '‎',
           headerStyle: {
