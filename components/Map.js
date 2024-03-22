@@ -22,7 +22,7 @@ import { useUserIdDecoder } from "./UserIdDecoder";
 
 const { width, height } = Dimensions.get("window");
 
-const GOOGLE_API_KEY = "AIzaSyCnB7axdJK9e345w6f1c-Da6pzxPpA0uD8";
+const GOOGLE_API_KEY = "AIzaSyD1-czL9crUVUOlVOa4z5-iDKAKgdUMegs";
 
 const MAX_DISTANCE = 100*1000; // METRE HESABI
 const ASPECT_RATIO = width / height;
@@ -76,7 +76,6 @@ const Map = () => {
   const [offer,setOffer] = useState();
   const [waypoints, setWaypoints] = useState([]);
   const userId = useUserIdDecoder();
-
   useEffect(() => {
     if(userId){
     const fetchOrders = async () => {
@@ -132,7 +131,6 @@ const Map = () => {
           }
           // Tüm koordinatları aldıktan sonra marker'ları güncelle
           setMarkers(allCoordinates.map((coordinate, index) => ({ id: index, coordinate })));
-          // console.log(markers)
         }
       } catch (error) {
         console.error('Error fetching producer information:', error);
@@ -153,7 +151,6 @@ const Map = () => {
             if (coordinates) {
               // Yeni bir marker oluşturarak var olan markerları koru
               setMarkers(prevMarkers => [...prevMarkers, { id: prevMarkers.length + 1, coordinate: coordinates }]);
-            //   console.log(markers);
             }
           });
       }
@@ -231,7 +228,6 @@ function calculateDistance(coord1, coord2) {
                   nearbyMarkers.push(marker);
               }
           });
-          console.log("Yakın markerlar:", nearbyMarkers);
           // Yakın markerlar bulunduğunda ilgili sipariş bilgilerini al
     const markerInfos = [];
     for (const marker of nearbyMarkers) {
@@ -349,7 +345,6 @@ function calculateDistance(coord1, coord2) {
           <View key={index}>
             {markerInfo.orderInfo.products.map((product, productIndex) => (
               <>
-              {/* {console.log(markerInfo.marker.coordinate)} */}
             <Text key={productIndex}>Ürün ID: {product.productId}</Text>
             <TouchableOpacity onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
   <Text>Rotaya ekle</Text>

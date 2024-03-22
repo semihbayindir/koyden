@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import { useUserIdDecoder } from './UserIdDecoder';
+import { useNavigation } from '@react-navigation/native';
 
 const TasiyiciOrders = () => {
   const [transportDetails, setTransportDetails] = useState([]);
   const userId = useUserIdDecoder();
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState({}); // Ürünlerin bilgisini saklamak için bir state
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -92,7 +94,10 @@ const TasiyiciOrders = () => {
   return (
     <View>
       <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }}>Siparişlerim</Text>
-      {transportDetails.length === 0 ? (
+        <TouchableOpacity onPress={() => navigation.navigate("Route")}>
+          <Text>Rota</Text>
+        </TouchableOpacity>      
+        {transportDetails.length === 0 ? (
         <Text style={{ textAlign: 'center' }}>Henüz siparişiniz bulunmamaktadır.</Text>
       ) : (
         <FlatList
