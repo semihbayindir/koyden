@@ -8,7 +8,8 @@ const TasiyiciOrders = () => {
   const [transportDetails, setTransportDetails] = useState([]);
   const userId = useUserIdDecoder();
   const [orders, setOrders] = useState([]);
-  const [products, setProducts] = useState({}); // Ürünlerin bilgisini saklamak için bir state
+  const [products, setProducts] = useState({});
+  const [producerInfos, setProducerInfos] = useState({}); // Üreticilerin bilgilerini saklamak için bir state
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -62,23 +63,55 @@ const TasiyiciOrders = () => {
     fetchProductsForOrders();
   }, [orders]);
 
+  useEffect(() => {
+    const fetchProducerInfo = async (producerId) => {
+      try {
+        const response = await axios.get(`http://localhost:8000/producer/${producerId}`);
+        const producerInfo = response.data.producer;
+        setProducerInfos(prevState => ({
+          ...prevState,
+          [producerId]: producerInfo // Üretici bilgilerini producerInfos state'ine kaydet
+        }));
+      } catch (error) {
+        console.error('Error fetching producer info:', error);
+      }
+    };
+  
+    // Her sipariş için üreticinin bilgilerini al
+    orders.forEach(order => {
+      fetchProducerInfo(order.producerId);
+    });
+  }, [orders]);
+
   const renderOrderItem = ({ item, index }) => {
     const order = item;
     const offerAcceptStatus = transportDetails[index].isOfferAccept ? 'Onaylandı' : 'Beklemede'; // isOfferAccept değerine göre durumu belirle
+    const producerInfo = producerInfos[order.producerId]; // Üreticinin bilgilerini al
+
     return (
       <View>
         <Text>Offer: {transportDetails[index].offer}</Text>
         <Text>Offer Accept Status: {offerAcceptStatus}</Text>
-        {/* <Text>Order Id: {order._id}</Text> */}
         <Text>From: {order.from}</Text>
         <Text>To: {order.to}</Text>
         <Text>isOfferAccept: {transportDetails[index].isOfferAccept}</Text>
 
+        {/* Üreticinin bilgilerini burada göster */}
+        {producerInfo && (
+          <View>
+            <Text>Producer Name: {producerInfo.name}</Text>
+            <Text>Producer Phone : {producerInfo.phone}</Text>
+            <Text>{producerInfo.verification.producerAddress.city + " " +
+             producerInfo.verification.producerAddress.district + " " 
+             + producerInfo.verification.producerAddress.street}</Text>
+            {/* Diğer üretici bilgilerini buraya ekleyebilirsiniz */}
+          </View>
+        )}
+
         {/* Ürünlerin bilgisini products state'inden al */}
         {order.products.map((product, index) => (
           <View key={index}>
-            {/* <Text>Product Id: {product.productId}</Text> */}
-            {products[product.productId] && ( // Ürün bilgisi varsa göster
+            {products[product.productId] && (
               <View>
                 <Text>Product Name: {products[product.productId].name}</Text>
                 <Image source={{ uri: products[product.productId].images[0] }} style={{ width: 100, height: 100}} />
@@ -86,7 +119,6 @@ const TasiyiciOrders = () => {
             )}
           </View>
         ))}
-        {/* Diğer sipariş bilgilerini buraya ekleyebilirsiniz */}
       </View>
     );
   };
@@ -94,10 +126,10 @@ const TasiyiciOrders = () => {
   return (
     <View>
       <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }}>Siparişlerim</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Route")}>
-          <Text>Rota</Text>
-        </TouchableOpacity>      
-        {transportDetails.length === 0 ? (
+      <TouchableOpacity onPress={() => navigation.navigate("Route")}>
+        <Text>Rota</Text>
+      </TouchableOpacity>      
+      {transportDetails.length === 0 ? (
         <Text style={{ textAlign: 'center' }}>Henüz siparişiniz bulunmamaktadır.</Text>
       ) : (
         <FlatList

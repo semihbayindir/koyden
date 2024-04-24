@@ -157,6 +157,27 @@ app.post("/users/:userId/verification", (req, res) => {
     });
 });
 
+
+app.get('/producer/:producerId', async (req, res) => {
+  const producerId = req.params.producerId;
+
+  try {
+    // Kullanıcıyı veritabanından bul
+    const producer = await User.findById(producerId);
+
+    if (!producer) {
+      return res.status(404).json({ message: "Üretici bulunamadı." });
+    }
+
+    // Kullanıcının bilgilerini döndür
+    res.status(200).json({ producer });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Sunucu hatası." });
+  }
+});
+
+
 const Product = require("./models/product");
 
 
@@ -534,6 +555,67 @@ app.delete('/cart/:userId/product/:productId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+app.put('/cart/:cartId/product/:productId/decrease', async (req, res) => {
+  try {
+    const { cartId, productId } = req.params;
+
+    const cart = await Cart.findById(cartId);
+
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found' });
+    }
+
+    const product = cart.products.find(item => item.productId.toString() === productId);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found in the cart' });
+    }
+
+    if (product.quantity > 1) {
+      product.quantity--;
+    } else {
+      // If quantity is already 1, remove the product from the cart
+      cart.products = cart.products.filter(item => item.productId.toString() !== productId);
+    }
+
+    await cart.save();
+
+    res.json(cart);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+// Endpoint to increase the quantity of a product in the cart
+app.put('/cart/:cartId/product/:productId/increase', async (req, res) => {
+  try {
+    const { cartId, productId } = req.params;
+
+    const cart = await Cart.findById(cartId);
+
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found' });
+    }
+
+    const product = cart.products.find(item => item.productId.toString() === productId);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found in the cart' });
+    }
+
+    product.quantity++;
+
+    await cart.save();
+
+    res.json(cart);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 
 // Teklif oluşturma endpointi
 app.post('/transportDetails/offer', async (req, res) => {
