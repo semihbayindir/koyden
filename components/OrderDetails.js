@@ -6,9 +6,6 @@ const OrderDetails = ({ route }) => {
   const { orderDetails } = route.params;
   const [productDetails, setProductDetails] = useState([]);
 
-
-  let totalOrderPrice = 0;
-
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -28,80 +25,105 @@ const OrderDetails = ({ route }) => {
     fetchProductDetails();
   }, [orderDetails]);
 
-
   const formatOrderDate = (date) => {
     const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
     return new Date(date).toLocaleDateString('tr-TR', options);
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.orderDetail}>
-      {item.products.map((product, index) => (
-        <View key={index}>
-          
-          <Text style={[styles.productDetailText,{fontSize:22, fontWeight:800, marginBottom:10}]}> {product.name}    </Text>
-          <View style={styles.productDetail}>
-            <View style={{borderWidth:1, borderRadius:15, backgroundColor:'white', padding:5}}>
-            <Image source={{ uri: product.images[0] }} style={styles.productImage} />
-            </View>
-            <View style={{marginLeft:10}}>
-              <Text style={styles.productDetailText}>Miktar: {product.qty} {product.qtyFormat}   </Text>
-              <Text style={styles.productDetailText}>Fiyat: {item.order.totalPrice} ₺ </Text>
-              <Text style={styles.orderInfoText}>Gönderen: {item.order.from}</Text>
-              <Text style={[styles.orderInfoText, { color: item.order.status === 'Hazırlanıyor' ? '#2285a1' : 'green' }]}> {item.order.status}</Text>
-
-            </View>
-          </View>
-        </View>
-      ))}
-      {/* <View style={styles.orderInfo}>
-        <Text style={styles.orderInfoText}>Sipariş Tarihi: {item.order.orderDate}</Text>
-        
-        <Text style={styles.orderInfoText}>Alıcı: {item.order.to}</Text>
-        <Text style={styles.orderInfoText}>Teklif: {item.order.offer}</Text>
-        <Text style={styles.orderInfoText}>Tutar: {item.order.totalPrice} ₺</Text>
-      </View> */}
-    
-      {item.order.offer > 0 && ( // Teklif 0'dan büyükse, kabul et ve reddet butonlarını göster
-        <View>
-          <TouchableOpacity style={styles.button} onPress={() => handleAcceptOffer(item.order._id)}>
-            <Text style={{ color: 'green' }}>Kabul Et</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => handleRejectOffer(item.order._id)}>
-            <Text style={{ color: 'red' }}>Reddet</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
-  );
-
-  const handleAcceptOffer = async (orderId) => {
-    const isOfferAccept = true;
+  const fetchTransportDetails = async (transportDetailsId, index) => {
     try {
-        const response = await axios.put(`http://localhost:8000/orders/update/isOfferAccept/${orderId}`, { isOfferAccept });
-        console.log('Offer updated successfully:', response.data);
-      } catch (error) {
-      console.error('Error updating offer:', error);
+      const response = await axios.get(`http://localhost:8000/transportDetails/${transportDetailsId}`);
+      const transportDetails = response.data.transportDetails;
+      // Update productDetails state with fetched transportDetails
+      setProductDetails(prevDetails => {
+        const updatedDetails = [...prevDetails];
+        updatedDetails[index].order.offer = transportDetails.offer;
+        return updatedDetails;
+      });
+    } catch (error) {
+      console.error('Error fetching transport details:', error);
     }
   };
 
+  useEffect(() => {
+    // Fetch transport details for each productDetails item
+    productDetails.forEach((item, index) => {
+      if (item.order.transportDetailsId) {
+        fetchTransportDetails(item.order.transportDetailsId, index);
+      }
+    });
+  }, [productDetails]);
+
+  const handleAcceptOffer = async (transportDetailsId) => {
+    try {
+      const response = await axios.put(`http://localhost:8000/transportDetails/update/isOfferAccept/${transportDetailsId}`, { isOfferAccept: true });
+      console.log('Offer accepted:', response.data);
+      alert('Offer accepted', response.data);
+      // Handle UI update if needed
+    } catch (error) {
+      console.error('Error accepting offer:', error);
+      // Handle error if needed
+    }
+  };
+  
+  const handleRejectOffer = async (transportDetailsId) => {
+    try {
+      const response = await axios.put(`http://localhost:8000/transportDetails/update/isOfferAccept/${transportDetailsId}`, { isOfferAccept: false });
+      console.log('Offer rejected:', response.data);
+      // Handle UI update if needed
+    } catch (error) {
+      console.error('Error rejecting offer:', error);
+      // Handle error if needed
+    }
+  };
+  
   return (
-    
     <View style={styles.container}>
-      
-      {/* <Text style={styles.title}>Sipariş Detayları</Text> */}
-      
-        {productDetails.length > 0 && (
-          <View style={{borderWidth:1, borderRadius:15, borderColor:'#ccc', backgroundColor:'#f9fbe5', padding:7, marginBottom:10}}>
-            <Text style={{fontSize:18}}>Sipariş Tarihi:{formatOrderDate(productDetails[0].order.orderDate)}</Text>
-            <Text style={{fontSize:18}}>Sipariş Durumu: {productDetails[0].order.status}</Text>
-            <Text style={{fontSize:18}}>Toplam Tutarı: {productDetails.reduce((total, item) => total + item.order.totalPrice, 0)} ₺</Text>
-          </View>
-        )}
-          
+      {productDetails.length > 0 && (
+        <View style={{ borderWidth: 1, borderRadius: 15, borderColor: '#ccc', backgroundColor: '#f9fbe5', padding: 7, marginBottom: 10 }}>
+          <Text style={{ fontSize: 18 }}>Sipariş Tarihi: {formatOrderDate(productDetails[0].order.orderDate)}</Text>
+          <Text style={{ fontSize: 18 }}>Sipariş Durumu: {productDetails[0].order.status}</Text>
+          <Text style={{ fontSize: 18 }}>Toplam Tutarı: {productDetails.reduce((total, item) => total + item.order.totalPrice, 0)} ₺</Text>
+        </View>
+      )}
       <FlatList
         data={productDetails}
-        renderItem={renderItem}
+        renderItem={({ item }) => (
+          <View style={styles.orderDetail}>
+            <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: 800, marginBottom: 10 }]}>Sipariş Detayları</Text>
+            {item.products.map((product, index) => (
+              <View key={index}>
+                <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: 800, marginBottom: 10 }]}> {product.name}</Text>
+                <View style={styles.productDetail}>
+                  <View style={{ borderWidth: 1, borderRadius: 15, backgroundColor: 'white', padding: 5 }}>
+                    <Image source={{ uri: product.images[0] }} style={styles.productImage} />
+                  </View>
+                  <View style={{ marginLeft: 10 }}>
+                    <Text style={styles.productDetailText}>Miktar: {product.qty} {product.qtyFormat}</Text>
+                    <Text style={styles.productDetailText}>Fiyat: {item.order.totalPrice} ₺</Text>
+                    <Text style={styles.orderInfoText}>Gönderen: {item.order.from}</Text>
+                    {item.order.offer !== undefined && (
+                      <View>
+                        <Text style={styles.orderInfoText}>Teklif: {item.order.offer}</Text>
+                        <TouchableOpacity style={styles.button} onPress={() => handleAcceptOffer(item.order.transportDetailsId)}>
+                          <Text style={{ color: 'blue' }}>Teklifi Kabul Et</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.button} onPress={() => handleRejectOffer(item.order.transportDetailsId)}>
+                          <Text style={{ color: 'red' }}>Teklifi Reddet</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                    {item.order.offer == undefined && (
+                      <View>
+                        <Text style={[styles.orderInfoText, { color: item.order.status === 'Hazırlanıyor' ? '#2285a1' : 'green' }]}>{item.order.status}</Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
         keyExtractor={(item, index) => index.toString()}
       />
     </View>
@@ -113,16 +135,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  title: {
-    fontSize: 25,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   orderDetail: {
     marginBottom: 20,
     borderWidth: 1,
-    borderRadius:15,
-    backgroundColor:'#f9fbe5',
+    borderRadius: 15,
+    backgroundColor: '#f9fbe5',
     borderColor: '#ccc',
     padding: 10,
   },
@@ -141,12 +158,19 @@ const styles = StyleSheet.create({
   productImage: {
     width: 90,
     height: 90,
-    borderRadius:5,
-    alignSelf:'center',
+    borderRadius: 5,
+    alignSelf: 'center',
   },
   productDetailText: {
     fontSize: 18,
     marginBottom: 5,
+  },
+  button: {
+    backgroundColor: '#e0e0e0',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
   },
 });
 
