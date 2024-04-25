@@ -511,17 +511,26 @@ app.put('/orders/update/offer/:orderId', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
-app.put('/orders/update/isOfferAccept/:orderId', async (req, res) => {
-  const orderId = req.params.orderId;
-  const { isOfferAccept } = req.body;
+// PUT endpoint for updating offer acceptance status of an order
+app.put('/transportDetails/update/isOfferAccept/:transportDetailsId', async (req, res) => {
   try {
-    const updatedOrder = await Order.findByIdAndUpdate(orderId, { isOfferAccept }, { new: true });
-    res.json(updatedOrder);
+    const { transportDetailsId } = req.params;
+    const { isOfferAccept } = req.body;
+
+    // Taşıma detaylarını bul ve teklif kabul durumunu güncelle
+    const updatedTransportDetails = await TransportDetails.findByIdAndUpdate(transportDetailsId, { isOfferAccept }, { new: true });
+
+    if (!updatedTransportDetails) {
+      return res.status(404).json({ message: "Taşıma detayları bulunamadı." });
+    }
+
+    res.status(200).json({ message: "Teklif kabul durumu başarıyla güncellendi.", transportDetails: updatedTransportDetails });
   } catch (error) {
-    console.error('Error updating order status:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error('Error updating offer acceptance status:', error);
+    res.status(500).json({ message: 'Sunucu hatası.' });
   }
 });
+
 
 //Tüm siparişleri getirme
 app.get("/orders", async (req, res) => {
@@ -531,6 +540,25 @@ app.get("/orders", async (req, res) => {
   } catch (error) {
     console.error('Error fetching orders:', error);
     res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+// POST endpoint for adding transportDetailsId to an order
+app.post('/orders/addTransportDetailsId', async (req, res) => {
+  try {
+    const { orderId, transportDetailsId } = req.body;
+
+    // Siparişi bul ve transportDetailsId alanını güncelle
+    const updatedOrder = await Order.findByIdAndUpdate(orderId, { transportDetailsId }, { new: true });
+
+    if (!updatedOrder) {
+      return res.status(404).json({ message: "Sipariş bulunamadı." });
+    }
+
+    res.status(200).json({ message: "TransportDetailsId başarıyla eklendi.", order: updatedOrder });
+  } catch (error) {
+    console.error('Error adding transportDetailsId to order:', error);
+    res.status(500).json({ message: 'Sunucu hatası.' });
   }
 });
 
@@ -642,7 +670,6 @@ app.post('/transportDetails/offer', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
 // GET all transport details
 app.get('/transportDetails/:transporterId', async (req, res) => {
   const transporterId = req.params.transporterId;
@@ -652,6 +679,23 @@ app.get('/transportDetails/:transporterId', async (req, res) => {
   } catch (error) {
     console.error('Error fetching transport details by transporterId:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// GET endpoint for fetching transport details by transportDetailsId
+app.get('/transportDetails/:transportDetailsId', async (req, res) => {
+  try {
+    const { transportDetailsId } = req.params;
+    const transportDetails = await TransportDetails.findById(transportDetailsId);
+
+    if (!transportDetails) {
+      return res.status(404).json({ message: "Taşıma detayı bulunamadı." });
+    }
+
+    res.status(200).json({ transportDetails });
+  } catch (error) {
+    console.error('Error fetching transport details by transportDetailsId:', error);
+    res.status(500).json({ message: 'Sunucu hatası.' });
   }
 });
 

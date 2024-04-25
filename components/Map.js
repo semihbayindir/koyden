@@ -278,6 +278,13 @@ function calculateDistance(coord1, coord2) {
             offer
           });
           console.log('Offer created successfully:', response.data);
+           // Teklif oluşturulduğunda, transportDetailsId'yi siparişe ekle
+          const transportDetailsId = response.data._id;
+          const addTransportDetailsIdResponse = await axios.post(`http://localhost:8000/orders/addTransportDetailsId`, {
+            orderId,
+            transportDetailsId
+          });
+          console.log('TransportDetailsId added to order:', addTransportDetailsIdResponse.data);
         }
       } catch (error) {
         console.error('Error creating offer:', error);

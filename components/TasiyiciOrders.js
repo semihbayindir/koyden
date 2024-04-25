@@ -18,7 +18,6 @@ const TasiyiciOrders = () => {
         try {
           const transportResponse = await axios.get(`http://localhost:8000/transportDetails/${userId}`);
           setTransportDetails(transportResponse.data);
-
           const orderPromises = transportResponse.data.map(async (transportDetail) => {
             const orderResponse = await axios.get(`http://localhost:8000/orders/${transportDetail.orderId}`);
             return orderResponse.data;
@@ -91,11 +90,8 @@ const TasiyiciOrders = () => {
     return (
       <View>
         <Text>Offer: {transportDetails[index].offer}</Text>
-        <Text>Offer Accept Status: {offerAcceptStatus}</Text>
-        <Text>From: {order.from}</Text>
-        <Text>To: {order.to}</Text>
-        <Text>isOfferAccept: {transportDetails[index].isOfferAccept}</Text>
-
+        {offerAcceptStatus == "Onaylandı" && (
+          <>
         {/* Üreticinin bilgilerini burada göster */}
         {producerInfo && (
           <View>
@@ -107,6 +103,12 @@ const TasiyiciOrders = () => {
             {/* Diğer üretici bilgilerini buraya ekleyebilirsiniz */}
           </View>
         )}
+       </>
+        )}
+        <Text>Offer Accept Status: {offerAcceptStatus}</Text>
+        <Text>From: {order.from}</Text>
+        <Text>To: {order.to}</Text>
+        <Text>isOfferAccept: {transportDetails[index].isOfferAccept}</Text>
 
         {/* Ürünlerin bilgisini products state'inden al */}
         {order.products.map((product, index) => (
