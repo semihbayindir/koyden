@@ -683,7 +683,7 @@ app.get('/transportDetails/:transporterId', async (req, res) => {
 });
 
 // GET endpoint for fetching transport details by transportDetailsId
-app.get('/transportDetails/:transportDetailsId', async (req, res) => {
+app.get('/transportDetails/id/:transportDetailsId', async (req, res) => {
   try {
     const { transportDetailsId } = req.params;
     const transportDetails = await TransportDetails.findById(transportDetailsId);

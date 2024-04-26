@@ -11,7 +11,6 @@ const Cart = () => {
     const [from,setFrom] = useState('Sakarya');
     const [to,setTo] = useState('İstanbul');
 
-
     
     useEffect(() => {
         if (userId) {
@@ -35,58 +34,6 @@ const Cart = () => {
         }
     }, [userId]);
     
-
-    // useEffect(() => {
-    //     const unsubscribe = navigation.addListener('focus', () => {
-    //         refreshCart(); // Ekran odaklandığında sepeti yenile
-    //     });
-    
-    //     // Component unmounted olduğunda listener'ı temizle
-    //     return unsubscribe;
-    // }, [navigation]);
-    
-    const refreshCart = async () => {
-        try {
-            const response = await axios.get(`http://localhost:8000/cart/${userId}`);
-            if (response.data && response.data.products) {
-                const groupedCartItems = groupCartItems(response.data.products);
-                setCartItems(groupedCartItems);
-            } else {
-                setCartItems([]);
-            }
-        } catch (error) {
-            console.error('Error refreshing cart:', error);
-        }
-    };
-
-
-
-    // const handleDeleteCartItem = async (productId) => {
-    //     try {
-    //         // Ürünü sepetten silmeden önce, önce sepetin içinde olup olmadığını kontrol edin
-    //         const existingCartItemIndex = cartItems.findIndex(item => item.productId._id === productId);
-    //         if (existingCartItemIndex === -1) {
-    //             console.error('Error deleting product: Product not found in cart');
-    //             return; // Ürün sepet içinde bulunamadığı için işlemi durdur
-    //         }
-    
-    //         // Ürünü sepetten silme isteği gönder
-    //         const response = await axios.delete(`http://localhost:8000/cart/${userId}/product/${productId}`);
-    //         console.log('Product deleted successfully:', response.data);
-    
-    //         // Sepet öğelerini yeniden yükleme veya güncelleme işlemi burada yapılabilir
-    //     } catch (error) {
-    //         if (error.response && error.response.status === 404) {
-    //             console.error('Error deleting product: Product not found in cart');
-    //         } else {
-    //             console.error('Error deleting product:', error);
-    //         }
-    //     }
-    // };
-
-
-
-
     const groupCartItems = (items) => {
         const groupedItems = {};
         items.forEach((item) => {
@@ -106,13 +53,6 @@ const Cart = () => {
         });
     };
 
-    const renderCartItem = ({ item }) => (
-        <View style={{ borderBottomWidth: 1, padding: 10 }}>
-            <Text style={{fontSize:18}}>Ürün Adı: {item.productId.name}</Text>
-            <Text style={{fontSize:18}}>Miktar: {item.quantity}</Text>
-            {/* Diğer ürün bilgilerini buraya ekleyebilirsiniz */}
-        </View>
-    );
     const handleOrder = async () => {
         try {
             const groupedProducts = {};
@@ -293,38 +233,6 @@ const Cart = () => {
             </TouchableOpacity>
         </View>
     );
-    
-    
-    
-    
-//     return (
-//         <View>
-            
-//             <Text style={{ fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }}>Sepet</Text>
-          
-//             {cartItems.length === 0 ? (
-//                 <Text style={{ textAlign: 'center' }}>Sepetiniz Boş</Text>
-//             ) : (
-//                 <View style={{flexDirection:'row'}}>
-//                 <FlatList
-//                     data={cartItems}
-//                     renderItem={renderCartItem}
-//                     keyExtractor={(item, index) => index.toString()} // veya unique bir değeri kullanabilirsiniz
-//                     style={{margin:10}}
-//                 >
-            
-//                 </FlatList>
-//                 <MaterialCommunityIcons style={{marginRight:20,marginTop:20}} name='delete' color={'red'} size={30} onPress={handleDeleteCartItem} />
-
-//                 </View>
-//             )}
-          
-//             <TouchableOpacity style={{backgroundColor:'#729c44',padding:10, marginHorizontal:50, marginTop:10,borderRadius:5, alignContent:'center'}} onPress={handleOrder}>
-//                 <Text style={{textAlign:'center',color:'white', fontSize:18}}>Sipariş Ver</Text>
-//             </TouchableOpacity>
-
-//         </View>
-//     );
  };
 
  const styles = StyleSheet.create({
