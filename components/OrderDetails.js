@@ -32,12 +32,13 @@ const OrderDetails = ({ route }) => {
 
   const fetchTransportDetails = async (transportDetailsId, index) => {
     try {
-      const response = await axios.get(`http://localhost:8000/transportDetails/${transportDetailsId}`);
+      const response = await axios.get(`http://localhost:8000/transportDetails/id/${transportDetailsId}`);
       const transportDetails = response.data.transportDetails;
       // Update productDetails state with fetched transportDetails
       setProductDetails(prevDetails => {
         const updatedDetails = [...prevDetails];
         updatedDetails[index].order.offer = transportDetails.offer;
+        updatedDetails[index].order.isOfferAccept = transportDetails.isOfferAccept;
         return updatedDetails;
       });
     } catch (error) {
@@ -57,7 +58,7 @@ const OrderDetails = ({ route }) => {
   const handleAcceptOffer = async (transportDetailsId) => {
     try {
       const response = await axios.put(`http://localhost:8000/transportDetails/update/isOfferAccept/${transportDetailsId}`, { isOfferAccept: true });
-      console.log('Offer accepted:', response.data);
+      // console.log('Offer accepted:', response.data);
       alert('Offer accepted', response.data);
       // Handle UI update if needed
     } catch (error) {
@@ -102,7 +103,7 @@ const OrderDetails = ({ route }) => {
                     <Text style={styles.productDetailText}>Miktar: {product.qty} {product.qtyFormat}</Text>
                     <Text style={styles.productDetailText}>Fiyat: {item.order.totalPrice} ₺</Text>
                     <Text style={styles.orderInfoText}>Gönderen: {item.order.from}</Text>
-                    {item.order.offer !== undefined && (
+                    {item.order.offer !== undefined && item.order.isOfferAccept == true &&(
                       <View>
                         <Text style={styles.orderInfoText}>Teklif: {item.order.offer}</Text>
                         <TouchableOpacity style={styles.button} onPress={() => handleAcceptOffer(item.order.transportDetailsId)}>
@@ -113,7 +114,7 @@ const OrderDetails = ({ route }) => {
                         </TouchableOpacity>
                       </View>
                     )}
-                    {item.order.offer == undefined && (
+                    {item.order.offer == undefined &&(
                       <View>
                         <Text style={[styles.orderInfoText, { color: item.order.status === 'Hazırlanıyor' ? '#2285a1' : 'green' }]}>{item.order.status}</Text>
                       </View>
