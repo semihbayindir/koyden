@@ -103,7 +103,7 @@ const OrderDetails = ({ route }) => {
                     <Text style={styles.productDetailText}>Miktar: {product.qty} {product.qtyFormat}</Text>
                     <Text style={styles.productDetailText}>Fiyat: {item.order.totalPrice} ₺</Text>
                     <Text style={styles.orderInfoText}>Gönderen: {item.order.from}</Text>
-                    {item.order.offer !== undefined && item.order.isOfferAccept == true &&(
+                    {item.order.offer !== undefined  && item.order.isOfferAccept!==true &&(
                       <View>
                         <Text style={styles.orderInfoText}>Teklif: {item.order.offer}</Text>
                         <TouchableOpacity style={styles.button} onPress={() => handleAcceptOffer(item.order.transportDetailsId)}>
@@ -113,6 +113,9 @@ const OrderDetails = ({ route }) => {
                           <Text style={{ color: 'red' }}>Teklifi Reddet</Text>
                         </TouchableOpacity>
                       </View>
+                    )}
+                    {item.order.isOfferAccept==true && (
+                      <Text>Teklifiniz taşıyıcıya iletildi.</Text>
                     )}
                     {item.order.offer == undefined &&(
                       <View>

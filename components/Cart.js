@@ -8,10 +8,10 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
     const userId = useUserIdDecoder();
-    const [from,setFrom] = useState('Sakarya');
-    const [to,setTo] = useState('İstanbul');
+    const [quantities, setQuantities] = useState({});
+    const [producerCity, setProducerCity] = useState('');
+    const [userCity, setUserCity] = useState('');
 
-    
     useEffect(() => {
         if (userId) {
             const fetchCartItems = async () => {
@@ -20,8 +20,7 @@ const Cart = () => {
                     if (response.data && response.data.products) {
                         const groupedCartItems = groupCartItems(response.data.products);
                         setCartItems(groupedCartItems);
-
-                        logProducerIds(groupedCartItems); // Üretici ID'lerini konsola yazdır
+                        initializeQuantities(groupedCartItems);
                     } else {
                         setCartItems([]);
                     }
@@ -46,66 +45,62 @@ const Cart = () => {
         return Object.values(groupedItems);
     };
 
-    const logProducerIds = (items) => {
+    const initializeQuantities = (items) => {
+        const initialQuantities = {};
         items.forEach(item => {
-            // console.log(item.productId.producerId); // Üretici ID'lerini konsola yazdır
-           
+            initialQuantities[item.productId._id] = item.quantity;
         });
+        setQuantities(initialQuantities);
     };
 
     const handleOrder = async () => {
         try {
             const groupedProducts = {};
             const orderIds = [];
+            const producerCities = {}; // Her bir üreticinin şehir bilgisini depolamak için bir nesne oluşturun
     
-            // Sepetteki her ürün için
             for (const cartItem of cartItems) {
                 const productId = cartItem.productId._id;
                 const producerId = cartItem.productId.producerId;
     
-                // Üretici bazında ürünleri grupla
                 if (!groupedProducts[producerId]) {
-                    // Üretici ID'si henüz gruplanmamışsa, yeni bir grup oluştur
                     groupedProducts[producerId] = [];
                 }
     
-                // Ürünü ilgili üretici grubuna ekle
                 groupedProducts[producerId].push({
                     productId: productId,
-                    quantity: cartItem.quantity, // Dropdown'dan alınan sipariş miktarını kullan
+                    quantity: quantities[productId],
                     price: cartItem.productId.price,
                 });
     
-                // Ürün miktarını azalt
-                await decreaseProductQuantity(productId, cartItem.quantity);
+                await decreaseProductQuantity(productId, quantities[productId]);
             }
     
-            // Her bir üretici için ayrı sipariş oluştur
+            // Her bir üretici için ayrı ayrı işlem yapın
             for (const producerId of Object.keys(groupedProducts)) {
                 const products = groupedProducts[producerId];
                 const totalPrice = products.reduce((total, item) => total + (item.price * item.quantity), 0);
     
-                // Sipariş veri modeli
+                // Üretici şehir bilgisini önce kontrol edin, daha önce alınmışsa tekrar sormayın
+                const producerCity = producerCities[producerId] || await fetchProducerCity(producerId);
+                producerCities[producerId] = producerCity;
+
                 const orderData = {
                     userId: userId,
                     producerId: producerId,
                     products: products,
                     totalPrice: totalPrice,
-                    from: from,
-                    to: to
+                    from: producerCity,
+                    to: userCity,
                 };
     
-                // Sipariş oluştur
                 const response = await axios.post('http://localhost:8000/orders/create', orderData);
                 console.log('Order placed successfully for producer', producerId, ':', response.data);
                 orderIds.push({ orderId: response.data._id });
             }
     
-            // SingleOrder oluşturma ve her bir orderId'yi ekleyerek kaydetme
-            console.log(orderIds)
             await handleSingleOrder(orderIds);
     
-            // İşlem tamamlandıktan sonra uygun bir şekilde yönlendirme veya bildirim yapılabilir
             await axios.delete(`http://localhost:8000/cart/${userId}`);
             setCartItems([]);
         } catch (error) {
@@ -113,11 +108,9 @@ const Cart = () => {
         }
     };
     
-
-    // Ürün miktarını azaltan yardımcı fonksiyon
+    
     const decreaseProductQuantity = async (productId, quantityToDecrease) => {
         try {
-            // Ürün miktarını azaltmak için istek gönder
             const response = await axios.put(`http://localhost:8000/products/${productId}/decreaseQuantity`, {
                 quantityToDecrease: quantityToDecrease
             });
@@ -129,27 +122,24 @@ const Cart = () => {
 
     const handleSingleOrder = async (orderIds) => {
         try {
-            // Tüm ürünleri ve toplam fiyatı içeren bir liste oluştur
             const products = cartItems.map(item => ({
                 productId: item.productId._id,
-                quantity: item.quantity,
-                price: item.productId.price // Ürün fiyatını cartItems içinden alıyoruz
+                quantity: quantities[item.productId._id],
+                price: item.productId.price
             }));
     
-            const totalPrice = cartItems.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
+            const totalPrice = cartItems.reduce((total, item) => total + (item.productId.price * quantities[item.productId._id]), 0);
 
-            // Sipariş veri modeli
             const orderData = {
                 userId: userId,
-                producerId: cartItems[0].productId.producerId, // İlk ürünün üreticisinin ID'si
+                producerId: cartItems[0].productId.producerId,
                 orderIds: orderIds,
                 products: products,
-                totalPrice: totalPrice, // Sepetin toplam fiyatını hesapla
-                from: from,
-                to: to
+                totalPrice: totalPrice,
+                from: producerCity,
+                to: userCity
             };
         
-            // Sipariş oluştur
             const response = await axios.post('http://localhost:8000/singleOrders/create', orderData);
             console.log('singleOrder placed successfully:', response.data);
         } catch (error) {
@@ -157,20 +147,16 @@ const Cart = () => {
         }
     };
 
-    cartItems.length > 0 && cartItems.map((cartItem, index) => {
-        return (
-            <View key={index}>
-                <Text>Ürün Adı: {cartItem.productId.name}</Text>
-                <Text>Miktar: {cartItem.quantity}</Text>
-                {/* Diğer ürün bilgilerini buraya ekleyebilirsiniz */}
-            </View>
-        );
-    })
+    const handleQuantityChange = (productId, quantityChange) => {
+        setQuantities(prevQuantities => ({
+            ...prevQuantities,
+            [productId]: prevQuantities[productId] + quantityChange
+        }));
+    };
 
     const handleDeleteCartItem = async (productId) => {
         try {
             const existingCartItem = cartItems.find(item => item.productId._id === productId);
-            console.log("Existing Cart Item : "+existingCartItem.productId._id)
             if (!existingCartItem) {
                 console.error('Error deleting product: Product not found in cart');
                 return;
@@ -190,6 +176,42 @@ const Cart = () => {
             }
         }
     };
+    
+    const fetchProducerCity = async (producerId) => {
+        try {
+            const response = await axios.get(`http://localhost:8000/producer/${producerId}`);
+            const producerCity = response.data.producer.verification.producerAddress.city;
+            setProducerCity(producerCity);
+            return producerCity;
+        } catch (error) {
+            console.error('Error fetching producer city:', error);
+            throw error; // Hata olduğunda dışarıya fırlatın
+        }
+    };
+    
+
+    const fetchUserCity = async () => {
+        try {
+
+    
+            const response = await axios.get(`http://localhost:8000/users/${userId}/verification`);
+
+            const userCity = response.data.producerAddress.city;
+            setUserCity(userCity);
+        } catch (error) {
+            console.error('Error fetching user city:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (cartItems.length > 0) {
+            const producerId = cartItems[0].productId.producerId;
+            fetchProducerCity(producerId);
+           
+            fetchUserCity();
+        }
+    }, [cartItems]);
+
     const uniqueProductsInCart = [...new Set(cartItems.map(item => item.productId._id))];
     const totalUniqueProductsInCart = uniqueProductsInCart.length;
     
@@ -199,27 +221,25 @@ const Cart = () => {
             <View>
                 {cartItems.length > 0 ? (
                     cartItems.map((cartItem, index) => (
-                        <View style={{flexDirection:'row', borderWidth:1, borderRadius:20, marginHorizontal:'3%', marginVertical:'2%',backgroundColor:'#f9fbe5'}}>
-                             <View style={{borderWidth:1, borderRadius:15, backgroundColor:'white', padding:5, margin: 5}}>
-                            <Image source={{ uri: cartItem.productId.images[0] }} style={styles.productImage} />
-                        </View>
-                        <View key={index} style={{ margin: '3%' ,flex:0.90, padding:9}}>
-               
-                            <Text style={{ fontWeight: 'bold', fontSize:22 }}>{cartItem.productId.name}</Text>
-                            <Text style={{  fontSize:18 }}>Miktar: {cartItem.quantity} {cartItem.quantityFormat}</Text>
-                            {/* Her bir cartItem içindeki ürünleri döngü kullanarak listeleyin */}
-                            {cartItem.products && cartItem.products.map((product, productIndex) => (
-                                <View key={productIndex} >
-
-                                    <Text>Ürün Adı: {product.name}</Text>
-                                    
-                                    {/* Diğer ürün bilgilerini buraya ekleyin */}
+                        <View style={{flexDirection:'row', borderWidth:1, borderRadius:20, marginHorizontal:'3%', marginVertical:'2%',backgroundColor:'#f9fbe5'}} key={index}>
+                            <View style={{borderWidth:1, borderRadius:15, backgroundColor:'white', padding:5, margin: 5}}>
+                                <Image source={{ uri: cartItem.productId.images[0] }} style={styles.productImage} />
+                            </View>
+                            <View style={{ margin: '3%' ,flex:0.90, padding:9}}>
+                                <Text style={{ fontWeight: 'bold', fontSize:22 }}>{cartItem.productId.name}</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <TouchableOpacity onPress={() => handleQuantityChange(cartItem.productId._id, -1)} style={{ padding: 5 }}>
+                                        <MaterialCommunityIcons name="minus-circle-outline" size={25} />
+                                    </TouchableOpacity>
+                                    <Text style={{  fontSize:20 }}>{quantities[cartItem.productId._id]} {cartItem.qtyFormat}</Text>
+                                    <TouchableOpacity onPress={() => handleQuantityChange(cartItem.productId._id, 1)} style={{ padding: 5 }}>
+                                        <MaterialCommunityIcons name="plus-circle-outline" size={25} />
+                                    </TouchableOpacity>
                                 </View>
-                            ))}
                             </View>
                             <View style={{flex:0.25,margin: '8%'}}>
                                 <TouchableOpacity onPress={() => handleDeleteCartItem(cartItem.productId._id)}>
-                                     <MaterialCommunityIcons name='delete' size={30} color={'red'}/>
+                                    <MaterialCommunityIcons name='delete' size={30} color={'red'}/>
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -242,6 +262,6 @@ const Cart = () => {
         borderRadius:5,
         alignSelf:'center',
       },
- })
+ });
 
 export default Cart;
