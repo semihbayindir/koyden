@@ -32,31 +32,50 @@ const AllProducts = () => {
     }
   }, [userId]);
   
+  
   const handleProductPress = (productId) => {
     navigation.navigate('SingleProduct', { productId: productId });
   };
 
-  const renderProductItem = ({ item }) => {
-    return (
-    
-      <TouchableOpacity style={styles.urunler} onPress={() => handleProductPress(item._id)}>
-        {item.images && item.images.length > 0 ? (
-          <Image style={styles.images} source={{ uri: item.images[0] }} /> 
-        ) : (
-          <View />
-        )}
-        <View style={styles.productInfo}>
-          <Text style={styles.productName}>{item.name}</Text>
-          <View style={styles.productDet}>
-            <Text style={styles.productQty}>{item.qty} {item.qtyFormat}</Text>
-            <Text style={styles.productPrice}>{item.price} ₺</Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-  
-    );
+  const [producerInfos, setProducerInfos] = useState([]);
+
+useEffect(() => {
+  const fetchProducerInfo = async () => {
+    try {
+      const producerInfoPromises = products.map(async (product) => {
+        const response = await axios.get(`http://localhost:8000/producer/${product.producerId}`);
+        return response.data.producer;
+      });
+      const producerInfo = await Promise.all(producerInfoPromises);
+      setProducerInfos(producerInfo);
+    } catch (error) {
+      console.error('Error fetching producer information:', error);
+    }
   };
-  
+
+  fetchProducerInfo();
+}, [products]);
+
+const renderProductItem = ({ item, index }) => {
+  const producerInfo = producerInfos[index];
+  return (
+    <TouchableOpacity style={styles.urunler} onPress={() => handleProductPress(item._id)}>
+      {item.images && item.images.length > 0 ? (
+        <Image style={styles.images} source={{ uri: item.images[0] }} /> 
+      ) : (
+        <View />
+      )}
+      <View style={styles.productInfo}>
+        <Text style={styles.productName}>{item.name}</Text>
+        {/* <Text style={styles.producerAddress}>{producerInfo && producerInfo.verification.producerAddress.city}</Text> */}
+        <View style={styles.productDet}>
+          <Text style={styles.productFrom}>{producerInfo && producerInfo.verification.producerAddress.city}</Text>
+          <Text style={styles.productPrice}>{item.price} ₺</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
   const filteredProducts = fuzzySearch(searchKeyword, products);
 
   return (
@@ -152,10 +171,11 @@ const AllProducts = () => {
       fontSize:18, 
       padding:5,
     },
-    productQty:{
+    productFrom:{
       fontSize:18, 
-      paddingLeft:20, 
+      paddingLeft:5, 
       paddingBottom:10,
+      color:'green'
     },
     productPrice:{
       fontSize:18, 

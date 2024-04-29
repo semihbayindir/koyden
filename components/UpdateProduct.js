@@ -64,6 +64,12 @@ const UpdateProduct = ({ productId, onClose }) => {
         value={updatedProductCategory}
         onChangeText={setUpdatedProductCategory}
       />
+      <TextInput
+        style={styles.input}
+        placeholder="Stok"
+        value={updatedProductQuantity}
+        onChangeText={setUpdatedProductQuantity}
+      />
       {/* Diğer input alanlarını ekleyin */}
 
       <TouchableOpacity style={styles.button} onPress={handleUpdateProduct}>
