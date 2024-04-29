@@ -76,6 +76,10 @@ const Map = () => {
   const [offer,setOffer] = useState();
   const [waypoints, setWaypoints] = useState([]);
   const userId = useUserIdDecoder();
+
+  const [otherMarkersInfo, setOtherMarkersInfo] = useState([]);
+  const [isOfferTextInputVisible, setIsOfferTextInputVisible] = useState(false);
+
   useEffect(() => {
     if(userId){
     const fetchOrders = async () => {
@@ -121,10 +125,8 @@ const Map = () => {
                   const address = `${district}, Turkey`;
                   const coordinates = await getCoordinatesFromAddress(address);
                   if (coordinates) {
-                  
-                    if (!allCoordinates.some(coord => coord.latitude === coordinates.latitude && coord.longitude === coordinates.longitude)) {
-                      allCoordinates.push(coordinates);
-                    }                  }
+                    allCoordinates.push(coordinates);
+                  }
                 }
               }
             }
@@ -262,15 +264,35 @@ function calculateDistance(coord1, coord2) {
       moveTo(position);
     };
 
-    const handleMarkerPress = (marker) => {
+    const handleMarkerPress = async (marker) => {
       setSelectedMarker(marker); // Seçili marker'ı state'e ata
+
+      // Aynı konumda bulunan diğer markaları bul
+    const nearbyMarkers = markers.filter((m) => {
+      return m.coordinate.latitude === marker.coordinate.latitude && m.coordinate.longitude === marker.coordinate.longitude;
+    });
+
+    // Bulunan diğer markaların bilgilerini getir ve state'e ata
+    const markerInfos = [];
+    for (const m of nearbyMarkers) {
+      try {
+        const orderId = orders[m.id]._id;
+        const response = await axios.get(`http://localhost:8000/orders/${orderId}`);
+        const orderInfo = response.data;
+        markerInfos.push({ marker: m, orderInfo });
+      } catch (error) {
+        console.error('Error fetching order info:', error);
+      }
+    }
+    setOtherMarkersInfo(markerInfos);
+    console.log(otherMarkersInfo[0].marker.id);
     };
 
 
-    const handleOffer = async () => {
+    const handleOffer = async (markerId) => {
       try {
         if (selectedMarker !== null) {
-          const orderId = orders[selectedMarker.id]._id; // Seçili markere göre siparişin ID'sini al
+          const orderId = orders[markerId]._id; // Seçili markere göre siparişin ID'sini al
           const transporterId = userId; // Taşıyıcı ID'si, değiştirilmeli
           const response = await axios.post(`http://localhost:8000/transportDetails/offer`, {
             orderId,
@@ -373,26 +395,29 @@ function calculateDistance(coord1, coord2) {
   <View style={styles.modalContainer}>
     {selectedMarker && (
       <>
-        <Text>Marker Information</Text>
-        {/* <Text>{`Marker ID: ${selectedMarker.id}`}</Text> */}
-        {/* Her bir ürün için bilgileri göster */}
-        {orders[selectedMarker.id]?.products.map((product, productIndex) => (
-          <View key={productIndex}>
-            <Text>{`Product ${productIndex + 1}`}</Text>
-            <Text>{`Product Name: ${product.productId.name}`}</Text>
-            <Text>{`Product Price: ${product.price}`}</Text>
-            <Text>{`Product Id: ${product.productId._id}`}</Text>
-            <Button title="Ürün Sayfası" onPress={() => handleProductPress(product.productId._id)} />
+        <Text>Siparişler</Text>
+        {otherMarkersInfo.map((otherMarker, otherMarkerIndex) => (
+          <View key={otherMarkerIndex}>
+            <Text style={styles.button}>Sipariş {otherMarkerIndex + 1}</Text>
+            {orders[otherMarker.marker.id]?.products.map((product, productIndex) => (
+              <View key={productIndex}>
+                <Text>{`Product ${productIndex + 1}`}</Text>
+                <Text>{`Product Name: ${product.productId.name}`}</Text>
+                <Text>{`Product Price: ${product.price}`}</Text>
+                <Text>{`Product Id: ${product.productId._id}`}</Text>
+                <Button title="Ürün Sayfası" onPress={() => handleProductPress(product.productId._id)} />
+              </View>
+            ))}
+            <TextInput
+                style={styles.offerInput}
+                value={offer}
+                onChangeText={(offer) => setOffer(offer)}
+                placeholder="Teklif Ver."
+                keyboardType="numeric"/>
+                <Button title="Teklif Yap" onPress={() => handleOffer(otherMarker.marker.id)}/>
           </View>
         ))}
-        <TextInput 
-        style={styles.offerInput}
-        value={offer}
-        onChangeText={(offer) => setOffer(offer)}
-        placeholder="Teklif Ver."
-        keyboardType="numeric"/>
-        <Button title="Teklif Yap" onPress={() => handleOffer()}/>
-        <Button title="Close" onPress={() => setSelectedMarker(null)} />
+          <Button title="Close" onPress={() => setSelectedMarker(null)} />
       </>
     )}
   </View>
