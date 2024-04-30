@@ -562,6 +562,23 @@ app.post('/orders/addTransportDetailsId', async (req, res) => {
   }
 });
 
+app.delete('/orders/:orderId', async (req, res) => {
+  const orderId = req.params.orderId; // orderId olarak değiştirildi
+  try {
+    // Order'ı bul ve sil
+    const deletedOrder = await Order.findByIdAndDelete(orderId);
+    if (deletedOrder) {
+      res.status(200).json({ message: 'Order deleted successfully' });
+    } else {
+      res.status(404).json({ error: 'Order not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting order:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 app.delete('/cart/:userId/product/:productId', async (req, res) => {
   const userId = req.params.userId;
   const productId = req.params.productId;

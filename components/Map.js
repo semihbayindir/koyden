@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   Modal,
   Button,
-  TextInput
+  TextInput,
+  ScrollView,
 } from "react-native";
 import {
   GooglePlacesAutocomplete,
@@ -20,17 +21,18 @@ import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { useUserIdDecoder } from "./UserIdDecoder";
 
+
 const { width, height } = Dimensions.get("window");
 
 const GOOGLE_API_KEY = "AIzaSyD1-czL9crUVUOlVOa4z5-iDKAKgdUMegs";
 
 const MAX_DISTANCE = 100*1000; // METRE HESABI
 const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.02;
+const LATITUDE_DELTA = 15;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const INITIAL_POSITION = {
-  latitude: 40.949581,
-  longitude: 29.109850,
+  latitude: 39.1667,
+  longitude: 35.6667,
   latitudeDelta: LATITUDE_DELTA,
   longitudeDelta: LONGITUDE_DELTA,
 };
@@ -281,7 +283,7 @@ function calculateDistance(coord1, coord2) {
         const orderInfo = response.data;
         markerInfos.push({ marker: m, orderInfo });
       } catch (error) {
-        console.error('Error fetching order info:', error);
+        // console.error('Error fetching order info:', error);
       }
     }
     setOtherMarkersInfo(markerInfos);
@@ -318,6 +320,11 @@ function calculateDistance(coord1, coord2) {
     const addMarkerRoute = async (coordinate) => {
       const newWaypoints = [...waypoints, coordinate]; // Mevcut waypoints dizisine yeni koordinatı ekleyin
       setWaypoints(newWaypoints); // Yeniden oluşturulan waypoints dizisini ayarlayın
+    };
+
+
+    const handleProductPress = (productId) => {
+      navigation.navigate('SingleProduct', { userType :'tasiyici', productId: productId  });
     };
     
   return (
@@ -391,8 +398,11 @@ function calculateDistance(coord1, coord2) {
       </View>
 
       {/* Modal bileşeni */}
-      <Modal visible={selectedMarker !== null} animationType="slide" transparent>
-  <View style={styles.modalContainer}>
+      
+      <Modal visible={selectedMarker !== null} animationType="slide" transparent >
+      <ScrollView style={styles.modalContainer} >
+       
+  
     {selectedMarker && (
       <>
         <Text>Siparişler</Text>
@@ -417,11 +427,16 @@ function calculateDistance(coord1, coord2) {
                 <Button title="Teklif Yap" onPress={() => handleOffer(otherMarker.marker.id)}/>
           </View>
         ))}
-          <Button title="Close" onPress={() => setSelectedMarker(null)} />
+          <TouchableOpacity  style={{marginBottom:15, paddingBottom:30, alignItems:'center'}} onPress={() => setSelectedMarker(null)} >
+            <Text style={{fontSize:20, color:'red',alignContent:'center'}}>Close</Text>
+          </TouchableOpacity>
       </>
     )}
-  </View>
-      </Modal>
+
+       
+        </ScrollView>
+      </Modal>  
+     
 </View>
   );
 }
@@ -464,6 +479,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   modalContainer: {
+    height:500,
     position: "absolute",
     bottom: 0,
     left: 0,
@@ -487,6 +503,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   },
+  closeButton: {
+     
+  }
 });
 
 export default Map;

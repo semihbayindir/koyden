@@ -24,8 +24,15 @@ const AddProduct = () => {
     const [selectedUnit, setSelectedUnit] = useState('kg');
     const [unitOptions, setUnitOptions] = useState(['kg', 'adet']);
 
+    const [selectedUnitKategori, setSelectedUnitKategori] = useState('meyve');
+    const [unitOptionsKategori, setUnitOptionsKategori] = useState(['meyve', 'sebze']);
+
     const handleUnitSelect = (index, value) => {
         setSelectedUnit(value); // Seçilen birimi ayarla
+    };
+
+    const handleUnitSelectKategori = (index, value) => {
+        setSelectedUnitKategori(value); // Seçilen birimi ayarla
     };
 
     useEffect(() => {
@@ -106,7 +113,7 @@ const AddProduct = () => {
                 name: productName,
                 description: productDescription,
                 images: [imageUrl], // AWS S3'den alınan URL
-                category: productCategory,
+                category: selectedUnitKategori,
                 qty: productQuantity,
                 qtyFormat: selectedUnit,
                 minQty: minOrderQuantity,
@@ -163,12 +170,40 @@ const AddProduct = () => {
                         value={productDescription}
                         onChangeText={(text) => setProductDescription(text)}
                     />
-                    <TextInput
-                        style={styles.input}
+                    
+
+
+
+
+
+                    <View style={styles.inputWithDropdown}>
+                    {/* <TextInput
+                        style={{fontSize: 22, flex: 1, borderWidth: 1, borderRadius: 10, marginRight: 5, maxWidth: '100%', width: '100%', padding: 9 }}
                         placeholder="Kategori"
                         value={productCategory}
                         onChangeText={(text) => setProductCategory(text)}
-                    />
+                    /> */}
+                    <Text style={{fontSize: 22,color:'gray',  flex: 1, marginRight: 70, padding: 9 }}>Kategori : </Text>
+                        <ModalDropdown
+                            options={unitOptionsKategori}
+                            defaultValue={selectedUnitKategori}
+                            onSelect={(index, value) => handleUnitSelectKategori(index, value)}
+                            style={{ fontSize: 22, flex:0.5, justifyContent:'flex-end' }}
+                            textStyle={{ fontSize: 22, color: 'gray', borderWidth: 1, borderRadius: 10, padding: 9 }}
+                            dropdownStyle={{ fontSize: 22, height: 100 }}
+                            dropdownTextStyle={{ fontSize: 22 }} // Dropdown içerisindeki metin stilini ayarla
+                            dropdownTextHighlightStyle={{ color: 'green' }} // Dropdown içerisinde seçilen metni vurgula
+                        />
+                    </View>
+
+
+
+
+
+
+
+
+
                     <View style={styles.inputWithDropdown}>
                         <TextInput
                             style={{ fontSize: 22, flex: 1, borderWidth: 1, borderRadius: 10, marginRight: 5, maxWidth: '100%', width: '100%', padding: 9 }}
@@ -225,7 +260,6 @@ const styles = StyleSheet.create({
     },
     inputWithDropdown: {
         flexDirection: 'row',
-        alignItems: 'center',
         marginTop: 15,
     },
 

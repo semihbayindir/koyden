@@ -5,7 +5,6 @@ import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react
 const OrderDetails = ({ route }) => {
   const { orderDetails } = route.params;
   const [productDetails, setProductDetails] = useState([]);
-
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -77,6 +76,18 @@ const OrderDetails = ({ route }) => {
       // Handle error if needed
     }
   };
+
+  const handleCancelOrder = async (orderId) => {
+    console.log('Order ID to cancel:', orderId);
+    try {
+      const response = await axios.delete(`http://localhost:8000/orders/${orderId}`);
+      console.log('Order cancelled:', response.data);
+      // Handle UI update if needed
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+      // Handle error if needed
+    }
+  };
   
   return (
     <View style={styles.container}>
@@ -126,7 +137,13 @@ const OrderDetails = ({ route }) => {
                 </View>
               </View>
             ))}
+            {item.order.isOfferAccept !== true && (
+      <TouchableOpacity  style={styles.button} onPress={() => handleCancelOrder(item.order._id)}>
+        <Text style={{ color: 'red' }}>Siparişi iptal et</Text>
+      </TouchableOpacity>
+      )}
           </View>
+          
         )}
         keyExtractor={(item, index) => index.toString()}
       />
@@ -136,7 +153,6 @@ const OrderDetails = ({ route }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
   },
   orderDetail: {
