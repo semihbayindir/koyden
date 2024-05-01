@@ -362,29 +362,29 @@ function calculateDistance(coord1, coord2) {
       </MapView>
       <View style={styles.searchContainer}>
         <InputAutocomplete
-          label="Başlangıç"
+          label="Başlangıç:"
           onPlaceSelected={(details) => {
             onPlaceSelected(details, "origin");
           }}
         />
         <InputAutocomplete
-          label="Varış"
+          label="Varış:"
           onPlaceSelected={(details) => {
             onPlaceSelected(details, "destination");
           }}
         />
-        <TouchableOpacity style={styles.button} onPress={traceRoute}>
-          <Text style={styles.buttonText}>Rota Oluştur</Text>
+        <TouchableOpacity style={styles.buttonRota} onPress={traceRoute}>
+          <Text style={{fontSize:18, fontWeight:700, textAlign:'center', color:'#fff'}}>Rota Oluştur</Text>
         </TouchableOpacity>
-        <Text>Yakın Siparişler:</Text>
+        <Text style={{fontSize:16, fontWeight:800, marginBottom:5}}>Yakın Siparişler:</Text>
         {selectedMarkerInfo.map((markerInfo, index) => (
           <View key={index}>
             {markerInfo.orderInfo.products.map((product, productIndex) => (
               <>
             <Text key={productIndex}>Ürün ID: {product.productId}</Text>
-            <TouchableOpacity onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
-  <Text>Rotaya ekle</Text>
-</TouchableOpacity>
+            <TouchableOpacity style={{backgroundColor:'#76be74', borderRadius:2, marginTop:10}} onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
+              <Text style ={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff',margin:5}}>Rotaya ekle</Text>
+            </TouchableOpacity>
             </>
         ))}
         </View>
@@ -405,30 +405,39 @@ function calculateDistance(coord1, coord2) {
   
     {selectedMarker && (
       <>
-        <Text>Siparişler</Text>
+        <Text style={{fontSize:24, fontWeight:800}}>Siparişler</Text>
         {otherMarkersInfo.map((otherMarker, otherMarkerIndex) => (
           <View key={otherMarkerIndex}>
-            <Text style={styles.button}>Sipariş {otherMarkerIndex + 1}</Text>
-            {orders[otherMarker.marker.id]?.products.map((product, productIndex) => (
-              <View key={productIndex}>
-                <Text>{`Product ${productIndex + 1}`}</Text>
-                <Text>{`Product Name: ${product.productId.name}`}</Text>
-                <Text>{`Product Price: ${product.price}`}</Text>
-                <Text>{`Product Id: ${product.productId._id}`}</Text>
-                <Button title="Ürün Sayfası" onPress={() => handleProductPress(product.productId._id)} />
+            <View style={{borderWidth:1,borderColor:'lightgray', backgroundColor:'white',borderRadius:10, marginTop:10}}>
+                
+                <Text style={{ fontWeight:700, fontSize:20, padding:7}}>Sipariş {otherMarkerIndex + 1}</Text>
+                
+                {orders[otherMarker.marker.id]?.products.map((product, productIndex) => (
+                  <View key={productIndex}>
+                    <Text style={styles.productDetailsText}>{`Product ${productIndex + 1}`}</Text>
+                    <Text style={styles.productDetailsText}>{`Name: ${product.productId.name}`}</Text>
+                    <Text style={styles.productDetailsText}>{`Price: ${product.price}`}</Text>
+                    <Text style={styles.productDetailsText}>{`Product Id: ${product.productId._id}`}</Text>
+                    <TouchableOpacity style={styles.buttonUrun} onPress={() => handleProductPress(product.productId._id)} >
+                      <Text style={styles.buttonText}>Ürün Sayfası</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+                <TextInput
+                    style={styles.offerInput}
+                    value={offer}
+                    onChangeText={(offer) => setOffer(offer)}
+                    placeholder="Teklif Ver"
+                    keyboardType="numeric"/>
+                    <TouchableOpacity style={styles.button}  onPress={() => handleOffer(otherMarker.marker.id)}>
+                      <Text style={styles.buttonText}>Teklif Yap</Text>
+                    </TouchableOpacity>
+                    </View>
               </View>
             ))}
-            <TextInput
-                style={styles.offerInput}
-                value={offer}
-                onChangeText={(offer) => setOffer(offer)}
-                placeholder="Teklif Ver."
-                keyboardType="numeric"/>
-                <Button title="Teklif Yap" onPress={() => handleOffer(otherMarker.marker.id)}/>
-          </View>
-        ))}
-          <TouchableOpacity  style={{marginBottom:15, paddingBottom:30, alignItems:'center'}} onPress={() => setSelectedMarker(null)} >
-            <Text style={{fontSize:20, color:'red',alignContent:'center'}}>Close</Text>
+            
+          <TouchableOpacity  style={{margin:20, marginTop:30, padding:10, alignItems:'center',backgroundColor:'red',borderRadius:10}} onPress={() => setSelectedMarker(null)} >
+            <Text style={{fontSize:20, color:'#fff',alignContent:'center'}}>KAPAT</Text>
           </TouchableOpacity>
       </>
     )}
@@ -469,22 +478,45 @@ const styles = StyleSheet.create({
     borderColor: "#888",
     borderWidth: 1,
   },
-  button: {
-    backgroundColor: "#bbb",
-    paddingVertical: 12,
+  buttonRota: {
+    backgroundColor: "#729c44",
+    paddingVertical: 10,
     marginTop: 16,
+    marginBottom:10,
     borderRadius: 4,
   },
-  buttonText: {
-    textAlign: "center",
+  button: {
+    backgroundColor: "#729c44",
+    paddingVertical: 10,
+    marginTop: 16,
+    marginBottom:15,
+    borderRadius: 10,
+    marginHorizontal:62,
   },
+
+  buttonUrun: {
+    backgroundColor: "#729c44",
+    paddingVertical: 5,
+    marginTop: 16,
+    marginBottom:10,
+    borderRadius: 10,
+    marginHorizontal:82,
+  },
+
+  buttonText: {
+    fontSize:18, 
+    fontWeight:700, 
+    textAlign:'center', 
+    color:'#fff'
+  },
+ 
   modalContainer: {
     height:500,
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#fff",
+    backgroundColor: "#ecf2e6",
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -497,11 +529,18 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 3,
   },
+  productDetailsText:{
+    fontSize:17,
+    paddingLeft:5
+  },
   offerInput: {
     height: 40,
-    margin: 12,
+    marginHorizontal:12,
+    marginTop:30,
     borderWidth: 1,
+    borderRadius:7,
     padding: 10,
+    backgroundColor:'#fff'
   },
   closeButton: {
      
