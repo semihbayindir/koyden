@@ -17,7 +17,7 @@ import Loading from './loadings/Loading';
 <>
     {loading ? (
 
-        <View style={{alignContent:'center',marginTop:'50%'}}><Loading/></View>
+        <View style={{alignItems:'center',marginTop:'90%'}}><Loading/></View>
       ) : (
         <>
     <View style={styles.container}>

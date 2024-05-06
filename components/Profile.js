@@ -4,178 +4,163 @@ import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { decode as atob } from 'base-64';
 import { useNavigation } from '@react-navigation/native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import * as ImagePicker from 'expo-image-picker';
 
 
 const Profile = () => {
     const navigation = useNavigation();
-    const [userId,setUserId] = useState('');
+    const [userId, setUserId] = useState('');
     const [userInfo, setUserInfo] = useState(null);
-  
+    const [userImage, setUserImage] = useState(null);
+
     const base64UrlDecode = (input) => {
         const base64 = input.replace(/-/g, '+').replace(/_/g, '/');
-      const decoded = atob(base64);
-      return JSON.parse(decoded);
-      };
-    
-      useEffect(() => {
-        const fetchUsers = async () => {
-          try {
-            const token = await AsyncStorage.getItem('authToken');
-            if (token !== null) {
-              const [header, payload, signature] = token.split('.');
-              const decodedPayload = base64UrlDecode(payload);
-              setUserId(decodedPayload.userId);
-            }
-          } catch (error) {
-            console.error('Token alınamadı veya decode edilemedi:', error);
-          }
-        };
-      
-        fetchUsers();
-      }, []);
-      
-      useEffect(() => {
-        if (userId) {
-          const fetchUserInfo = async () => {
-            try {
-              const response = await axios.get(`http://localhost:8000/api/users/${userId}`);
-              const userData = response.data;
-              setUserInfo(userData);
-              // console.log(userInfo);
-            } catch (error) {
-              console.error('Error fetching user information:', error);
-            }
-          };
-      
-          fetchUserInfo();
-        }
-      }, [userId]);
-      
-  
-      const signOut = async () => {
-        try {
-          await AsyncStorage.removeItem('authToken');
-          console.log('Çıkış işlemi başarılı.');
-          navigation.navigate('Login');
-        } catch (error) {
-          console.error('Çıkış işlemi sırasında bir hata oluştu:', error);
-        }
-      };
-  
-    return (
-      <View style={styles.container}>
-        <View style={styles.profileHeader}>
-          {/* <Image style={styles.avatar} source={{ uri: userInfo?.avatarUrl || 'default_avatar_url' }} /> */}
-          <Text style={styles.username}>{userInfo?.name +" "+ userInfo?.surname|| 'Guest'}</Text>
-          <Text style={styles.username}>{userInfo?.verification?.producerAddress?.city +" "+ userInfo?.verification?.producerAddress?.district || 'Guest'}</Text>
-          <Text style={styles.username}>{userInfo?.verification?.description || 'Guest'}</Text>
-          <Text style={styles.username}>{"account no : " + userInfo?.verification?.paymentInfo?.accountNumber || 'Guest'}</Text>
-          <Text style={styles.username}>{"iban : " + userInfo?.verification?.paymentInfo?.iban || 'Guest'}</Text>
-        </View>
-        <View style={styles.userInfo}>
-          <Text>Email: {userInfo?.email || 'N/A'}</Text>
-        </View>
-        <TouchableOpacity onPress={signOut} style={styles.signOutButton}>
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+        const decoded = atob(base64);
+        return JSON.parse(decoded);
+    };
 
-  const styles = StyleSheet.create({
+    const handleImagePick = async () => {
+        try {
+            const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+            if (permissionResult.granted === false) {
+                alert('Permission to access gallery is required!');
+                return;
+            }
+
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 1,
+            });
+
+            if (!result.cancelled) {
+                setUserImage(result.uri);
+            }
+        } catch (error) {
+            console.error('Error picking image:', error);
+        }
+    };
+
+
+    const handleImagePress = () => {
+      if (userImage) {
+          // Profil fotoğrafını kaldırma işlemi
+          setUserImage(null);
+      } else {
+          // Profil fotoğrafını değiştirme işlemi
+          handleImagePick();
+      }
+  };
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const token = await AsyncStorage.getItem('authToken');
+                if (token !== null) {
+                    const [header, payload, signature] = token.split('.');
+                    const decodedPayload = base64UrlDecode(payload);
+                    setUserId(decodedPayload.userId);
+                }
+            } catch (error) {
+                console.error('Token alınamadı veya decode edilemedi:', error);
+            }
+        };
+
+        fetchUsers();
+    }, []);
+
+    useEffect(() => {
+        if (userId) {
+            const fetchUserInfo = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:8000/api/users/${userId}`);
+                    const userData = response.data;
+                    setUserInfo(userData);
+                } catch (error) {
+                    console.error('Error fetching user information:', error);
+                }
+            };
+
+            fetchUserInfo();
+        }
+    }, [userId]);
+
+    const signOut = async () => {
+        try {
+            await AsyncStorage.removeItem('authToken');
+            console.log('Çıkış işlemi başarılı.');
+            navigation.navigate('Login');
+        } catch (error) {
+            console.error('Çıkış işlemi sırasında bir hata oluştu:', error);
+        }
+    };
+
+    return (
+        <View>
+            <View>
+              <TouchableOpacity style={{ marginHorizontal: '32%' }} onPress={handleImagePress}>
+                  {userImage ? (
+                      <Image source={{ uri: userImage }} style={styles.avatar} />
+                  ) : (
+                      <MaterialCommunityIcons name='account-circle' color='#729c44' size={150} style={{ alignSelf: 'center', marginTop: 30 }} />
+                  )}
+              </TouchableOpacity>
+            </View>
+            <Text style={{ fontSize: 26, fontWeight: 'bold', padding: 10, textAlign: 'center' }}>{userInfo?.name + " " + userInfo?.surname || 'Guest'}</Text>
+            <View style={styles.profileHeader}>
+                <Text style={styles.username}>{userInfo?.verification?.producerAddress?.city + " " + userInfo?.verification?.producerAddress?.district || 'Guest'}</Text>
+                <Text style={styles.username}>{userInfo?.verification?.description || 'Guest'}</Text>
+                <Text style={styles.username}>{"account no : " + userInfo?.verification?.paymentInfo?.accountNumber || 'Guest'}</Text>
+                <Text style={styles.username}>{"iban : " + userInfo?.verification?.paymentInfo?.iban || 'Guest'}</Text>
+                <Text style={styles.username}>Email: {userInfo?.email || 'N/A'}</Text>
+            </View>
+            <TouchableOpacity onPress={signOut} style={styles.signOutButton}>
+                <Text style={styles.signOutText}>Sign Out</Text>
+            </TouchableOpacity>
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    welcome:{
-      flex:1,
-      margin:15,
-    },
-    butons:{
-      margin:10,
-      borderWidth:2,
-      borderRadius:10,
-      borderColor:'#9ab863',
-      paddingHorizontal:10,
-      padding:4
-    },
-    urunler:{
-      backgroundColor:'#d8e3c3',
-      marginHorizontal:10,
-      borderWidth:2,
-      borderRadius:10,
-      borderColor:'#9ab863',
-      width: '45%',
-      justifyContent:'center',
-      marginBottom:10,
-    },
-    images: {
-      width: '100%',
-      height: 140,
-      marginTop:10,
-      resizeMode: 'contain',
-      
-    },
-    input: {
-      borderWidth:1,
-      borderRadius:10,
-      marginTop:15,
-      padding:9,
-    },
-    modalContainer: {
-      backgroundColor: 'white',
-      padding: 22,
-      justifyContent: 'flex-start',
-      alignItems: 'flex-start',
-      borderRadius: 15,
-      borderColor: 'rgba(0, 0, 0, 0.1)',
-    },
-    productName:{
-      fontSize:18, 
-      padding:5,
-    },
-    productQty:{
-      fontSize:18, 
-      paddingLeft:20, 
-      paddingBottom:10,
-    },
-    productPrice:{
-      fontSize:18, 
-      paddingLeft:30, 
-      paddingBottom:10,
-    },
-    productDet:{
-      flexDirection:'row',
-    },
-  
-  
     profileHeader: {
-      alignItems: 'center',
+        margin: 15,
     },
     avatar: {
-      width: 100,
-      height: 100,
-      borderRadius: 50,
-      marginBottom: 10,
+        width: 150,
+        height: 150,
+        margin:30,
+        borderRadius: 75,
+        marginBottom: 10,
+        alignSelf: 'center',
     },
     username: {
-      fontSize: 20,
-      fontWeight: 'bold',
-    },
-    userInfo: {
-      marginTop: 20,
+        fontSize: 20,
+        fontWeight: 'bold',
+        borderWidth: 1,
+        borderRadius: 10,
+        padding: 10,
     },
     signOutButton: {
-      marginTop: 20,
-      backgroundColor: '#FF0000',
-      padding: 10,
-      borderRadius: 5,
+        marginTop: 20,
+        backgroundColor: '#FF0000',
+        padding: 10,
+        borderRadius: 5,
+        marginHorizontal: '30%',
     },
     signOutText: {
-      color: '#FFFFFF', 
-      fontWeight: 'bold',
+        color: '#FFFFFF',
+        fontWeight: 'bold',
+        fontSize: 18,
+        textAlign: 'center',
     },
-  });
+});
 
-  export default Profile;
+export default Profile;

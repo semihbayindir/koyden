@@ -20,25 +20,30 @@ const AllOrders = () => {
     });
 
     renderOrderItem = ({item}) => {
-        return (
-            <TouchableOpacity style={styles.order}>
-                {/* <Text style={styles.orderText}>Total Price: {item.totalPrice} ₺</Text> */}
-                <Text style={styles.orderText}>Sipariş Tarihi: {new Date(item.orderDate).toLocaleDateString("tr-TR")}</Text>
-                <Text style={styles.orderText}>from: {item.from}</Text>
-                <Text style={styles.orderText}>to: {item.to}</Text>
-            {item.products.map((product, index) => (
-            <View key={`${product.productId}-${index}`}>
-            <Text style={styles.orderText}>Ürün adı: {product.productId.name}</Text>
-            {/* <Image source={{ uri: product.productId.images[0] }} style={{ width: 100, height: 100}} /> */}
-                <Text style={styles.orderText}>Ağırlık: {product.quantity} kg</Text>
-                {/* <Text style={styles.orderText}>Price: {product.price}</Text> */}
-                {/* <Text style={styles.orderText}>Producer Id: {product.productId}</Text> */}
-                {/* <Text style={styles.orderText}>Şehir : {producerInfo.verification.producerAddress.street}</Text> */}
-            </View>
-            ))}
-        </TouchableOpacity>
-          );
-    }
+      return (
+          <TouchableOpacity style={styles.order}>
+              <View>
+                  <Text style={styles.orderText}>Sipariş Tarihi: {new Date(item.orderDate).toLocaleDateString("tr-TR")}</Text>
+                  <Text style={styles.orderText}>Gönderen: {item.from}</Text>
+                  <Text style={styles.orderText}>Alıcı: {item.to}</Text>
+              </View>
+              {item.products.map((product, index) => (
+                  <View style={{flexDirection:'row'}} key={`${product.productId}-${index}`}>
+                      <View style={{paddingVertical:5}}>
+                          <View style={{ borderWidth: 1, borderRadius: 15, backgroundColor: 'white', padding: 5 }}>
+                              <Image style={styles.productImage}  source={{ uri: product.productId.images[0] }} />
+                          </View>
+                      </View>
+                      <View style={{ marginLeft: 10 }}>
+                          <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: 800, marginBottom: 10 }]}>{product.productId.name}</Text>
+                          <Text style={styles.orderText}>Ağırlık: {product.quantity} kg</Text>
+                      </View>
+                  </View>
+              ))}
+          </TouchableOpacity>
+      );
+  }
+
     return (
         <View style={styles.welcome}>
           <Text style={{textAlign:'left', fontWeight:200, fontSize:30, fontStyle:'italic'}}>Hoşgeldin
@@ -63,14 +68,22 @@ const AllOrders = () => {
     const styles = StyleSheet.create({
         order: {
           borderWidth: 1,
+          borderRadius:15,
           borderColor: 'lightgrey',
+          backgroundColor:'#f9fbe5',
           padding: 10,
           marginBottom: 10,
         },
         orderText: {
-          fontSize: 16,
+          fontSize: 20,
           marginBottom: 5,
         },
+
+        productDetailText: {
+          fontSize: 18,
+          marginBottom: 5,
+        },
+      
         container: {
           flex: 1,
           justifyContent: 'center',
@@ -89,6 +102,29 @@ const AllOrders = () => {
           paddingHorizontal:10,
           padding:4
         },
+
+
+        orderInfoText: {
+          fontSize: 18,
+          marginBottom: 5,
+        },
+        productDetail: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: 10
+        },
+        productImage: {
+          width: 90,
+          height: 90,
+          borderRadius: 5,
+          alignSelf: 'center',
+        },
+        productDetailText: {
+          fontSize: 18,
+          marginBottom: 5,
+        },
+
+
       });
 export default AllOrders
 

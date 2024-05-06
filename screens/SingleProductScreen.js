@@ -144,38 +144,37 @@ const handleResetScreen = () => {
       <Image source={{ uri: images[0] }} style={{ width: 250, height: 250, margin:15, borderRadius:5, alignSelf:'center'}} />
       <View style={{backgroundColor:'#cde8b5',borderRadius:15, margin:10}}>
         <View style={{flexDirection:'row'}}>
-          <Text style={styles.productHead}>Ürün Adı:</Text>
-          <Text style={styles.productInfo}>{name}</Text>
+          <Text style={{fontSize:26, fontWeight:800, marginTop:10, marginLeft:15}}>{name}</Text>
         </View>
-        <View style={{flexDirection:'row'}}>
+        <View style={{flexDirection:'row', marginTop:8}}>
           <Text style={styles.productHead}>Açıklama:</Text>
           <Text style={styles.productInfo}>{description}</Text>
         </View>
-        <View style={{flexDirection:'row'}}>
+        <View style={{flexDirection:'row', marginTop:8}}>
           <Text style={styles.productHead}>Kategori:</Text>
           <Text style={styles.productInfo}>{category}</Text>
         </View>
-        <View style={{flexDirection:'row'}}>
+        <View style={{flexDirection:'row', marginTop:8}}>
           <Text style={styles.productHead}>Stok:</Text>
           <Text style={styles.productInfo}>{qty} kg</Text>
         </View>
-        <View style={{flexDirection:'row'}}>
+        <View style={{flexDirection:'row', marginTop:8}}>
           <Text style={styles.productHead}>Min Sipariş Miktarı:</Text>
           <Text style={styles.productInfo}>{minQty}</Text>
         </View>
-        <View style={{flexDirection:'row'}}>
+        <View style={{flexDirection:'row', marginTop:8}}>
           <Text style={styles.productHead}>Birim Fiyatı: </Text>
           <Text style={styles.productInfo}>{price} ₺</Text>
         </View>
-        <View style={styles.inputContainer}>
-        <Text style={{ fontSize: 22, fontWeight: 'bold' }}>Sipariş Miktarı:</Text>
+        <View style={{flexDirection:'row', marginTop:8, marginBottom:10}}>
+        <Text style={styles.productHead}>Sipariş Miktarı:</Text>
         <ModalDropdown
           options={quantityOptions}
           defaultValue={orderQuantity}
           onSelect={(index, value) => handleOrderQuantityChange(value)}
-          style={{ fontSize: 22, marginBottom:5, marginLeft:10}}
-          textStyle={{ fontSize: 22, color: 'gray', borderWidth: 1, borderRadius: 10, padding: 9, backgroundColor:'white' }}
-          dropdownStyle={{ fontSize: 22, height: 200}}
+          style={{ fontSize: 22, marginBottom:5, marginLeft:10, borderRadius: 10, paddingHorizontal:15, backgroundColor:'white' }}
+          textStyle={{ fontSize: 22, color: 'gray' }}
+          dropdownStyle={{ fontSize: 22, height: 200, borderRadius: 10, padding: 9, backgroundColor:'white', }}
           dropdownTextStyle={{ fontSize: 22 }} 
           dropdownTextHighlightStyle={{ color: 'green' }} 
         />
@@ -184,18 +183,24 @@ const handleResetScreen = () => {
 
       {userType === 'tasiyici' && (
       <>
-      <Text>  TAŞIYICI KISMI BURAYA GELECEK -- TEKLİF VER</Text>
-      <View style={styles.inputContainer}>
-      <TextInput
-      placeholder="Fiyat Teklifi"
-      onChangeText={handlePriceOfferChange}
-      value={priceOffer}
-      keyboardType="numeric"
-      style={styles.input}
-      />
-      <Text style={styles.currencySymbol}>₺</Text>
-      </View>      
-      <Button title="Fiyat Teklifi Ver" onPress={handlePriceOffer} />
+      <Text style={{fontSize:22, fontWeight:700, marginLeft:15}}>TEKLİF VER</Text>
+        <View style={{flexDirection:'row', alignItems:'center', justifyContent:'center', marginBottom:20, marginRight:20}}>
+          <View style={styles.inputContainer}>
+            <TextInput
+            placeholder="Fiyat Teklifi"
+            onChangeText={handlePriceOfferChange}
+            value={priceOffer}
+            keyboardType="numeric"
+            style={styles.input}
+            />
+            <Text style={styles.currencySymbol}>₺</Text>
+          </View>      
+          <View>
+            <TouchableOpacity style={styles.buttonTrans} onPress={handlePriceOffer} >
+              <Text style={{textAlign:'center', fontSize:20, color:'#fff', padding:10}}>Teklif Ver</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </>
       )}
       
@@ -247,9 +252,16 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom:10,
   },
+  buttonTrans: {
+    backgroundColor: '#729c44',
+    borderRadius: 5,
+    marginHorizontal: '3%2',
+    marginTop: 10,
+    marginBottom:10,
+  },
   productInfo:{
-    margin:10, 
-    padding:5, 
+     
+    marginLeft:5,
     fontSize:22, 
     borderColor:'gray',
     borderRadius:5,
@@ -257,26 +269,29 @@ const styles = StyleSheet.create({
   productHead:{
     fontSize:22, 
     fontWeight:'700',
-    marginTop:15, 
+     
     marginLeft:15
   },
   inputContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    
     borderRadius: 5,
-    paddingHorizontal: 10,
+    
   },
   input: {
-    width:'20%',
+    width:'50%',
     borderWidth: 1,
     borderColor: '#ccc',
-    paddingVertical: 10,
-    backgroundColor:'white'
+    paddingVertical: 12,
+    paddingHorizontal:20,
+    backgroundColor:'white',
+    marginHorizontal:10
   },
   currencySymbol: {
     marginLeft: 10,
+    marginTop:5,
     fontSize: 25,
-    fontWeight: 'bold',
+    fontWeight: 600,
     
   },
 });
