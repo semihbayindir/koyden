@@ -19,54 +19,30 @@ const AllOrders = () => {
             })
     });
 
-
-
-
-    const formatOrderDate = (date) => {
-      const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-      return new Date(date).toLocaleDateString('tr-TR', options);
-    };
-
-
-
-
-
-
     renderOrderItem = ({item}) => {
-        return (
-            <TouchableOpacity style={styles.order}>
+      return (
+          <TouchableOpacity style={styles.order}>
+              <View>
+                  <Text style={styles.orderText}>Sipariş Tarihi: {new Date(item.orderDate).toLocaleDateString("tr-TR")}</Text>
+                  <Text style={styles.orderText}>Gönderen: {item.from}</Text>
+                  <Text style={styles.orderText}>Alıcı: {item.to}</Text>
+              </View>
               {item.products.map((product, index) => (
-
-              <View style={{flexDirection:'row'}}>
-                  <View style={{paddingVertical:5}}>
-                    <View key={`${product.productId}-${index}`} style={{ borderWidth: 1, borderRadius: 15, backgroundColor: 'white', padding: 5 }}>
-                    <Image style={styles.productImage}  source={{ uri: product.productId.images[0] }} />
-                    </View>
+                  <View style={{flexDirection:'row'}} key={`${product.productId}-${index}`}>
+                      <View style={{paddingVertical:5}}>
+                          <View style={{ borderWidth: 1, borderRadius: 15, backgroundColor: 'white', padding: 5 }}>
+                              <Image style={styles.productImage}  source={{ uri: product.productId.images[0] }} />
+                          </View>
+                      </View>
+                      <View style={{ marginLeft: 10 }}>
+                          <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: 800, marginBottom: 10 }]}>{product.productId.name}</Text>
+                          <Text style={styles.orderText}>Ağırlık: {product.quantity} kg</Text>
+                      </View>
                   </View>
-                  <View key={`${product.productId}-${index}`} style={{ marginLeft: 10 }}>
-                        
-                        <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: 800, marginBottom: 10 }]}>{product.productId.name}</Text>
-                        
-                      {/* <Text style={styles.orderText}>Total Price: {item.totalPrice} ₺</Text> */}
-                      <Text style={styles.orderText}>Sipariş Tarihi: {new Date(item.orderDate).toLocaleDateString("tr-TR")}</Text>
-                      <Text style={styles.orderText}>Gönderen: {item.from}</Text>
-                      <Text style={styles.orderText}>Alıcı: {item.to}</Text>
-                      <Text style={styles.orderText}>Ağırlık: {product.quantity} kg</Text>
-                  </View>
-
-                  
-                {/* <Text style={styles.orderText}>Price: {product.price}</Text> */}
-                {/* <Text style={styles.orderText}>Producer Id: {product.productId}</Text> */}
-                {/* <Text style={styles.orderText}>Şehir : {producerInfo.verification.producerAddress.street}</Text> */}
-                
-           
-            </View>
-            ))}
-            
-        </TouchableOpacity>
-          );
-    }
-
+              ))}
+          </TouchableOpacity>
+      );
+  }
 
     return (
         <View style={styles.welcome}>

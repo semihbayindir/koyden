@@ -241,7 +241,7 @@ function calculateDistance(coord1, coord2) {
         const orderInfo = response.data;
         markerInfos.push({ marker, orderInfo });
       } catch (error) {
-        console.error('Error fetching order info:', error);
+        // console.error('Error fetching order info:', error);
       }
     }
     setSelectedMarkerInfo(markerInfos);
@@ -379,13 +379,24 @@ function calculateDistance(coord1, coord2) {
         <Text style={{fontSize:16, fontWeight:800, marginBottom:5}}>Yakın Siparişler:</Text>
         {selectedMarkerInfo.map((markerInfo, index) => (
           <View key={index}>
-            {markerInfo.orderInfo.products.map((product, productIndex) => (
-              <>
-            <Text key={productIndex}>Ürün ID: {product.productId}</Text>
-            <TouchableOpacity style={{backgroundColor:'#76be74', borderRadius:2, marginTop:10}} onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
+            {orders[markerInfo.marker.id]?.products.map((product, productIndex) => (
+              <View key={productIndex}>
+                <Text style={styles.productDetailsText}>{`${markerInfo.orderInfo.from} -> ${markerInfo.orderInfo.to}`}</Text>
+                <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
+                <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>            
+                <TouchableOpacity style={{backgroundColor:'#76be74', borderRadius:2, marginTop:10}} onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
               <Text style ={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff',margin:5}}>Rotaya ekle</Text>
             </TouchableOpacity>
-            </>
+            <TextInput
+                    style={styles.offerInput}
+                    value={offer}
+                    onChangeText={(offer) => setOffer(offer)}
+                    placeholder="Teklif Ver"
+                    keyboardType="numeric"/>
+                    <TouchableOpacity style={styles.button}  onPress={() => handleOffer(markerInfo.marker.id)}>
+                      <Text style={styles.buttonText}>Teklif Yap</Text>
+                    </TouchableOpacity>
+            </View>
         ))}
         </View>
 ))}
@@ -411,13 +422,12 @@ function calculateDistance(coord1, coord2) {
             <View style={{borderWidth:1,borderColor:'lightgray', backgroundColor:'white',borderRadius:10, marginTop:10}}>
                 
                 <Text style={{ fontWeight:700, fontSize:20, padding:7}}>Sipariş {otherMarkerIndex + 1}</Text>
-                
+                {console.log(otherMarker)}
                 {orders[otherMarker.marker.id]?.products.map((product, productIndex) => (
                   <View key={productIndex}>
-                    <Text style={styles.productDetailsText}>{`Product ${productIndex + 1}`}</Text>
-                    <Text style={styles.productDetailsText}>{`Name: ${product.productId.name}`}</Text>
-                    <Text style={styles.productDetailsText}>{`Price: ${product.price}`}</Text>
-                    <Text style={styles.productDetailsText}>{`Product Id: ${product.productId._id}`}</Text>
+                    <Text style={styles.productDetailsText}>{`${otherMarker.orderInfo.from} -> ${otherMarker.orderInfo.to}`}</Text>
+                    <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
+                    <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
                     <TouchableOpacity style={styles.buttonUrun} onPress={() => handleProductPress(product.productId._id)} >
                       <Text style={styles.buttonText}>Ürün Sayfası</Text>
                     </TouchableOpacity>
