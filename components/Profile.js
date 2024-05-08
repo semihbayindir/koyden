@@ -12,7 +12,7 @@ const Profile = () => {
     const navigation = useNavigation();
     const [userId, setUserId] = useState('');
     const [userInfo, setUserInfo] = useState(null);
-    const [userImage, setUserImage] = useState(null);
+    const [userImage, setUserImage] = useState();
 
     const base64UrlDecode = (input) => {
         const base64 = input.replace(/-/g, '+').replace(/_/g, '/');
@@ -37,10 +37,43 @@ const Profile = () => {
             });
 
             if (!result.cancelled) {
-                setUserImage(result.uri);
+                // Fotoğrafı yükleme işlemi
+                handleAddProfileImage(result.uri);
             }
         } catch (error) {
             console.error('Error picking image:', error);
+        }
+    };
+
+    const handleAddProfileImage = async (uri) => {
+        try {
+            // AWS S3'ye fotoğrafı yükleme
+            const formData = new FormData();
+            // Tarih ve saat bilgisini kullanarak dosya adını oluştur
+            const timestamp = new Date().toISOString().replace(/:/g, '_');
+            const fileName = `profile_image_${timestamp}.jpg`;
+
+            formData.append('image', {
+                name: fileName,
+                type: 'image/jpg',
+                uri: uri,
+            });
+
+            const s3Response = await axios.post('http://localhost:8000/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            const imageUrl = s3Response.data.imageUrl;
+
+            // Veritabanına fotoğraf URL'sini kaydetme
+            await axios.put(`http://localhost:8000/users/${userId}/image`, { image: imageUrl });
+
+            // Kullanıcının profil fotoğrafını güncelleme
+            setUserImage(imageUrl);
+        } catch (error) {
+            console.error('Error adding profile image:', error);
         }
     };
 
@@ -79,6 +112,7 @@ const Profile = () => {
                     const response = await axios.get(`http://localhost:8000/api/users/${userId}`);
                     const userData = response.data;
                     setUserInfo(userData);
+                    setUserImage(userData.image)
                 } catch (error) {
                     console.error('Error fetching user information:', error);
                 }

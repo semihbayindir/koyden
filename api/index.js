@@ -157,6 +157,19 @@ app.post("/users/:userId/verification", (req, res) => {
     });
 });
 
+// Kullanıcı profili için fotoğraf URL'sini güncellemek için endpoint
+app.put('/users/:userId/image', async (req, res) => {
+  const { userId } = req.params;
+  const { image } = req.body;
+
+  try {
+      const updatedUser = await User.findByIdAndUpdate(userId, { image: image }, { new: true });
+      res.json(updatedUser);
+  } catch (error) {
+      console.error('Error updating user profile image:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 app.get('/producer/:producerId', async (req, res) => {
   const producerId = req.params.producerId;
