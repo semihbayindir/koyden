@@ -146,9 +146,9 @@ const handleResetScreen = () => {
         <View style={{flexDirection:'row'}}>
           <Text style={{fontSize:26, fontWeight:800, marginTop:10, marginLeft:15}}>{name}</Text>
         </View>
-        <View style={{flexDirection:'row', marginTop:8}}>
+        <View style={{ marginTop:8, flex:1}}>
           <Text style={styles.productHead}>Açıklama:</Text>
-          <Text style={styles.productInfo}>{description}</Text>
+          <Text style={{flex:1, marginLeft:15, marginRight:15,fontSize:22, }}>{description}</Text>
         </View>
         <View style={{flexDirection:'row', marginTop:8}}>
           <Text style={styles.productHead}>Kategori:</Text>
@@ -260,16 +260,14 @@ const styles = StyleSheet.create({
     marginBottom:10,
   },
   productInfo:{
-     
+    flex:0.4,
     marginLeft:5,
     fontSize:22, 
-    borderColor:'gray',
-    borderRadius:5,
   },
   productHead:{
     fontSize:22, 
     fontWeight:'700',
-     
+    flex:0.6,
     marginLeft:15
   },
   inputContainer: {

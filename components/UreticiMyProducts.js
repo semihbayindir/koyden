@@ -94,11 +94,9 @@ const styles = StyleSheet.create({
     padding:4
   },
   urunler:{
-    backgroundColor:'#d8e3c3',
+    backgroundColor:'#fff',
     marginHorizontal:10,
-    borderWidth:2,
-    borderRadius:10,
-    borderColor:'#9ab863',
+    borderRadius:20,
     width: '45%',
     justifyContent:'center',
     marginBottom:10,
@@ -106,9 +104,8 @@ const styles = StyleSheet.create({
   images: {
     width: '100%',
     height: 140,
-    marginTop:10,
-    resizeMode: 'contain',
-    
+    marginBottom:10,
+    borderRadius:20
   },
   input: {
     borderWidth:1,
@@ -127,20 +124,26 @@ const styles = StyleSheet.create({
   productName:{
     fontSize:18, 
     padding:5,
+    flex:0.7
   },
   productQty:{
     fontSize:18, 
-    paddingLeft:20, 
+    paddingLeft:5, 
     paddingBottom:10,
+    color:'green',
+    flex:0.7
   },
   productPrice:{
     fontSize:18, 
-    paddingLeft:30, 
+    flex:0.3,
     paddingBottom:10,
+
   },
   productDet:{
     flexDirection:'row',
+    flex:1
   },
+
 
 
   profileHeader: {

@@ -20,6 +20,7 @@ import MapViewDirections from "react-native-maps-directions";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { useUserIdDecoder } from "./UserIdDecoder";
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 const { width, height } = Dimensions.get("window");
@@ -79,8 +80,13 @@ const Map = () => {
   const [waypoints, setWaypoints] = useState([]);
   const userId = useUserIdDecoder();
 
+
+
   const [otherMarkersInfo, setOtherMarkersInfo] = useState([]);
   const [isOfferTextInputVisible, setIsOfferTextInputVisible] = useState(false);
+
+
+
 
   useEffect(() => {
     if(userId){
@@ -376,9 +382,16 @@ function calculateDistance(coord1, coord2) {
         <TouchableOpacity style={styles.buttonRota} onPress={traceRoute}>
           <Text style={{fontSize:18, fontWeight:700, textAlign:'center', color:'#fff'}}>Rota Oluştur</Text>
         </TouchableOpacity>
-        <Text style={{fontSize:16, fontWeight:800, marginBottom:5}}>Yakın Siparişler:</Text>
+        
         {selectedMarkerInfo.map((markerInfo, index) => (
-          <View key={index}>
+          <Modal visible={selectedMarker !== null} animationType="slide" transparent >
+          <View style={styles.modalContainer} key={index}>
+            <View style={{flexDirection:'row'}}>
+          <Text style={{fontSize:16, fontWeight:800, marginBottom:5}}>Yakın Siparişler:</Text>
+           <TouchableOpacity style={{margin :5, padding:5, alignSelf:'flex-end'}} onPress={() => setSelectedMarker(null)}>
+            <MaterialCommunityIcons name="close" size={30} color={'green'} />
+           </TouchableOpacity>
+           </View>
             {orders[markerInfo.marker.id]?.products.map((product, productIndex) => (
               <View key={productIndex}>
                 <Text style={styles.productDetailsText}>{`${markerInfo.orderInfo.from} -> ${markerInfo.orderInfo.to}`}</Text>
@@ -396,9 +409,10 @@ function calculateDistance(coord1, coord2) {
                     <TouchableOpacity style={styles.button}  onPress={() => handleOffer(markerInfo.marker.id)}>
                       <Text style={styles.buttonText}>Teklif Yap</Text>
                     </TouchableOpacity>
-            </View>
+            </View> 
         ))}
         </View>
+        </Modal>
 ))}
         {distance && duration ? (
           <View>
@@ -521,7 +535,7 @@ const styles = StyleSheet.create({
   },
  
   modalContainer: {
-    height:500,
+    height:'auto',
     position: "absolute",
     bottom: 0,
     left: 0,
