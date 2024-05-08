@@ -80,12 +80,17 @@ const Map = () => {
   const [waypoints, setWaypoints] = useState([]);
   const userId = useUserIdDecoder();
 
+  const [isModalVisible, setModalVisible] = useState(true);
+
 
 
   const [otherMarkersInfo, setOtherMarkersInfo] = useState([]);
   const [isOfferTextInputVisible, setIsOfferTextInputVisible] = useState(false);
 
 
+  const toggleModal = () => {
+    setModalVisible(false);
+};
 
 
   useEffect(() => {
@@ -384,11 +389,11 @@ function calculateDistance(coord1, coord2) {
         </TouchableOpacity>
         
         {selectedMarkerInfo.map((markerInfo, index) => (
-          <Modal visible={selectedMarker !== null} animationType="slide" transparent >
+          <Modal visible={isModalVisible} animationType="slide" transparent >
           <View style={styles.modalContainer} key={index}>
-            <View style={{flexDirection:'row'}}>
-          <Text style={{fontSize:16, fontWeight:800, marginBottom:5}}>Yakın Siparişler:</Text>
-           <TouchableOpacity style={{margin :5, padding:5, alignSelf:'flex-end'}} onPress={() => setSelectedMarker(null)}>
+            <View style={{flexDirection:'row',flex:1}}>
+          <Text style={{fontSize:22, fontWeight:800,marginTop:7, marginBottom:5, flex:0.9}}>Yakın Siparişler:</Text>
+           <TouchableOpacity style={{margin :5, padding:5, alignSelf:'flex-end', flex:0.1}} onPress={toggleModal()}>
             <MaterialCommunityIcons name="close" size={30} color={'green'} />
            </TouchableOpacity>
            </View>
