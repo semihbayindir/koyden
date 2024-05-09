@@ -81,8 +81,6 @@ const Map = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const userId = useUserIdDecoder();
 
-  const [isModalVisible, setModalVisible] = useState(true);
-
 
 
 
@@ -90,6 +88,7 @@ const Map = () => {
   const [isOfferTextInputVisible, setIsOfferTextInputVisible] = useState(false);
 
 
+ 
 
 
 
@@ -389,25 +388,30 @@ function calculateDistance(coord1, coord2) {
           <Text style={{fontSize:18, fontWeight:700, textAlign:'center', color:'#fff'}}>Rota Oluştur</Text>
         </TouchableOpacity>
         
-     {selectedMarkerInfo.map((markerInfo, index) => (
-          <Modal visible={isModalVisible} animationType="slide" transparent >
-          <View style={styles.modalContainer} key={index}>
-            <View style={{flexDirection:'row',flex:1}}>
-          <Text style={{fontSize:22, fontWeight:800,marginTop:7, marginBottom:5, flex:0.9}}>Yakın Siparişler:</Text>
-           <TouchableOpacity style={{margin :5, padding:5, alignSelf:'flex-end', flex:0.1}} onPress={toggleModal()}>
-
-            <MaterialCommunityIcons name="close" size={30} color={'green'} />
-           </TouchableOpacity>
+            <Modal transparent={true} visible={isModalOpen} >
+              <ScrollView style={styles.modalContainer1}>
+                <View style={{flexDirection:'row',flex:1}}>
+                <Text style={{fontSize:24, fontStyle:'italic', fontWeight:800, marginBottom:10, flex:0.9}}>Yakın Siparişler:</Text>
+                  <TouchableOpacity style={{alignSelf:'flex-end', flex:0.1, marginBottom:10}} onPress={() => setIsModalOpen(false)}>
+                    <MaterialCommunityIcons name="close" size={33} color={'green'} />
+                  </TouchableOpacity>
+                </View>
            {selectedMarkerInfo.map((markerInfo, index) => (
   <View key={index}>
     {orders[markerInfo.marker.id]?.products.map((product, productIndex) => (
-      <View key={productIndex}>
-        <Text style={styles.productDetailsText}>{`${markerInfo.orderInfo.from} -> ${markerInfo.orderInfo.to}`}</Text>
-        <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
-        <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
-        <TouchableOpacity style={{backgroundColor:'#76be74', borderRadius:2, marginTop:10}} onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
-          <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff',margin:5}}>Rotaya ekle</Text>
-        </TouchableOpacity>
+      <View style={styles.yakinSiparis} key={productIndex}>
+
+        <View style={{flexDirection:'row'}}>
+          <View style={{flex:0.9}}>
+          <Text style={[styles.productDetailsText,{fontWeight:'800',marginVertical:5}]}>{`${markerInfo.orderInfo.from} -> ${markerInfo.orderInfo.to}`}</Text>
+          <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
+          <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
+          </View>
+          <TouchableOpacity style={{backgroundColor:'#de510b', flex:0.2, marginRight:'1%',borderRadius:40, padding:10}} onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
+            <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff',marginTop:10}}>Rotaya ekle</Text>
+          </TouchableOpacity>
+        </View>
+
         <TextInput
           style={styles.offerInput}
           value={offer[`textInput${index}${productIndex}`] || ""}
@@ -442,20 +446,27 @@ function calculateDistance(coord1, coord2) {
   
     {selectedMarker && (
       <>
-        <Text style={{fontSize:24, fontWeight:800}}>Siparişler</Text>
+      <View style={{flexDirection:'row',flex:1}}>
+        <Text style={{fontSize:24, fontStyle:'italic', fontWeight:800, marginBottom:10, flex:0.9}}>Siparişler</Text>
+          <TouchableOpacity style={{alignSelf:'flex-end', flex:0.1,marginLeft:'5%', marginBottom:10}} onPress={() => setSelectedMarker(null)}>
+            <MaterialCommunityIcons name="close" size={33} color={'green'} />
+          </TouchableOpacity>
+      </View>
         {otherMarkersInfo.map((otherMarker, otherMarkerIndex) => (
           <View key={otherMarkerIndex}>
-            <View style={{borderWidth:1,borderColor:'lightgray', backgroundColor:'white',borderRadius:10, marginTop:10}}>
+            <View style={styles.yakinSiparis}>
                 
-                <Text style={{ fontWeight:700, fontSize:20, padding:7}}>Sipariş {otherMarkerIndex + 1}</Text>
+                <Text style={{ fontWeight:700, fontSize:20, marginLeft:'3%', marginTop:'5%'}}>Sipariş {otherMarkerIndex + 1}</Text>
                 {/* {console.log(otherMarker)} */}
                 {orders[otherMarker.marker.id]?.products.map((product, productIndex) => (
-                  <View key={productIndex}>
+                  <View style={{flexDirection:'row', marginLeft:'1%'}} key={productIndex}>
+                    <View >
                     <Text style={styles.productDetailsText}>{`${otherMarker.orderInfo.from} -> ${otherMarker.orderInfo.to}`}</Text>
                     <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
                     <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
-                    <TouchableOpacity style={styles.buttonUrun} onPress={() => handleProductPress(product.productId._id)} >
-                      <Text style={styles.buttonText}>Ürün Sayfası</Text>
+                    </View>
+                    <TouchableOpacity style={{backgroundColor:'#de510b', marginTop:20,borderRadius:40, padding:10, marginLeft:'10%'}} onPress={() => handleProductPress(product.productId._id)} >
+                      <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff'}}>Ürün Sayfası</Text>
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -472,9 +483,7 @@ function calculateDistance(coord1, coord2) {
               </View>
             ))}
             
-          <TouchableOpacity  style={{margin:20, marginTop:30, padding:10, alignItems:'center',backgroundColor:'red',borderRadius:10}} onPress={() => setSelectedMarker(null)} >
-            <Text style={{fontSize:20, color:'#fff',alignContent:'center'}}>KAPAT</Text>
-          </TouchableOpacity>
+          
       </>
     )}
 
@@ -523,25 +532,26 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#729c44",
-    paddingVertical: 10,
-    marginTop: 16,
+    paddingVertical: 7,
+    marginTop: 20,
     marginBottom:15,
-    borderRadius: 10,
-    marginHorizontal:62,
+    borderRadius: 20,
+    marginHorizontal:90,
   },
 
   buttonUrun: {
     backgroundColor: "#729c44",
-    paddingVertical: 5,
+    paddingVertical: 10,
+    paddingHorizontal:10,
     marginTop: 16,
     marginBottom:10,
     borderRadius: 10,
-    marginHorizontal:82,
+    marginHorizontal:32,
   },
 
   buttonText: {
-    fontSize:18, 
-    fontWeight:700, 
+    fontSize:20, 
+    fontWeight:'bold', 
     textAlign:'center', 
     color:'#fff'
   },
@@ -580,8 +590,8 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   productDetailsText:{
-    fontSize:17,
-    paddingLeft:5
+    fontSize:18,
+    paddingLeft:7,
   },
   offerInput: {
     height: 40,
@@ -592,8 +602,13 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor:'#fff'
   },
-  closeButton: {
-     
+  yakinSiparis:{
+    
+    borderColor:'lightgray',
+    marginBottom:20,
+    borderRadius:20,
+    padding:10,
+    backgroundColor:'#fff'
   }
 });
 
