@@ -81,6 +81,8 @@ const Map = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const userId = useUserIdDecoder();
 
+  const [isModalVisible, setModalVisible] = useState(true);
+
 
 
 
@@ -88,7 +90,6 @@ const Map = () => {
   const [isOfferTextInputVisible, setIsOfferTextInputVisible] = useState(false);
 
 
- 
 
 
 
@@ -388,10 +389,13 @@ function calculateDistance(coord1, coord2) {
           <Text style={{fontSize:18, fontWeight:700, textAlign:'center', color:'#fff'}}>Rota Oluştur</Text>
         </TouchableOpacity>
         
-            <Modal transparent={true} visible={isModalOpen} >
-              <ScrollView style={styles.modalContainer1}>
-                <Text style={{fontSize:16, fontWeight:800, marginBottom:5}}>Yakın Siparişler:</Text>
-           <TouchableOpacity style={{alignSelf:'flex-end'}} onPress={() => setIsModalOpen(false)}>
+     {selectedMarkerInfo.map((markerInfo, index) => (
+          <Modal visible={isModalVisible} animationType="slide" transparent >
+          <View style={styles.modalContainer} key={index}>
+            <View style={{flexDirection:'row',flex:1}}>
+          <Text style={{fontSize:22, fontWeight:800,marginTop:7, marginBottom:5, flex:0.9}}>Yakın Siparişler:</Text>
+           <TouchableOpacity style={{margin :5, padding:5, alignSelf:'flex-end', flex:0.1}} onPress={toggleModal()}>
+
             <MaterialCommunityIcons name="close" size={30} color={'green'} />
            </TouchableOpacity>
            {selectedMarkerInfo.map((markerInfo, index) => (
