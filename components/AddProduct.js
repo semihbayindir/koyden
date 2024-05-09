@@ -106,7 +106,7 @@ const AddProduct = () => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-
+            console.log(s3Response)
             const imageUrl = s3Response.data.imageUrl;
 
             const productData = {

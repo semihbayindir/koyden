@@ -98,7 +98,7 @@ const renderProductItem = ({ item, index }) => {
 
         <View style={{flexDirection:'row', flex:1}}>
             <Text style={styles.productName}>{item.name}</Text>
-            <TouchableOpacity style={{alignItems:'flex-end',marginRight:4, flex:0.3}} onPress={() => handleAddToCart(item._id)}>
+            <TouchableOpacity style={{alignItems:'flex-end',marginRight:7, flex:0.3}} onPress={() => handleAddToCart(item._id)}>
             <MaterialCommunityIcons name='plus-circle' size={40} color={'#de510b'}/>
           </TouchableOpacity>
         </View>
@@ -184,7 +184,8 @@ const renderProductItem = ({ item, index }) => {
       width: '100%',
       height: 140,
       marginBottom:10,
-      borderRadius:20
+      borderRadius:20,
+      resizeMode:'cover'
     },
     input: {
       borderWidth:1,
