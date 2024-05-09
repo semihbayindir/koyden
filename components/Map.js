@@ -76,15 +76,19 @@ const Map = () => {
   const [stopFetchingOrders, setStopFetchingOrders] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState(null); // Seçili marker'ı saklamak için state
   const [selectedMarkerInfo, setSelectedMarkerInfo] = useState([])
-  const [offer,setOffer] = useState();
+  const [offer,setOffer] = useState({});
   const [waypoints, setWaypoints] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const userId = useUserIdDecoder();
+
 
 
 
   const [otherMarkersInfo, setOtherMarkersInfo] = useState([]);
   const [isOfferTextInputVisible, setIsOfferTextInputVisible] = useState(false);
 
+
+ 
 
 
 
@@ -258,6 +262,7 @@ function calculateDistance(coord1, coord2) {
   const traceRoute = () => {
       if (origin && destination) {
         setShowDirections(true);
+        setIsModalOpen(true);
         mapRef.current?.fitToCoordinates([origin, destination], { edgePadding });
       }
     };
@@ -293,7 +298,7 @@ function calculateDistance(coord1, coord2) {
       }
     }
     setOtherMarkersInfo(markerInfos);
-    console.log(otherMarkersInfo[0].marker.id);
+    // console.log(otherMarkersInfo[0].marker.id);
     };
 
 
@@ -383,37 +388,40 @@ function calculateDistance(coord1, coord2) {
           <Text style={{fontSize:18, fontWeight:700, textAlign:'center', color:'#fff'}}>Rota Oluştur</Text>
         </TouchableOpacity>
         
-        {selectedMarkerInfo.map((markerInfo, index) => (
-          <Modal visible={selectedMarker !== null} animationType="slide" transparent >
-          <View style={styles.modalContainer} key={index}>
-            <View style={{flexDirection:'row'}}>
-          <Text style={{fontSize:16, fontWeight:800, marginBottom:5}}>Yakın Siparişler:</Text>
-           <TouchableOpacity style={{margin :5, padding:5, alignSelf:'flex-end'}} onPress={() => setSelectedMarker(null)}>
+            <Modal transparent={true} visible={isModalOpen} >
+              <ScrollView style={styles.modalContainer1}>
+                <Text style={{fontSize:16, fontWeight:800, marginBottom:5}}>Yakın Siparişler:</Text>
+           <TouchableOpacity style={{alignSelf:'flex-end'}} onPress={() => setIsModalOpen(false)}>
             <MaterialCommunityIcons name="close" size={30} color={'green'} />
            </TouchableOpacity>
-           </View>
-            {orders[markerInfo.marker.id]?.products.map((product, productIndex) => (
-              <View key={productIndex}>
-                <Text style={styles.productDetailsText}>{`${markerInfo.orderInfo.from} -> ${markerInfo.orderInfo.to}`}</Text>
-                <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
-                <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>            
-                <TouchableOpacity style={{backgroundColor:'#76be74', borderRadius:2, marginTop:10}} onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
-              <Text style ={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff',margin:5}}>Rotaya ekle</Text>
-            </TouchableOpacity>
-            <TextInput
-                    style={styles.offerInput}
-                    value={offer}
-                    onChangeText={(offer) => setOffer(offer)}
-                    placeholder="Teklif Ver"
-                    keyboardType="numeric"/>
-                    <TouchableOpacity style={styles.button}  onPress={() => handleOffer(markerInfo.marker.id)}>
-                      <Text style={styles.buttonText}>Teklif Yap</Text>
-                    </TouchableOpacity>
-            </View> 
-        ))}
-        </View>
-        </Modal>
+           {selectedMarkerInfo.map((markerInfo, index) => (
+  <View key={index}>
+    {orders[markerInfo.marker.id]?.products.map((product, productIndex) => (
+      <View key={productIndex}>
+        <Text style={styles.productDetailsText}>{`${markerInfo.orderInfo.from} -> ${markerInfo.orderInfo.to}`}</Text>
+        <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
+        <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
+        <TouchableOpacity style={{backgroundColor:'#76be74', borderRadius:2, marginTop:10}} onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
+          <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff',margin:5}}>Rotaya ekle</Text>
+        </TouchableOpacity>
+        <TextInput
+          style={styles.offerInput}
+          value={offer[`textInput${index}${productIndex}`] || ""}
+          onChangeText={(newOffer) => setOffer({ ...offer, [`textInput${index}${productIndex}`]: newOffer })}
+          placeholder="Teklif Ver"
+          keyboardType="numeric"
+        />
+        <TouchableOpacity style={styles.button} onPress={() => handleOffer(markerInfo.marker.id)}>
+          <Text style={styles.buttonText}>Teklif Yap</Text>
+        </TouchableOpacity>
+      </View>
+    ))}
+  </View>
 ))}
+
+</ScrollView>
+</Modal>
+
         {distance && duration ? (
           <View>
             <Text>Distance: {distance.toFixed(2)}</Text>
@@ -436,7 +444,7 @@ function calculateDistance(coord1, coord2) {
             <View style={{borderWidth:1,borderColor:'lightgray', backgroundColor:'white',borderRadius:10, marginTop:10}}>
                 
                 <Text style={{ fontWeight:700, fontSize:20, padding:7}}>Sipariş {otherMarkerIndex + 1}</Text>
-                {console.log(otherMarker)}
+                {/* {console.log(otherMarker)} */}
                 {orders[otherMarker.marker.id]?.products.map((product, productIndex) => (
                   <View key={productIndex}>
                     <Text style={styles.productDetailsText}>{`${otherMarker.orderInfo.from} -> ${otherMarker.orderInfo.to}`}</Text>
@@ -533,7 +541,21 @@ const styles = StyleSheet.create({
     textAlign:'center', 
     color:'#fff'
   },
- 
+  modalContainer1: {
+    height:'45%',
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#ecf2e6",
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -3,
+    },},
   modalContainer: {
     height:'auto',
     position: "absolute",
