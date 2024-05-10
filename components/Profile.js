@@ -178,8 +178,7 @@ const styles = StyleSheet.create({
     username: {
         fontSize: 20,
         fontWeight: 'bold',
-        borderWidth: 1,
-        borderRadius: 10,
+        
         padding: 10,
     },
     signOutButton: {

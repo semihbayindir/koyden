@@ -24,8 +24,8 @@ const AddProduct = () => {
     const [selectedUnit, setSelectedUnit] = useState('kg');
     const [unitOptions, setUnitOptions] = useState(['kg', 'adet']);
 
-    const [selectedUnitKategori, setSelectedUnitKategori] = useState('meyve');
-    const [unitOptionsKategori, setUnitOptionsKategori] = useState(['meyve', 'sebze']);
+    const [selectedUnitKategori, setSelectedUnitKategori] = useState('Meyve');
+    const [unitOptionsKategori, setUnitOptionsKategori] = useState(['Meyve', 'Sebze']);
 
     const handleUnitSelect = (index, value) => {
         setSelectedUnit(value); // Seçilen birimi ayarla
