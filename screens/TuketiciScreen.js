@@ -76,7 +76,7 @@ const UreticiScreen = () => {
     ) : (
       <>
       <Tab.Navigator 
-  screenOptions={{ headerShown: false, tabBarStyle: { height:90 ,backgroundColor: '#e2eed6' } }}
+  screenOptions={{ headerShown: false, tabBarStyle: { height:90 ,backgroundColor: '#e2eed6', borderTopLeftRadius:30, borderTopRightRadius:30 } }}
 >
   <Tab.Screen 
     name="Tüketici" 
