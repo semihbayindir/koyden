@@ -225,7 +225,7 @@ const Cart = () => {
                             <View style={{borderWidth:1, borderRadius:15, backgroundColor:'white', padding:5, margin: 5}}>
                                 <Image source={{ uri: cartItem.productId.images[0] }} style={styles.productImage} />
                             </View>
-                            <View style={{ margin: '3%' ,flex:0.90, padding:9}}>
+                            <View style={{ margin: '3%' ,flex:0.90, padding:5}}>
                                 <Text style={{ fontWeight: 'bold', fontSize:22 }}>{cartItem.productId.name}</Text>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <TouchableOpacity onPress={() => handleQuantityChange(cartItem.productId._id, -1)} style={{ padding: 5 }}>

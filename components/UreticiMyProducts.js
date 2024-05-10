@@ -56,11 +56,11 @@ const UreticiMyProducts = () => {
             <Text style={{ textAlign: 'left', fontWeight: 800, fontSize: 30, fontStyle: 'normal' }}>  ÜRETİCİ,</Text>
           </Text>
           <View style={{ flexDirection: 'row', alignItems:'center', marginTop: 10 }}>
-            <TouchableOpacity style={styles.butons}>
-              <Text style={{ fontSize: 18 }}>Ürünlerim</Text>
+            <TouchableOpacity style={styles.buttons}>
+              <Text style={{ fontSize: 20 }}>Ürünlerim</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.butons} onPress={() => navigation.navigate('UreticiOrders')}>
-              <Text style={{ fontSize: 18 }}>Siparişlerim</Text>
+            <TouchableOpacity style={styles.buttons} onPress={() => navigation.navigate('UreticiOrders')}>
+              <Text style={{ fontSize: 20 }}>Siparişlerim</Text>
             </TouchableOpacity>
           </View>
           <FlatList // Ürünler yüklendikten sonra
@@ -85,13 +85,13 @@ const styles = StyleSheet.create({
     marginTop:15,
     marginHorizontal:15
   },
-  butons:{
-    margin:10,
-    borderWidth:2,
-    borderRadius:10,
-    borderColor:'#9ab863',
-    paddingHorizontal:10,
-    padding:4
+  buttons: {
+    marginHorizontal: 10,
+    backgroundColor:'#fff',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical:8,
+    marginBottom:15,
   },
   urunler:{
     backgroundColor:'#fff',
