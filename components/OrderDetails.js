@@ -66,10 +66,33 @@ const OrderDetails = ({ route }) => {
     }
   };
   
-  const handleRejectOffer = async (transportDetailsId) => {
+  const handleRejectOffer = async (orderId, transportDetailsId) => {
     try {
+      // Teklifi reddetmeden önce transportDetailsId'yi null olarak güncelle
+      await axios.delete(`http://localhost:8000/orders/${orderId}/removeTransportDetailsId`);
+      
+      // Teklifi reddet
       const response = await axios.put(`http://localhost:8000/transportDetails/update/isOfferAccept/${transportDetailsId}`, { isOfferAccept: false });
       console.log('Offer rejected:', response.data);
+      
+      // State'i güncelle
+      setProductDetails(prevDetails => {
+        const updatedDetails = prevDetails.map(item => {
+          // İlgili siparişin transportDetailsId özelliğini null olarak güncelle
+          if (item.order._id === orderId) {
+            return {
+              ...item,
+              order: {
+                ...item.order,
+                transportDetailsId: null
+              }
+            };
+          }
+          return item;
+        });
+        return updatedDetails;
+      });
+      
       // Handle UI update if needed
     } catch (error) {
       console.error('Error rejecting offer:', error);
