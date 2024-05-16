@@ -81,16 +81,7 @@ const Map = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const userId = useUserIdDecoder();
 
-
-
-
   const [otherMarkersInfo, setOtherMarkersInfo] = useState([]);
-  const [isOfferTextInputVisible, setIsOfferTextInputVisible] = useState(false);
-
-
- 
-
-
 
   useEffect(() => {
     if(userId){
@@ -310,7 +301,6 @@ function calculateDistance(coord1, coord2) {
           const response = await axios.post(`http://localhost:8000/transportDetails/offer`, {
             orderId,
             transporterId,
-            offer
           });
           console.log('Offer created successfully:', response.data);
            // Teklif oluşturulduğunda, transportDetailsId'yi siparişe ekle
@@ -350,13 +340,16 @@ function calculateDistance(coord1, coord2) {
         {destination && <Marker coordinate={destination} />}
         
         {/* Tanımlanan markers'lar */}
+        
         {markers.map((marker) => (
+          !orders[marker.id].transportDetailsId ? (
           <Marker
             key={marker.id}
             coordinate={marker.coordinate}
             title={`Marker ${marker.id}`}
             onPress={() => handleMarkerPress(marker)} // Marker'a tıklandığında handleMarkerPress fonksiyonunu çağır
           />
+          ) : null  
         ))}
 
         {showDirections && origin && destination && (
@@ -412,16 +405,7 @@ function calculateDistance(coord1, coord2) {
           </TouchableOpacity>
         </View>
 
-        <TextInput
-          style={styles.offerInput}
-          value={offer[`textInput${index}${productIndex}`] || ""}
-          onChangeText={(newOffer) => setOffer({ ...offer, [`textInput${index}${productIndex}`]: newOffer })}
-          placeholder="Teklif Ver"
-          keyboardType="numeric"
-        />
-        <TouchableOpacity style={styles.button} onPress={() => handleOffer(markerInfo.marker.id)}>
-          <Text style={styles.buttonText}>Teklif Yap</Text>
-        </TouchableOpacity>
+
       </View>
     ))}
   </View>
@@ -461,24 +445,20 @@ function calculateDistance(coord1, coord2) {
                 {orders[otherMarker.marker.id]?.products.map((product, productIndex) => (
                   <View style={{flexDirection:'row', marginLeft:'1%'}} key={productIndex}>
                     <View >
+                      <Text style={styles.productDetailsText}>{"Taşıma Ücreti : " + orders[otherMarker.marker.id].transportFee}</Text>
                     <Text style={styles.productDetailsText}>{`${otherMarker.orderInfo.from} -> ${otherMarker.orderInfo.to}`}</Text>
                     <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
                     <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
                     </View>
-                    <TouchableOpacity style={{backgroundColor:'#de510b', marginTop:20,borderRadius:40, padding:10, marginLeft:'10%'}} onPress={() => handleProductPress(product.productId._id)} >
-                      <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff'}}>Ürün Sayfası</Text>
+                    <TouchableOpacity onPress={() => handleOffer(otherMarker.marker.id)}>
+                      <Text>Teklif Yap</Text>
                     </TouchableOpacity>
+                    {/* <TouchableOpacity style={{backgroundColor:'#de510b', marginTop:20,borderRadius:40, padding:10, marginLeft:'10%'}} onPress={() => handleProductPress(product.productId._id)} >
+                      <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff'}}>Ürün Sayfası</Text>
+                    </TouchableOpacity> */}
                   </View>
                 ))}
-                <TextInput
-                    style={styles.offerInput}
-                    value={offer}
-                    onChangeText={(offer) => setOffer(offer)}
-                    placeholder="Teklif Ver"
-                    keyboardType="numeric"/>
-                    <TouchableOpacity style={styles.button}  onPress={() => handleOffer(otherMarker.marker.id)}>
-                      <Text style={styles.buttonText}>Teklif Yap</Text>
-                    </TouchableOpacity>
+                    
                     </View>
               </View>
             ))}
