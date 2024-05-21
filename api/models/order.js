@@ -15,6 +15,7 @@ const orderSchema = new mongoose.Schema({
   orderDate: { type: Date, default: Date.now }, // Sipariş tarihi
   from: { type: String, required: true },
   to: { type: String, required: true }, 
+  transportFee: { type: Number, required: true},
   status: { type: String, enum: ['Hazırlanıyor', 'Kargoya Verildi', 'Teslim Edildi'], default: 'Hazırlanıyor' }, // Sipariş durumu
 });
 

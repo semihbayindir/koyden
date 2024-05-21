@@ -69,6 +69,8 @@ const Map = () => {
   const [showDirections, setShowDirections] = useState(false);
   const [distance, setDistance] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [originalDistance, setOriginalDistance] = useState(0); // Original distance
+  const [originalDuration, setOriginalDuration] = useState(0); // Original duration
   const [markers, setMarkers] = useState([]); // Markers dizisi tanımlandı
   const mapRef = useRef(null);
   const [orders, setOrders] = useState([]);
@@ -76,21 +78,11 @@ const Map = () => {
   const [stopFetchingOrders, setStopFetchingOrders] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState(null); // Seçili marker'ı saklamak için state
   const [selectedMarkerInfo, setSelectedMarkerInfo] = useState([])
-  const [offer,setOffer] = useState({});
   const [waypoints, setWaypoints] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const userId = useUserIdDecoder();
 
-
-
-
   const [otherMarkersInfo, setOtherMarkersInfo] = useState([]);
-  const [isOfferTextInputVisible, setIsOfferTextInputVisible] = useState(false);
-
-
- 
-
-
 
   useEffect(() => {
     if(userId){
@@ -227,36 +219,56 @@ function calculateDistance(coord1, coord2) {
   
     const traceRouteOnReady = async (result) => {
       if (result) {
-          const routePoints = result.coordinates;
-          const nearbyMarkers = [];
-          markers.forEach((marker) => {
-              let minDistance = MAX_DISTANCE;
-              for (let i = 0; i < routePoints.length; i++) {
-                  const routePoint = routePoints[i];
-                  const distance = calculateDistance(routePoint, marker.coordinate);
-                  if (distance < minDistance) {
-                      minDistance = distance;
-                  }
-              }
-              if (minDistance < MAX_DISTANCE) {
-                  nearbyMarkers.push(marker);
-              }
-          });
-          // Yakın markerlar bulunduğunda ilgili sipariş bilgilerini al
-    const markerInfos = [];
-    for (const marker of nearbyMarkers) {
-      try {
-        const orderId = orders[marker.id]._id;
-        const response = await axios.get(`http://localhost:8000/orders/${orderId}`);
-        const orderInfo = response.data;
-        markerInfos.push({ marker, orderInfo });
-      } catch (error) {
-        // console.error('Error fetching order info:', error);
+        if (originalDistance === 0 && originalDuration === 0) {
+          setOriginalDistance(result.distance);
+          setOriginalDuration(result.duration);
+        }
+    
+        const totalDistance = result.distance;
+        const totalDuration = result.duration;
+    
+        // Check if there are waypoints before setting extra distance and duration
+        if (waypoints.length > 0) {
+          setDistance(totalDistance);
+          setDuration(totalDuration);
+        } else {
+          setDistance(originalDistance);
+          setDuration(originalDuration);
+        }
+    
+        const routePoints = result.coordinates;
+        const nearbyMarkers = [];
+    
+        for (const marker of markers) {
+          let minDistance = MAX_DISTANCE;
+          for (const routePoint of routePoints) {
+            const distance = calculateDistance(routePoint, marker.coordinate);
+            if (distance < minDistance) {
+              minDistance = distance;
+            }
+          }
+          if (minDistance < MAX_DISTANCE) {
+            nearbyMarkers.push(marker); 
+          }
+        }
+    
+        const markerInfos = [];
+        for (const marker of nearbyMarkers) {
+          try {
+            const orderId = orders[marker.id]._id;
+            const response = await axios.get(`http://localhost:8000/orders/${orderId}`);
+            const orderInfo = response.data;
+            markerInfos.push({ marker, orderInfo });
+          } catch (error) {
+            console.error('Error fetching order info:', error);
+          }
+        }
+        setSelectedMarkerInfo(markerInfos);
       }
-    }
-    setSelectedMarkerInfo(markerInfos);
-  }
-};
+    };
+    
+    
+    
   
   
   const traceRoute = () => {
@@ -310,7 +322,6 @@ function calculateDistance(coord1, coord2) {
           const response = await axios.post(`http://localhost:8000/transportDetails/offer`, {
             orderId,
             transporterId,
-            offer
           });
           console.log('Offer created successfully:', response.data);
            // Teklif oluşturulduğunda, transportDetailsId'yi siparişe ekle
@@ -333,6 +344,11 @@ function calculateDistance(coord1, coord2) {
       setWaypoints(newWaypoints); // Yeniden oluşturulan waypoints dizisini ayarlayın
     };
 
+    const removeMarkerRoute = async (coordinateToRemove) => {
+      const newWaypoints = waypoints.filter(coordinate => coordinate !== coordinateToRemove);
+      setWaypoints(newWaypoints); 
+    };
+    
 
     const handleProductPress = (productId) => {
       navigation.navigate('SingleProduct', { userType :'tasiyici', productId: productId  });
@@ -350,13 +366,16 @@ function calculateDistance(coord1, coord2) {
         {destination && <Marker coordinate={destination} />}
         
         {/* Tanımlanan markers'lar */}
+        
         {markers.map((marker) => (
+          !orders[marker.id].transportDetailsId ? (
           <Marker
             key={marker.id}
             coordinate={marker.coordinate}
             title={`Marker ${marker.id}`}
             onPress={() => handleMarkerPress(marker)} // Marker'a tıklandığında handleMarkerPress fonksiyonunu çağır
           />
+          ) : null  
         ))}
 
         {showDirections && origin && destination && (
@@ -388,52 +407,48 @@ function calculateDistance(coord1, coord2) {
           <Text style={{fontSize:18, fontWeight:700, textAlign:'center', color:'#fff'}}>Rota Oluştur</Text>
         </TouchableOpacity>
         
-            <Modal transparent={true} visible={isModalOpen} >
-              <ScrollView style={styles.modalContainer1}>
-                <View style={{flexDirection:'row',flex:1}}>
-                <Text style={{fontSize:24, fontStyle:'italic', fontWeight:800, marginBottom:10, flex:0.9}}>Yakın Siparişler:</Text>
-                  <TouchableOpacity style={{alignSelf:'flex-end', flex:0.1, marginBottom:10}} onPress={() => setIsModalOpen(false)}>
-                    <MaterialCommunityIcons name="close" size={33} color={'green'} />
-                  </TouchableOpacity>
-                </View>
-           {selectedMarkerInfo.map((markerInfo, index) => (
-  <View key={index}>
-    {orders[markerInfo.marker.id]?.products.map((product, productIndex) => (
-      <View style={styles.yakinSiparis} key={productIndex}>
-
-        <View style={{flexDirection:'row'}}>
-          <View style={{flex:0.9}}>
-          <Text style={[styles.productDetailsText,{fontWeight:'800',marginVertical:5}]}>{`${markerInfo.orderInfo.from} -> ${markerInfo.orderInfo.to}`}</Text>
-          <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
-          <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
+        <Modal transparent={true} visible={isModalOpen}>
+  <ScrollView style={styles.modalContainer1}>
+    <View style={{flexDirection:'row',flex:1}}>
+      <Text style={{fontSize:24, fontStyle:'italic', fontWeight:800, marginBottom:10, flex:0.9}}>Yakın Siparişler:</Text>
+      <TouchableOpacity style={{alignSelf:'flex-end', flex:0.1, marginBottom:10}} onPress={() => setIsModalOpen(false)}>
+        <MaterialCommunityIcons name="close" size={33} color={'green'} />
+      </TouchableOpacity>
+    </View>
+    {selectedMarkerInfo.map((markerInfo, index) => (
+      <View key={index}>
+        {!orders[markerInfo.marker.id]?.transportDetailsId && orders[markerInfo.marker.id]?.products.map((product, productIndex) => (
+          <View style={styles.yakinSiparis} key={productIndex}>
+            <View style={{flexDirection:'row'}}>
+              <View style={{flex:0.9}}>
+                <Text style={[styles.productDetailsText,{fontWeight:'800',marginVertical:5}]}>{`${markerInfo.orderInfo.from} -> ${markerInfo.orderInfo.to}`}</Text>
+                <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
+                <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
+                <Text style={styles.productDetailsText}>{"Taşıma Ücreti : " + orders[markerInfo.marker.id].transportFee}</Text>
+              </View>
+              <TouchableOpacity style={{backgroundColor:'#de510b', flex:0.2, marginRight:'1%',borderRadius:40, padding:10}} onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
+                <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff',marginTop:10}}>Rotaya ekle</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={{backgroundColor:'#de510b', flex:0.2, marginRight:'1%',borderRadius:40, padding:10}} onPress={() => removeMarkerRoute(markerInfo.marker.coordinate)}>
+                <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff',marginTop:10}}>Rotadan Çıkar</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <TouchableOpacity style={{backgroundColor:'#de510b', flex:0.2, marginRight:'1%',borderRadius:40, padding:10}} onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
-            <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff',marginTop:10}}>Rotaya ekle</Text>
-          </TouchableOpacity>
-        </View>
-
-        <TextInput
-          style={styles.offerInput}
-          value={offer[`textInput${index}${productIndex}`] || ""}
-          onChangeText={(newOffer) => setOffer({ ...offer, [`textInput${index}${productIndex}`]: newOffer })}
-          placeholder="Teklif Ver"
-          keyboardType="numeric"
-        />
-        <TouchableOpacity style={styles.button} onPress={() => handleOffer(markerInfo.marker.id)}>
-          <Text style={styles.buttonText}>Teklif Yap</Text>
-        </TouchableOpacity>
+        ))}
       </View>
     ))}
-  </View>
-))}
-
-</ScrollView>
+  </ScrollView>
 </Modal>
-
         {distance && duration ? (
           <View>
-            <Text>Distance: {distance.toFixed(2)}</Text>
-            <Text>Duration: {Math.ceil(duration)} min</Text>
+            <Text>Mesafe: {distance.toFixed(2)} km</Text>
+            <Text>Süre: {Math.ceil(duration)} dakika</Text>
+            {originalDistance !== 0 && originalDuration !== 0 && (
+            <>
+              <Text>Ek Mesafe: {(Math.abs(distance - originalDistance)).toFixed(2)} km</Text>
+              <Text>Ek Süre: {Math.abs(Math.ceil(duration - originalDuration))} dk</Text>
+            </>
+          )}
           </View>
         ) : null}
       </View>
@@ -454,32 +469,29 @@ function calculateDistance(coord1, coord2) {
       </View>
         {otherMarkersInfo.map((otherMarker, otherMarkerIndex) => (
           <View key={otherMarkerIndex}>
-            <View style={styles.yakinSiparis}>
-                
-                <Text style={{ fontWeight:700, fontSize:20, marginLeft:'3%', marginTop:'5%'}}>Sipariş {otherMarkerIndex + 1}</Text>
-                {/* {console.log(otherMarker)} */}
-                {orders[otherMarker.marker.id]?.products.map((product, productIndex) => (
-                  <View style={{flexDirection:'row', marginLeft:'1%', flex:1}} key={productIndex}>
-                    <View style={{flex:0.9}}>
-                    <Text style={styles.productDetailsText}>{`${otherMarker.orderInfo.from} -> ${otherMarker.orderInfo.to}`}</Text>
+
+             {!orders[otherMarker.marker.id]?.transportDetailsId && orders[otherMarker.marker.id]?.products.map((product, productIndex) => (
+            <View style={styles.yakinSiparis} key={productIndex}>
+               
+                  <View style={{flexDirection:'row', marginLeft:'1%'}} key={productIndex}>
+                    <View >
+                    <Text style={{fontSize:22, fontWeight:900, paddingLeft:7}}>{`${otherMarker.orderInfo.from} -> ${otherMarker.orderInfo.to}`}</Text>
+                      <Text style={styles.productDetailsText}>{"Taşıma Ücreti : " + orders[otherMarker.marker.id].transportFee}</Text>
+
                     <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
                     <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
+
                     </View>
+
                     <TouchableOpacity style={{backgroundColor:'#de510b', marginTop:5,borderRadius:50, padding:10, marginRight:'5%', flex:0.3}} onPress={() => handleProductPress(product.productId._id)} >
                       <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff'}}>Ürün Sayfası</Text>
+
                     </TouchableOpacity>
                   </View>
-                ))}
-                <TextInput
-                    style={styles.offerInput}
-                    value={offer}
-                    onChangeText={(offer) => setOffer(offer)}
-                    placeholder="Teklif Ver"
-                    keyboardType="numeric"/>
-                    <TouchableOpacity style={styles.button}  onPress={() => handleOffer(otherMarker.marker.id)}>
-                      <Text style={styles.buttonText}>Teklif Yap</Text>
-                    </TouchableOpacity>
-                    </View>
+               
+                    
+                    </View> 
+                  ))}
               </View>
             ))}
             

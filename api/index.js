@@ -443,7 +443,7 @@ const TransportDetails = require("./models/transport_details");
 //Sipariş Oluşturma (Tüketici tarafı):
 app.post('/orders/create', async (req, res) => {
   try {
-    const { userId, producerId, transportDetailsId, products, totalPrice, from, to } = req.body;
+    const { userId, producerId, transportDetailsId, products, totalPrice, from, to, transportFee } = req.body;
 
     const newOrder = new Order({
       userId,
@@ -452,7 +452,8 @@ app.post('/orders/create', async (req, res) => {
       products,
       totalPrice,
       from,
-      to
+      to,
+      transportFee
     });
 
     const savedOrder = await newOrder.save();
@@ -678,14 +679,13 @@ app.put('/cart/:cartId/product/:productId/increase', async (req, res) => {
 // Teklif oluşturma endpointi
 app.post('/transportDetails/offer', async (req, res) => {
   try {
-    const { orderId, transporterId, offer } = req.body;
+    const { orderId, transporterId } = req.body;
 
     // Yeni bir TransportDetails belgesi oluştur
     const transportDetails = new TransportDetails({
       orderId,
       transporterId,
-      offer,
-      isOfferAccept: false // Başlangıçta teklif kabul edilmemiş olarak işaretlenir
+      isOfferAccept: false // Başlangıçta teklif kabul edilmiş olarak işaretlenir
     });
 
     // TransportDetails belgesini kaydet
@@ -726,6 +726,21 @@ app.get('/transportDetails/id/:transportDetailsId', async (req, res) => {
   } catch (error) {
     console.error('Error fetching transport details by transportDetailsId:', error);
     res.status(500).json({ message: 'Sunucu hatası.' });
+  }
+});
+
+// DELETE request to remove transportDetailsId from order
+app.delete('/:orderId/removeTransportDetailsId', async (req, res) => {
+  const orderId = req.params.orderId;
+  try {
+    const order = await Order.findByIdAndUpdate(orderId, { transportDetailsId: null }, { new: true });
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    res.json(order);
+  } catch (error) {
+    console.error('Error removing transportDetailsId from order:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
