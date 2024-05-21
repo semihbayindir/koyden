@@ -9,7 +9,7 @@ const TasiyiciOrders = () => {
   const userId = useUserIdDecoder();
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState({});
-  const [producerInfos, setProducerInfos] = useState({}); // Üreticilerin bilgilerini saklamak için bir state
+  const [producerInfos, setProducerInfos] = useState({});
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -17,8 +17,10 @@ const TasiyiciOrders = () => {
       if (userId) {
         try {
           const transportResponse = await axios.get(`http://localhost:8000/transportDetails/${userId}`);
-          setTransportDetails(transportResponse.data);
-          const orderPromises = transportResponse.data.map(async (transportDetail) => {
+          const filteredTransportDetails = transportResponse.data.filter(detail => detail.isOfferAccept);
+          setTransportDetails(filteredTransportDetails);
+
+          const orderPromises = filteredTransportDetails.map(async (transportDetail) => {
             const orderResponse = await axios.get(`http://localhost:8000/orders/${transportDetail.orderId}`);
             return orderResponse.data;
           });
@@ -37,20 +39,18 @@ const TasiyiciOrders = () => {
   const fetchProduct = async (productId) => {
     try {
       const response = await axios.get(`http://localhost:8000/products/${productId}`);
-      return response.data; // Ürün verisi başarıyla alındı
+      return response.data;
     } catch (error) {
       console.error('Error fetching product:', error);
-      throw new Error('Error fetching product'); // Ürün alınırken bir hata oluştu
+      throw new Error('Error fetching product');
     }
   };
 
   useEffect(() => {
-    // Tüm siparişlerin ürün bilgilerini çek ve products state'ine kaydet
     const fetchProductsForOrders = async () => {
       const productMap = {};
       for (const order of orders) {
         for (const product of order.products) {
-          // Eğer bu ürünü daha önce çekmediysek, çek
           if (!productMap[product.productId]) {
             productMap[product.productId] = await fetchProduct(product.productId);
           }
@@ -69,14 +69,13 @@ const TasiyiciOrders = () => {
         const producerInfo = response.data.producer;
         setProducerInfos(prevState => ({
           ...prevState,
-          [producerId]: producerInfo // Üretici bilgilerini producerInfos state'ine kaydet
+          [producerId]: producerInfo
         }));
       } catch (error) {
         console.error('Error fetching producer info:', error);
       }
     };
-  
-    // Her sipariş için üreticinin bilgilerini al
+
     orders.forEach(order => {
       fetchProducerInfo(order.producerId);
     });
@@ -84,32 +83,26 @@ const TasiyiciOrders = () => {
 
   const renderOrderItem = ({ item, index }) => {
     const order = item;
-    const offerAcceptStatus = transportDetails[index].isOfferAccept ? 'Onaylandı' : 'Beklemede'; // isOfferAccept değerine göre durumu belirle
-    const producerInfo = producerInfos[order.producerId]; // Üreticinin bilgilerini al
+    const offerAcceptStatus = 'Onaylandı';
+    const producerInfo = producerInfos[order.producerId];
 
     return (
       <View>
-        {offerAcceptStatus == "Onaylandı" && (
-          <>
-        {/* Üreticinin bilgilerini burada göster */}
-        {producerInfo && (
-          <View>
-            <Text>Producer Name: {producerInfo.name}</Text>
-            <Text>Producer Phone : {producerInfo.phone}</Text>
-            <Text>{producerInfo.verification.producerAddress.city + " " +
-             producerInfo.verification.producerAddress.district + " " 
-             + producerInfo.verification.producerAddress.street}</Text>
-            {/* Diğer üretici bilgilerini buraya ekleyebilirsiniz */}
-          </View>
-        )}
-       </>
-        )}
+        <View>
+          {producerInfo && (
+            <View>
+              <Text>Producer Name: {producerInfo.name}</Text>
+              <Text>Producer Phone : {producerInfo.phone}</Text>
+              <Text>{producerInfo.verification.producerAddress.city + " " +
+                producerInfo.verification.producerAddress.district + " " 
+                + producerInfo.verification.producerAddress.street}</Text>
+            </View>
+          )}
+        </View>
         <Text>Sipariş kabul durumu: {offerAcceptStatus}</Text>
         <Text>Başlangıç: {order.from}</Text>
         <Text>Varış: {order.to}</Text>
-        {/* <Text>isOfferAccept: {transportDetails[index].isOfferAccept}</Text> */}
 
-        {/* Ürünlerin bilgisini products state'inden al */}
         {order.products.map((product, index) => (
           <View key={index}>
             {products[product.productId] && (

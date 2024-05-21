@@ -361,7 +361,9 @@ function calculateDistance(coord1, coord2) {
         initialRegion={INITIAL_POSITION}
       >
         {origin && <Marker coordinate={origin} />}
-        {destination && <Marker coordinate={destination} />}
+        {destination && <Marker coordinate={destination}
+                    icon={require('/Users/semihbayindir/Documents/GitHub/koyden/assets/home/174209-basket-fresh-fruit-free-photo.png')} // Özel ikon dosyanızın yolu
+                    />}
         
         {/* Tanımlanan markers'lar */}
         
