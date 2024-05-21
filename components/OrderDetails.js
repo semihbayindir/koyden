@@ -128,7 +128,7 @@ const OrderDetails = ({ route }) => {
         data={productDetails}
         renderItem={({ item }) => (
           <View style={styles.orderDetail}>
-            <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: 800, marginBottom: 10 }]}>Sipariş Detayları</Text>
+            <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: 800, marginBottom: 10 }]}>Sipariş Detayları</Text>  
             {item.products.map((product, index) => (
               <View key={index}>
                 <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: 800, marginBottom: 10 }]}> {product.name}</Text>
@@ -136,13 +136,18 @@ const OrderDetails = ({ route }) => {
                   <View style={{ borderWidth: 1, borderColor:'lightgray', borderRadius: 15, backgroundColor: 'white', padding: 5 }}>
                     <Image source={{ uri: product.images[0] }} style={styles.productImage} />
                   </View>
-                  <View style={{ marginLeft:'5%'}}>
-                    <Text style={styles.productDetailText}>Miktar: {product.qty} {product.qtyFormat}</Text>
+
+                  <View style={{ marginLeft: 10 }}>
+                    {item.order.products.map((newProduct, index) => (
+                      <View key={index}>
+                        <Text style={styles.productDetailText}>Miktar: {newProduct.quantity} {product.qtyFormat}</Text>
+                      </View>
+                    ))} 
+
                     <Text style={styles.productDetailText}>Fiyat: {item.order.totalPrice} ₺</Text>
                     <Text style={styles.orderInfoText}>Gönderen: {item.order.from}</Text>
                     {item.order.isOfferAccept!==true && item.order.transportDetailsId &&(
                       <View>
-                        {/* {console.log(item.order.transportDetailsId)} */}
                         <TouchableOpacity style={styles.button} onPress={() => handleAcceptOffer(item.order.transportDetailsId)}>
                           <Text style={{ color: 'white', fontSize:17 }}>Teklifi Kabul Et</Text>
                         </TouchableOpacity>
