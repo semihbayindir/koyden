@@ -525,26 +525,6 @@ app.put('/orders/update/offer/:orderId', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
-// PUT endpoint for updating offer acceptance status of an order
-app.put('/transportDetails/update/isOfferAccept/:transportDetailsId', async (req, res) => {
-  try {
-    const { transportDetailsId } = req.params;
-    const { isOfferAccept } = req.body;
-
-    // Taşıma detaylarını bul ve teklif kabul durumunu güncelle
-    const updatedTransportDetails = await TransportDetails.findByIdAndUpdate(transportDetailsId, { isOfferAccept }, { new: true });
-
-    if (!updatedTransportDetails) {
-      return res.status(404).json({ message: "Taşıma detayları bulunamadı." });
-    }
-
-    res.status(200).json({ message: "Teklif kabul durumu başarıyla güncellendi.", transportDetails: updatedTransportDetails });
-  } catch (error) {
-    console.error('Error updating offer acceptance status:', error);
-    res.status(500).json({ message: 'Sunucu hatası.' });
-  }
-});
-
 
 //Tüm siparişleri getirme
 app.get("/orders", async (req, res) => {
@@ -728,9 +708,8 @@ app.get('/transportDetails/id/:transportDetailsId', async (req, res) => {
     res.status(500).json({ message: 'Sunucu hatası.' });
   }
 });
-
 // DELETE request to remove transportDetailsId from order
-app.delete('/:orderId/removeTransportDetailsId', async (req, res) => {
+app.delete('/orders/:orderId/removeTransportDetailsId', async (req, res) => {
   const orderId = req.params.orderId;
   try {
     const order = await Order.findByIdAndUpdate(orderId, { transportDetailsId: null }, { new: true });
@@ -744,6 +723,25 @@ app.delete('/:orderId/removeTransportDetailsId', async (req, res) => {
   }
 });
 
+// PUT endpoint for updating offer acceptance status of an order
+app.put('/transportDetails/update/isOfferAccept/:transportDetailsId', async (req, res) => {
+  try {
+    const { transportDetailsId } = req.params;
+    const { isOfferAccept } = req.body;
+
+    // Taşıma detaylarını bul ve teklif kabul durumunu güncelle
+    const updatedTransportDetails = await TransportDetails.findByIdAndUpdate(transportDetailsId, { isOfferAccept }, { new: true });
+
+    if (!updatedTransportDetails) {
+      return res.status(404).json({ message: "Taşıma detayları bulunamadı." });
+    }
+
+    res.status(200).json({ message: "Teklif kabul durumu başarıyla güncellendi.", transportDetails: updatedTransportDetails });
+  } catch (error) {
+    console.error('Error updating offer acceptance status:', error);
+    res.status(500).json({ message: 'Sunucu hatası.' });
+  }
+});
 
 
 
