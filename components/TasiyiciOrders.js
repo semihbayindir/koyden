@@ -89,7 +89,6 @@ const TasiyiciOrders = () => {
 
     return (
       <View>
-        <Text>Offer: {transportDetails[index].offer}</Text>
         {offerAcceptStatus == "Onaylandı" && (
           <>
         {/* Üreticinin bilgilerini burada göster */}
@@ -105,17 +104,17 @@ const TasiyiciOrders = () => {
         )}
        </>
         )}
-        <Text>Offer Accept Status: {offerAcceptStatus}</Text>
-        <Text>From: {order.from}</Text>
-        <Text>To: {order.to}</Text>
-        <Text>isOfferAccept: {transportDetails[index].isOfferAccept}</Text>
+        <Text>Sipariş kabul durumu: {offerAcceptStatus}</Text>
+        <Text>Başlangıç: {order.from}</Text>
+        <Text>Varış: {order.to}</Text>
+        {/* <Text>isOfferAccept: {transportDetails[index].isOfferAccept}</Text> */}
 
         {/* Ürünlerin bilgisini products state'inden al */}
         {order.products.map((product, index) => (
           <View key={index}>
             {products[product.productId] && (
               <View>
-                <Text>Product Name: {products[product.productId].name}</Text>
+                <Text>Ürün adı: {products[product.productId].name}</Text>
                 <Image source={{ uri: products[product.productId].images[0] }} style={{ width: 100, height: 100}} />
               </View>
             )}

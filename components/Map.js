@@ -316,7 +316,6 @@ function calculateDistance(coord1, coord2) {
 
     const handleOffer = async (markerId) => {
       try {
-        if (selectedMarker !== null) {
           const orderId = orders[markerId]._id; // Seçili markere göre siparişin ID'sini al
           const transporterId = userId; // Taşıyıcı ID'si, değiştirilmeli
           const response = await axios.post(`http://localhost:8000/transportDetails/offer`, {
@@ -331,8 +330,7 @@ function calculateDistance(coord1, coord2) {
             transportDetailsId
           });
           console.log('TransportDetailsId added to order:', addTransportDetailsIdResponse.data);
-        }
-      } catch (error) {
+        }catch (error) {
         console.error('Error creating offer:', error);
       }
     };
@@ -425,6 +423,9 @@ function calculateDistance(coord1, coord2) {
                 <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
                 <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
                 <Text style={styles.productDetailsText}>{"Taşıma Ücreti : " + orders[markerInfo.marker.id].transportFee}</Text>
+                <TouchableOpacity style={{backgroundColor:'#de510b', flex:0.2, marginRight:'1%',borderRadius:40, padding:10}} onPress={() => handleOffer(markerInfo.marker.id)}>
+                <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff'}}>İşi kabul et</Text>
+              </TouchableOpacity>
               </View>
               <TouchableOpacity style={{backgroundColor:'#de510b', flex:0.2, marginRight:'1%',borderRadius:40, padding:10}} onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
                 <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff',marginTop:10}}>Rotaya ekle</Text>
@@ -480,7 +481,9 @@ function calculateDistance(coord1, coord2) {
 
                     <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
                     <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
-
+                    <TouchableOpacity onPress={() => handleOffer(otherMarker.marker.id)}>
+                      <Text>İşi kabul et</Text>
+                    </TouchableOpacity>
                     </View>
 
                     <TouchableOpacity style={{backgroundColor:'#de510b', marginTop:5,borderRadius:50, padding:10, marginRight:'5%', flex:0.3}} onPress={() => handleProductPress(product.productId._id)} >
