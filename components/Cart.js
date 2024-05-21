@@ -269,8 +269,8 @@ const Cart = () => {
             <View>
                 {Object.values(cartItems).flat().length > 0 ? (
                     Object.values(cartItems).flat().map((cartItem, index) => (
-                        <View style={{ flexDirection: 'row', borderWidth: 1, borderRadius: 20, marginHorizontal: '3%', marginVertical: '2%', backgroundColor: '#f9fbe5' }} key={index}>
-                            <View style={{ borderWidth: 1, borderRadius: 15, backgroundColor: 'white', padding: 5, margin: 5 }}>
+                        <View style={{ flexDirection: 'row', borderRadius: 20, marginHorizontal: '3%', marginVertical: '2%', backgroundColor: '#f9fbe5' }} key={index}>
+                            <View style={{borderWidth:1,borderColor:'lightgray', borderRadius: 15, backgroundColor: 'white', padding: 5, margin: 5 }}>
                                 <Image source={{ uri: cartItem.productId.images[0] }} style={styles.productImage} />
                             </View>
                             <View style={{ margin: '3%', flex: 0.90, padding: 5 }}>
