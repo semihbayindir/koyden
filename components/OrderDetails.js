@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react
 const OrderDetails = ({ route }) => {
   const { orderDetails } = route.params;
   const [productDetails, setProductDetails] = useState([]);
+  const [transporterIds, setTransporterIds] = useState([]);
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -33,6 +34,8 @@ const OrderDetails = ({ route }) => {
     try {
       const response = await axios.get(`http://localhost:8000/transportDetails/id/${transportDetailsId}`);
       const transportDetails = response.data.transportDetails;
+      // console.log(transportDetails.transporterId)
+      setTransporterIds(transportDetails.transporterId);
       // Update productDetails state with fetched transportDetails
       setProductDetails(prevDetails => {
         const updatedDetails = [...prevDetails];
@@ -137,9 +140,9 @@ const OrderDetails = ({ route }) => {
                     <Text style={styles.productDetailText}>Miktar: {product.qty} {product.qtyFormat}</Text>
                     <Text style={styles.productDetailText}>Fiyat: {item.order.totalPrice} ₺</Text>
                     <Text style={styles.orderInfoText}>Gönderen: {item.order.from}</Text>
-                    {item.order.offer !== undefined  && item.order.isOfferAccept!==true &&(
+                    {item.order.isOfferAccept!==true &&(
                       <View>
-                        <Text style={styles.orderInfoText}>Teklif: {item.order.offer}</Text>
+                        {/* {console.log(item.order.transportDetailsId)} */}
                         <TouchableOpacity style={styles.button} onPress={() => handleAcceptOffer(item.order.transportDetailsId)}>
                           <Text style={{ color: 'blue' }}>Teklifi Kabul Et</Text>
                         </TouchableOpacity>
@@ -149,11 +152,9 @@ const OrderDetails = ({ route }) => {
                       </View>
                     )}
                     {item.order.isOfferAccept==true && (
-                      <Text>Teklifiniz taşıyıcıya iletildi.</Text>
-                    )}
-                    {item.order.offer == undefined &&(
                       <View>
-                        <Text style={[styles.orderInfoText, { color: item.order.status === 'Hazırlanıyor' ? '#2285a1' : 'green' }]}>{item.order.status}</Text>
+                      <Text>Teklifiniz taşıyıcıya iletildi.</Text>
+                      <Text style={[styles.orderInfoText, { color: item.order.status === 'Hazırlanıyor' ? '#2285a1' : 'green' }]}>{item.order.status}</Text>
                       </View>
                     )}
                   </View>

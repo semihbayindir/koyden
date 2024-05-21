@@ -685,7 +685,7 @@ app.post('/transportDetails/offer', async (req, res) => {
     const transportDetails = new TransportDetails({
       orderId,
       transporterId,
-      isOfferAccept: true // Başlangıçta teklif kabul edilmiş olarak işaretlenir
+      isOfferAccept: false // Başlangıçta teklif kabul edilmiş olarak işaretlenir
     });
 
     // TransportDetails belgesini kaydet
