@@ -51,8 +51,8 @@ const Orders = () => {
         
         <View style={{flexDirection:'row'}}>
         {item.products.map((product, index) => (
-          <View style={{flexDirection:'row', borderWidth:1, borderRadius:5, backgroundColor:'white', padding:5, marginBottom:10, marginRight: 10}}>
-          <Image source={{ uri: product.productId.images[0] }} style={{ width: 60, height: 60}} />
+          <View style={{flexDirection:'row', borderWidth:1, borderColor:'lightgray', borderRadius:10, backgroundColor:'white', padding:5, marginBottom:10, marginRight: 10}}>
+          <Image source={{ uri: product.productId.images[0] }} style={{ width: 70, height: 70}} />
           </View>
           ))}
           </View>
@@ -103,8 +103,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   order: {
-    borderWidth: 1,
-    borderRadius:15,
+    borderRadius:20,
     borderColor: 'lightgrey',
     backgroundColor:'#f9fbe5',
     padding: 10,

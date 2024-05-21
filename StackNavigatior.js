@@ -202,7 +202,7 @@ const StackNavigator = () => {
         name="UreticiOrders"
         component={UreticiOrders}
         options={{
-          title: 'KÖYDEN',
+          title: 'Siparişlerim',
           //headerTitle: (props) => <LogoTitle {...props} />,
           headerBackTitle: '‎',
           headerStyle: {
@@ -211,6 +211,7 @@ const StackNavigator = () => {
           headerTintColor: '#fff',
           headerTitleStyle: {
             fontWeight: 'bold',
+            fontSize:22
           },        
         }}
         />

@@ -118,7 +118,7 @@ const OrderDetails = ({ route }) => {
   return (
     <View style={styles.container}>
       {productDetails.length > 0 && (
-        <View style={{ borderWidth: 1, borderRadius: 15, borderColor: '#ccc', backgroundColor: '#f9fbe5', padding: 7, marginBottom: 10 }}>
+        <View style={{  borderRadius: 20,  backgroundColor: '#f9fbe5', padding: 7, marginBottom: 10 }}>
           <Text style={{ fontSize: 18 }}>Sipariş Tarihi: {formatOrderDate(productDetails[0].order.orderDate)}</Text>
           <Text style={{ fontSize: 18 }}>Sipariş Durumu: {productDetails[0].order.status}</Text>
           <Text style={{ fontSize: 18 }}>Toplam Tutarı: {productDetails.reduce((total, item) => total + item.order.totalPrice, 0)} ₺</Text>
@@ -133,27 +133,26 @@ const OrderDetails = ({ route }) => {
               <View key={index}>
                 <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: 800, marginBottom: 10 }]}> {product.name}</Text>
                 <View style={styles.productDetail}>
-                  <View style={{ borderWidth: 1, borderRadius: 15, backgroundColor: 'white', padding: 5 }}>
+                  <View style={{ borderWidth: 1, borderColor:'lightgray', borderRadius: 15, backgroundColor: 'white', padding: 5 }}>
                     <Image source={{ uri: product.images[0] }} style={styles.productImage} />
                   </View>
-                  <View style={{ marginLeft: 10 }}>
+                  <View style={{ marginLeft:'5%'}}>
                     <Text style={styles.productDetailText}>Miktar: {product.qty} {product.qtyFormat}</Text>
                     <Text style={styles.productDetailText}>Fiyat: {item.order.totalPrice} ₺</Text>
                     <Text style={styles.orderInfoText}>Gönderen: {item.order.from}</Text>
-                    {item.order.isOfferAccept!==true &&(
+                    {item.order.isOfferAccept!==true && item.order.transportDetailsId &&(
                       <View>
                         {/* {console.log(item.order.transportDetailsId)} */}
                         <TouchableOpacity style={styles.button} onPress={() => handleAcceptOffer(item.order.transportDetailsId)}>
-                          <Text style={{ color: 'blue' }}>Teklifi Kabul Et</Text>
+                          <Text style={{ color: 'white', fontSize:17 }}>Teklifi Kabul Et</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.button} onPress={() => handleRejectOffer(item.order.transportDetailsId)}>
-                          <Text style={{ color: 'red' }}>Teklifi Reddet</Text>
+                        <TouchableOpacity style={styles.button1} onPress={() => handleRejectOffer(item.order.transportDetailsId)}>
+                          <Text style={{ color: 'white', fontSize:17 }}>Teklifi Reddet</Text>
                         </TouchableOpacity>
                       </View>
                     )}
                     {item.order.isOfferAccept==true && (
                       <View>
-                      <Text>Teklifiniz taşıyıcıya iletildi.</Text>
                       <Text style={[styles.orderInfoText, { color: item.order.status === 'Hazırlanıyor' ? '#2285a1' : 'green' }]}>{item.order.status}</Text>
                       </View>
                     )}
@@ -162,8 +161,8 @@ const OrderDetails = ({ route }) => {
               </View>
             ))}
             {item.order.isOfferAccept !== true && (
-      <TouchableOpacity  style={styles.button} onPress={() => handleCancelOrder(item.order._id)}>
-        <Text style={{ color: 'red' }}>Siparişi iptal et</Text>
+      <TouchableOpacity  style={styles.button1} onPress={() => handleCancelOrder(item.order._id)}>
+        <Text style={{ color: 'white', fontSize:17 }}>Siparişi iptal et</Text>
       </TouchableOpacity>
       )}
           </View>
@@ -181,10 +180,8 @@ const styles = StyleSheet.create({
   },
   orderDetail: {
     marginBottom: 20,
-    borderWidth: 1,
-    borderRadius: 15,
+    borderRadius: 20,
     backgroundColor: '#f9fbe5',
-    borderColor: '#ccc',
     padding: 10,
   },
   orderInfo: {
@@ -200,9 +197,9 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   productImage: {
-    width: 90,
-    height: 90,
-    borderRadius: 5,
+    width: 150,
+    height: 150,
+    borderRadius: 10,
     alignSelf: 'center',
   },
   productDetailText: {
@@ -210,7 +207,14 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   button: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#729c44',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  button1: {
+    backgroundColor: 'red',
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
