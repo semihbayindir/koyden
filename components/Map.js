@@ -360,8 +360,9 @@ function calculateDistance(coord1, coord2) {
         provider={PROVIDER_GOOGLE}
         initialRegion={INITIAL_POSITION}
       >
-        {origin && <Marker coordinate={origin} />}
-        {destination && <Marker coordinate={destination} />}
+        {origin && <Marker coordinate={origin} icon={ require("../assets/map-marker_1673221.png")}/>}
+        {destination && <Marker coordinate={destination} 
+        icon={ require("../assets/map-marker_1673221.png")}/>}
         
         {/* Tanımlanan markers'lar */}
         
@@ -369,6 +370,7 @@ function calculateDistance(coord1, coord2) {
           !orders[marker.id].transportDetailsId ? (
           <Marker
             key={marker.id}
+            icon={ require("../assets/packing_15349433.png")}
             coordinate={marker.coordinate}
             title={`Marker ${marker.id}`}
             onPress={() => handleMarkerPress(marker)} // Marker'a tıklandığında handleMarkerPress fonksiyonunu çağır
@@ -423,9 +425,7 @@ function calculateDistance(coord1, coord2) {
                 <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
                 <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
                 <Text style={styles.productDetailsText}>{"Taşıma Ücreti : " + orders[markerInfo.marker.id].transportFee}</Text>
-                <TouchableOpacity style={{backgroundColor:'#de510b', flex:0.2, marginRight:'1%',borderRadius:40, padding:10}} onPress={() => handleOffer(markerInfo.marker.id)}>
-                <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff'}}>İşi kabul et</Text>
-              </TouchableOpacity>
+                
               </View>
               <TouchableOpacity style={{backgroundColor:'#de510b', flex:0.2, marginRight:'1%',borderRadius:40, padding:10}} onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
                 <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff',marginTop:10}}>Rotaya ekle</Text>
@@ -434,6 +434,9 @@ function calculateDistance(coord1, coord2) {
                 <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff',marginTop:10}}>Rotadan Çıkar</Text>
               </TouchableOpacity>
             </View>
+            <TouchableOpacity style={{backgroundColor:'#de510b', margin:10 ,borderRadius:40, padding:10}} onPress={() => handleOffer(markerInfo.marker.id)}>
+                <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff'}}>İşi kabul et</Text>
+              </TouchableOpacity>
           </View>
         ))}
       </View>
@@ -481,19 +484,21 @@ function calculateDistance(coord1, coord2) {
 
                     <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
                     <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
-                    <TouchableOpacity onPress={() => handleOffer(otherMarker.marker.id)}>
-                      <Text>İşi kabul et</Text>
-                    </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity style={{backgroundColor:'#de510b', marginTop:5,borderRadius:50, padding:10, marginRight:'5%', flex:0.3}} onPress={() => handleProductPress(product.productId._id)} >
+                    <TouchableOpacity style={{backgroundColor:'#de510b', marginTop:5,borderRadius:50, padding:10, paddingTop:15, marginLeft:'8%', marginBottom:'5%',flex:1}} onPress={() => handleProductPress(product.productId._id)} >
                       <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff'}}>Ürün Sayfası</Text>
 
                     </TouchableOpacity>
+                    
                   </View>
                
+                  <TouchableOpacity style={{backgroundColor:'#de510b', borderRadius:20, padding:10, margin:10}} onPress={() => handleOffer(otherMarker.marker.id)}>
+                      <Text style={{color:'white', textAlign:'center',fontWeight:700, fontSize:18}}>İşi kabul et</Text>
+                    </TouchableOpacity>
                     
                     </View> 
+                    
                   ))}
               </View>
             ))}
@@ -571,7 +576,7 @@ const styles = StyleSheet.create({
     color:'#fff'
   },
   modalContainer1: {
-    height:'45%',
+    height:'auto',
     position: "absolute",
     bottom: 0,
     left: 0,
