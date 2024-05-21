@@ -469,6 +469,7 @@ function calculateDistance(coord1, coord2) {
       </View>
         {otherMarkersInfo.map((otherMarker, otherMarkerIndex) => (
           <View key={otherMarkerIndex}>
+
              {!orders[otherMarker.marker.id]?.transportDetailsId && orders[otherMarker.marker.id]?.products.map((product, productIndex) => (
             <View style={styles.yakinSiparis} key={productIndex}>
                
@@ -476,13 +477,15 @@ function calculateDistance(coord1, coord2) {
                     <View >
                     <Text style={{fontSize:22, fontWeight:900, paddingLeft:7}}>{`${otherMarker.orderInfo.from} -> ${otherMarker.orderInfo.to}`}</Text>
                       <Text style={styles.productDetailsText}>{"Taşıma Ücreti : " + orders[otherMarker.marker.id].transportFee}</Text>
-                   
+
                     <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
                     <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
 
                     </View>
-                    <TouchableOpacity onPress={() => handleOffer(otherMarker.marker.id)}>
-                      <Text>Teklif Yap</Text>
+
+                    <TouchableOpacity style={{backgroundColor:'#de510b', marginTop:5,borderRadius:50, padding:10, marginRight:'5%', flex:0.3}} onPress={() => handleProductPress(product.productId._id)} >
+                      <Text style={{textAlign:'center', fontSize:17, fontWeight:700, color:'#fff'}}>Ürün Sayfası</Text>
+
                     </TouchableOpacity>
                   </View>
                
@@ -542,10 +545,10 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "#729c44",
     paddingVertical: 7,
-    marginTop: 20,
-    marginBottom:15,
+    marginTop: 10,
+    marginBottom:10,
     borderRadius: 20,
-    marginHorizontal:90,
+    marginHorizontal:110,
   },
 
   buttonUrun: {
@@ -572,8 +575,8 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: "#ecf2e6",
     padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -587,8 +590,8 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: "#ecf2e6",
     padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

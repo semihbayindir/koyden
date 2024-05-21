@@ -38,7 +38,7 @@ const AllProducts = () => {
         });
     }
   }, [userId]);
-  
+
   const handleProductPress = (productId) => {
     navigation.navigate('SingleProduct', { productId: productId });
   };
@@ -75,24 +75,10 @@ const AllProducts = () => {
     fetchProducerInfo();
   }, [products]);
 
-  const handleCategoryFilter = (category) => {
-    // Kategori filtresini kaldır
-    setFilteredCategory(null);
-    // Kategorilere göre ürünleri filtrele
-    if (category === 'meyve') {
-      const meyveProducts = products.filter(product => product.category === 'meyve');
-      setProducts(meyveProducts);
-    } else if (category === 'sebze') {
-      const sebzeProducts = products.filter(product => product.category === 'sebze');
-      setProducts(sebzeProducts);
-    }
-  };
-
   const handleShowAllProducts = () => {
     axios.get(`http://localhost:8000/products`)
       .then(response => {
         setProducts(response.data);
-
         setFilteredCategory(null); // Filtreleme kaldır
       })
       .catch(error => {
@@ -106,7 +92,7 @@ const AllProducts = () => {
       <TouchableOpacity style={styles.urunler} onPress={() => handleProductPress(item._id)}>
         {item.images && item.images.length > 0 ? (
           <View>
-            <Image style={styles.images} source={{ uri: item.images[0] }} /> 
+            <Image style={styles.images} source={{ uri: item.images[0] }} />
           </View>
         ) : (
           <View />
@@ -127,7 +113,7 @@ const AllProducts = () => {
     );
   };
 
-  const filteredProducts = fuzzySearch(searchKeyword, products);
+  const filteredProducts = fuzzySearch(searchKeyword, products.filter(product => !filteredCategory || product.category === filteredCategory));
 
   return (
     <View style={styles.container}>
@@ -138,29 +124,29 @@ const AllProducts = () => {
         value={searchKeyword}
         onChangeText={setSearchKeyword}
       />
-      <View >
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, marginBottom: 10 }}>
-        <TouchableOpacity style={styles.buttons} onPress={handleShowAllProducts}>
-          <Text style={styles.buttonText}>Tümü</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.buttons}>
-          <Text style={styles.buttonText}>Bana özel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.buttons} onPress={() => navigation.navigate('Orders')}>
-          <Text style={styles.buttonText}>Siparişlerim</Text>
-        </TouchableOpacity>
+      <View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, marginBottom: 10 }}>
+          <TouchableOpacity style={styles.buttons} onPress={handleShowAllProducts}>
+            <Text style={styles.buttonText}>Tümü</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttons}>
+            <Text style={styles.buttonText}>Bana özel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttons} onPress={() => navigation.navigate('Orders')}>
+            <Text style={styles.buttonText}>Siparişlerim</Text>
+          </TouchableOpacity>
         </View>
         {/* Kategori Butonları */}
-        <View style={{flexDirection: 'row'}}>
-        <TouchableOpacity style={styles.katButtons} onPress={() => handleCategoryFilter('meyve')}>
-          <Text style={[styles.buttonText, {color:'#fff'}]}>Meyve ({meyveCount})</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.katButtons} onPress={() => handleCategoryFilter('sebze')}>
-          <Text style={[styles.buttonText, {color:'#fff'}]}>Sebze ({sebzeCount})</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity style={styles.katButtons} onPress={() => setFilteredCategory('meyve')}>
+            <Text style={[styles.buttonText, { color: '#fff' }]}>Meyve ({meyveCount})</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.katButtons} onPress={() => setFilteredCategory('sebze')}>
+            <Text style={[styles.buttonText, { color: '#fff' }]}>Sebze ({sebzeCount})</Text>
+          </TouchableOpacity>
         </View>
       </View>
-      
+
       {filteredProducts.length === 0 && (
         <View>
           <Text>Aranan ürün bulunamadı.</Text>
@@ -186,21 +172,21 @@ const styles = StyleSheet.create({
   },
   buttons: {
     marginHorizontal: 10,
-    backgroundColor:'#fff',
+    backgroundColor: '#fff',
     borderRadius: 12,
     paddingHorizontal: 10,
-    paddingVertical:8
+    paddingVertical: 8
   },
-  katButtons:{
+  katButtons: {
     marginHorizontal: 10,
-    marginBottom:10,
+    marginBottom: 10,
     borderRadius: 12,
-    backgroundColor:'#de510b',
+    backgroundColor: '#de510b',
     paddingHorizontal: 10,
-    paddingVertical:6
+    paddingVertical: 6
   },
-  buttonText:{
-    fontSize:20,
+  buttonText: {
+    fontSize: 20,
   },
   urunler: {
     backgroundColor: '#fff',
