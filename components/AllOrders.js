@@ -32,7 +32,7 @@ const AllOrders = () => {
               {item.products.map((product, index) => (
                 <View style={{flexDirection:'row'}} key={`${product.productId}-${index}`}>
                     <View style={{paddingVertical:5}}>
-                        <View style={{ borderWidth: 1, borderRadius: 15, backgroundColor: 'white', padding: 5 }}>
+                        <View style={{ borderWidth: 1, borderRadius: 15,borderColor: 'lightgrey', backgroundColor: 'white', padding: 5 }}>
                             <Image style={styles.productImage}  source={{ uri: product.productId.images[0] }} />
                         </View>
                     </View>
@@ -72,9 +72,8 @@ const AllOrders = () => {
     
     const styles = StyleSheet.create({
         order: {
-          borderWidth: 1,
-          borderRadius:15,
-          borderColor: 'lightgrey',
+          borderRadius:20,
+          
           backgroundColor:'#f9fbe5',
           padding: 10,
           marginBottom: 10,
