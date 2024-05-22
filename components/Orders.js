@@ -64,7 +64,7 @@ const Orders = () => {
   const handleSingleOrderPress = async (singleOrder) => {
     try {
       const orderDetails = await Promise.all(singleOrder.orderIds.map(orderId => axios.get(`http://localhost:8000/orders/${orderId.orderId}`)));
-      console.log('Order details:', orderDetails);
+      // console.log('Order details:', orderDetails);
       navigation.navigate('OrderDetails', { orderDetails: orderDetails });
     } catch (error) {
       console.error('Error fetching order details:', error);
