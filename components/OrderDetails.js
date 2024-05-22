@@ -6,8 +6,14 @@ const OrderDetails = ({ route }) => {
   const { orderDetails } = route.params;
   const [productDetails, setProductDetails] = useState([]);
   const [transporterIds, setTransporterIds] = useState([]);
+  const [transporterInfos, setTransporterInfos] = useState([]);
+//  Tüm siparişlerin durumlarını kontrol et
+// {console.log(productDetails[0].order.status)}
+// {console.log(productDetails[1].order.status)}
 
-  useEffect(() => {
+useEffect(() => {
+    let isMounted = true;
+
     const fetchProductDetails = async () => {
       try {
         const details = await Promise.all(orderDetails.map(async (order) => {
@@ -17,52 +23,147 @@ const OrderDetails = ({ route }) => {
           }));
           return { order: order.data, products: products };
         }));
-        setProductDetails(details);
+        if (isMounted) setProductDetails(details);
       } catch (error) {
         console.error('Error fetching product details:', error);
       }
     };
 
     fetchProductDetails();
+
+    return () => {
+      isMounted = false;
+    };
   }, [orderDetails]);
 
-  const formatOrderDate = (date) => {
-    const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-    return new Date(date).toLocaleDateString('tr-TR', options);
-  };
-
-  const fetchTransportDetails = async (transportDetailsId, index) => {
-    try {
-      const response = await axios.get(`http://localhost:8000/transportDetails/id/${transportDetailsId}`);
-      const transportDetails = response.data.transportDetails;
-      setTransporterIds(transportDetails.transporterId);
-      setProductDetails(prevDetails => {
-        const updatedDetails = [...prevDetails];
-        updatedDetails[index].order.offer = transportDetails.offer;
-        updatedDetails[index].order.isOfferAccept = transportDetails.isOfferAccept;
-        return updatedDetails;
-      });
-    } catch (error) {
-      console.error('Error fetching transport details:', error);
-    }
-  };
-
   useEffect(() => {
+    let isMounted = true;
+
+    const fetchTransportDetails = async (transportDetailsId, index) => {
+      try {
+        const response = await axios.get(`http://localhost:8000/transportDetails/id/${transportDetailsId}`);
+        const transportDetails = response.data.transportDetails;
+
+        const transporterResponse = await axios.get(`http://localhost:8000/user/${transportDetails.transporterId}`);
+        const transporterInfo = transporterResponse.data;
+
+        if (isMounted) {
+          setProductDetails(prevDetails => {
+            const updatedDetails = [...prevDetails];
+            updatedDetails[index].order.offer = transportDetails.offer;
+            updatedDetails[index].order.isOfferAccept = transportDetails.isOfferAccept;
+            updatedDetails[index].order.transporterInfo = transporterInfo;
+            return updatedDetails;
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching transport details:', error);
+      }
+    };
+
     productDetails.forEach((item, index) => {
       if (item.order.transportDetailsId) {
         fetchTransportDetails(item.order.transportDetailsId, index);
       }
     });
+
+    return () => {
+      isMounted = false;
+    };
   }, [productDetails]);
 
-  const handleAcceptOffer = async (transportDetailsId) => {
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchTransporterInfos = async () => {
+      try {
+        const transporterInfos = await Promise.all(transporterIds.map(async (id) => {
+          const response = await axios.get(`http://localhost:8000/user/${id}`);
+          return response.data;
+        }));
+        if (isMounted) setTransporterInfos(transporterInfos);
+      } catch (error) {
+        console.error('Error fetching transporter infos:', error);
+      }
+    };
+
+    if (transporterIds.length > 0) {
+      fetchTransporterInfos();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [transporterIds]);
+
+  const updateSingleOrderStatus = async (orderId) => {
     try {
+      const response = await axios.put(`http://localhost:8000/singleOrder/${orderId}/status`);
+      console.log('SingleOrder status changed', response.data);
+    } catch (error) {
+      console.error('Error updating single order status:', error);
+    }
+  };
+  
+
+  useEffect(() => {
+    const updateOrderStatus = async () => {
+      // Tüm siparişlerin durumlarını al
+      const statuses = productDetails.map(item => item.order.status);
+      // Tüm durumların aynı olup olmadığını kontrol et
+      const allSameStatus = statuses.every(status => status === statuses[0]);
+      // Eğer tüm durumlar aynı ise, singleOrder status'u güncelle
+      if (allSameStatus) {
+        const orderId = productDetails[0].order._id; // Herhangi bir order ID'sini alabiliriz, çünkü tüm siparişlerin durumları aynı
+        await updateSingleOrderStatus(orderId);
+      }
+    };
+  
+    // Sadece productDetails değiştiğinde updateOrderStatus'u çağır
+    updateOrderStatus();
+  }, [productDetails]);
+  
+  
+  const handleAcceptOffer = async (transportDetailsId, orderId) => {
+    try {
+      // Önce taşıyıcı teklifini kabul et
       const response = await axios.put(`http://localhost:8000/transportDetails/update/isOfferAccept/${transportDetailsId}`, { isOfferAccept: true });
       alert('Offer accepted', response.data);
+  
+      // Ardından sipariş durumunu güncelle
+      await axios.put(`http://localhost:8000/orders/${orderId}/status`);
+  
+      // Güncellenmiş sipariş durumunu bileşen durumuna yansıt
+      setProductDetails(prevDetails => {
+        const updatedDetails = prevDetails.map(item => {
+          if (item.order._id === orderId) {
+            return {
+              ...item,
+              order: {
+                ...item.order,
+                status: 'Kargoya Verildi',
+                isOfferAccept: true,
+              }
+            };
+          }
+          return item;
+        });
+  
+        // Tüm siparişlerin durumlarını kontrol et
+        const allSameStatus = updatedDetails.every((item, index, array) => item.order.status === array[0].order.status);
+        
+        if (allSameStatus) {
+          updateSingleOrderStatus(orderId);
+        }
+  
+        return updatedDetails;
+      });
     } catch (error) {
       console.error('Error accepting offer:', error);
     }
   };
+  
+  
 
   const handleRejectOffer = async (orderId, transportDetailsId) => {
     try {
@@ -101,6 +202,11 @@ const OrderDetails = ({ route }) => {
     }
   };
 
+  const formatOrderDate = (date) => {
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+    return new Date(date).toLocaleDateString('tr-TR', options);
+  };
+
   return (
     <View style={styles.container}>
       {productDetails.length > 0 && (
@@ -131,9 +237,12 @@ const OrderDetails = ({ route }) => {
                     <Text style={styles.productDetailText}>Fiyat: {item.order.totalPrice} ₺</Text>
                     <Text style={styles.orderInfoText}>Gönderen: {item.order.from}</Text>
                     <Text style={styles.orderInfoText}>TAŞIYICI BİLGİLERİ</Text>
+                    {item.order.transporterInfo && (
+                      <Text style={styles.orderInfoText}>{item.order.transporterInfo.name}</Text>
+                    )}
                     {item.order.isOfferAccept !== true && item.order.transportDetailsId && (
                       <View>
-                        <TouchableOpacity style={styles.button} onPress={() => handleAcceptOffer(item.order.transportDetailsId)}>
+                        <TouchableOpacity style={styles.button} onPress={() => handleAcceptOffer(item.order.transportDetailsId, item.order._id)}>
                           <Text style={{ color: 'white', fontSize: 17 }}>Taşıyıcıyı Kabul Et</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.button1} onPress={() => handleRejectOffer(item.order._id, item.order.transportDetailsId)}>
@@ -196,18 +305,18 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   button: {
-    backgroundColor: '#729c44',
+    backgroundColor: '#2285a1',
     padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
+    borderRadius: 10,
     alignItems: 'center',
+    marginTop: 10,
   },
   button1: {
-    backgroundColor: 'red',
+    backgroundColor: '#ff5252',
     padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
+    borderRadius: 10,
     alignItems: 'center',
+    marginTop: 10,
   },
 });
 
