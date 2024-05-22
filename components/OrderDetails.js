@@ -60,7 +60,6 @@ useEffect(() => {
         console.error('Error fetching transport details:', error);
       }
     };
-
     productDetails.forEach((item, index) => {
       if (item.order.transportDetailsId) {
         fetchTransportDetails(item.order.transportDetailsId, index);
@@ -158,12 +157,11 @@ useEffect(() => {
   
         return updatedDetails;
       });
+
     } catch (error) {
       console.error('Error accepting offer:', error);
     }
   };
-  
-  
 
   const handleRejectOffer = async (orderId, transportDetailsId) => {
     try {
@@ -237,12 +235,14 @@ useEffect(() => {
                     <Text style={styles.productDetailText}>Fiyat: {item.order.totalPrice} ₺</Text>
                     <Text style={styles.orderInfoText}>Gönderen: {item.order.from}</Text>
                     <Text style={styles.orderInfoText}>TAŞIYICI BİLGİLERİ</Text>
+
                     {item.order.transporterInfo && (
                       <Text style={styles.orderInfoText}>{item.order.transporterInfo.name}</Text>
                     )}
                     {item.order.isOfferAccept !== true && item.order.transportDetailsId && (
                       <View>
                         <TouchableOpacity style={styles.button} onPress={() => handleAcceptOffer(item.order.transportDetailsId, item.order._id)}>
+
                           <Text style={{ color: 'white', fontSize: 17 }}>Taşıyıcıyı Kabul Et</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.button1} onPress={() => handleRejectOffer(item.order._id, item.order.transportDetailsId)}>

@@ -360,9 +360,12 @@ function calculateDistance(coord1, coord2) {
         provider={PROVIDER_GOOGLE}
         initialRegion={INITIAL_POSITION}
       >
+
         {origin && <Marker coordinate={origin} icon={ require("../assets/map-marker_1673221.png")}/>}
         {destination && <Marker coordinate={destination} 
         icon={ require("../assets/map-marker_1673221.png")}/>}        
+
+        
         {/* Tanımlanan markers'lar */}
         
         {markers.map((marker) => (
