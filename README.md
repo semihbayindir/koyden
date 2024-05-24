@@ -1,4 +1,4 @@
-# koyden
+# koyden (graduation project)
 Project Overview
 
 This project is a mobile application developed using the MERN stack (MongoDB, Express.js, React Native, Node.js). The application is designed to facilitate interactions between producers, consumers, and carriers, integrating various functionalities to streamline the supply chain and delivery processes.
