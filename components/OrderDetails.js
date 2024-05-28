@@ -7,11 +7,10 @@ const OrderDetails = ({ route }) => {
   const [productDetails, setProductDetails] = useState([]);
   const [transporterIds, setTransporterIds] = useState([]);
   const [transporterInfos, setTransporterInfos] = useState([]);
-//  Tüm siparişlerin durumlarını kontrol et
-// {console.log(productDetails[0].order.status)}
-// {console.log(productDetails[1].order.status)}
+  const [statusUpdated, setStatusUpdated] = useState(false); // State to track if status update is needed
+  const [lastStatusUpdated, setLastStatusUpdated] = useState(false); // State to track if last status update is needed
 
-useEffect(() => {
+  useEffect(() => {
     let isMounted = true;
 
     const fetchProductDetails = async () => {
@@ -98,41 +97,49 @@ useEffect(() => {
   const updateSingleOrderStatus = async (orderId) => {
     try {
       const response = await axios.put(`http://localhost:8000/singleOrder/${orderId}/status`);
-      console.log('SingleOrder status changed', response.data);
+      console.log("updateSingleOrderStatus :", response.data)
     } catch (error) {
       console.error('Error updating single order status:', error);
     }
   };
-  
+
+  const updateSingleOrderLastStatus = async (orderId) => {
+    try {
+      const response = await axios.put(`http://localhost:8000/singleOrder/${orderId}/lastStatus`);
+      console.log("updateSingleOrderLastStatus :", response.data)
+    } catch (error) {
+      console.error('Error updating single order last status:', error);
+    }
+  };
 
   useEffect(() => {
     const updateOrderStatus = async () => {
-      // Tüm siparişlerin durumlarını al
       const statuses = productDetails.map(item => item.order.status);
-      // Tüm durumların aynı olup olmadığını kontrol et
       const allSameStatus = statuses.every(status => status === statuses[0]);
-      // Eğer tüm durumlar aynı ise, singleOrder status'u güncelle
-      if (allSameStatus) {
-        const orderId = productDetails[0].order._id; // Herhangi bir order ID'sini alabiliriz, çünkü tüm siparişlerin durumları aynı
+      if (allSameStatus && productDetails.length > 0 && !statusUpdated) {
+        const orderId = productDetails[0].order._id;
         await updateSingleOrderStatus(orderId);
+        setStatusUpdated(true); // Set the status to updated
+      }
+
+      const allDelivered = statuses.every(status => status === 'Teslim Edildi');
+      if (allDelivered && productDetails.length > 0 && !lastStatusUpdated) {
+        const orderId = productDetails[0].order._id;
+        await updateSingleOrderLastStatus(orderId);
+        setLastStatusUpdated(true); // Set the last status to updated
       }
     };
-  
-    // Sadece productDetails değiştiğinde updateOrderStatus'u çağır
+
     updateOrderStatus();
-  }, [productDetails]);
-  
-  
+  }, [productDetails, statusUpdated, lastStatusUpdated]);
+
   const handleAcceptOffer = async (transportDetailsId, orderId) => {
     try {
-      // Önce taşıyıcı teklifini kabul et
       const response = await axios.put(`http://localhost:8000/transportDetails/update/isOfferAccept/${transportDetailsId}`, { isOfferAccept: true });
       alert('Offer accepted', response.data);
-  
-      // Ardından sipariş durumunu güncelle
+
       await axios.put(`http://localhost:8000/orders/${orderId}/status`);
-  
-      // Güncellenmiş sipariş durumunu bileşen durumuna yansıt
+
       setProductDetails(prevDetails => {
         const updatedDetails = prevDetails.map(item => {
           if (item.order._id === orderId) {
@@ -147,14 +154,13 @@ useEffect(() => {
           }
           return item;
         });
-  
-        // Tüm siparişlerin durumlarını kontrol et
+
         const allSameStatus = updatedDetails.every((item, index, array) => item.order.status === array[0].order.status);
-        
+
         if (allSameStatus) {
           updateSingleOrderStatus(orderId);
         }
-  
+
         return updatedDetails;
       });
 
@@ -162,6 +168,41 @@ useEffect(() => {
       console.error('Error accepting offer:', error);
     }
   };
+
+
+  const handleStatus = async (transportDetailsId, orderId) => {
+    try {
+      response = await axios.put(`http://localhost:8000/orders/${orderId}/lastStatus`);
+      alert('Teslim Alındı', response.data);
+
+      setProductDetails(prevDetails => {
+        const updatedDetails = prevDetails.map(item => {
+          if (item.order._id === orderId) {
+            return {
+              ...item,
+              order: {
+                ...item.order,
+                status: 'Teslim Edildi',
+                isOfferAccept: true,
+              }
+            };
+          }
+          return item;
+        });
+
+        const allSameStatus = updatedDetails.every((item, index, array) => item.order.status === array[0].order.status);
+
+        if (allSameStatus) {
+          updateSingleOrderLastStatus(orderId);
+        }
+
+        return updatedDetails;
+      });
+    } catch (error) {
+      console.error('Teslim edilemedi:', error);
+    }
+  };
+
 
   const handleRejectOffer = async (orderId, transportDetailsId) => {
     try {
@@ -211,7 +252,6 @@ useEffect(() => {
         <View style={{ borderRadius: 20, backgroundColor: '#f9fbe5', padding: 7, marginBottom: 10 }}>
           <Text style={{ fontSize: 18 }}>Sipariş Tarihi: {formatOrderDate(productDetails[0].order.orderDate)}</Text>
           <Text style={{ fontSize: 18 }}>Sipariş Durumu: {productDetails[0].order.status}</Text>
-          <Text style={{ fontSize: 18 }}>Toplam Tutarı: {productDetails.reduce((total, item) => total + item.order.totalPrice, 0)} ₺</Text>
         </View>
       )}
       <FlatList
@@ -223,8 +263,10 @@ useEffect(() => {
               <View key={index}>
                 <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: '800', marginBottom: 10 }]}>{product.name}</Text>
                 <View style={styles.productDetail}>
-                  <View style={{ borderWidth: 1, borderColor: 'lightgray', borderRadius: 15, backgroundColor: 'white', padding: 5 }}>
-                    <Image source={{ uri: product.images[0] }} style={styles.productImage} />
+                  <View style={{ borderWidth: 1, borderColor: 'lightgray', borderRadius: 15, backgroundColor: 'white', padding:5 }}>
+                    {product.images && product.images.length > 0 && (
+                      <Image source={{ uri: product.images[0] }} style={styles.productImage} />
+                    )}
                   </View>
                   <View style={{ marginLeft: 10 }}>
                     {item.order.products.map((newProduct, index) => (
@@ -250,8 +292,12 @@ useEffect(() => {
                         </TouchableOpacity>
                       </View>
                     )}
+                    
                     {item.order.isOfferAccept === true && (
                       <View>
+                        <TouchableOpacity style={styles.button} onPress={() => handleStatus(item.order.transportDetailsId, item.order._id)}>
+                          <Text>Teslim Aldım</Text>
+                        </TouchableOpacity>
                         <Text style={[styles.orderInfoText, { color: item.order.status === 'Hazırlanıyor' ? '#2285a1' : 'green' }]}>{item.order.status}</Text>
                       </View>
                     )}

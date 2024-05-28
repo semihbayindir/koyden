@@ -781,6 +781,59 @@ app.put('/orders/:orderId/status', async (req, res) => {
   }
 });
 
+// Sipariş durumunu güncelleyen endpoint
+app.put('/orders/:orderId/lastStatus/', async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ error: 'Sipariş bulunamadı' });
+    }
+
+    order.status = 'Teslim Edildi';
+    await order.save();
+
+    res.json({ message: 'Sipariş durumu güncellendi', order });
+  } catch (error) {
+    console.error('Sipariş durumu güncellenirken hata:', error);
+    res.status(500).json({ error: 'Sunucu hatası' });
+  }
+});
+
+app.put('/singleOrder/:orderId/lastStatus', async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    // İlgili SingleOrder belgesini bul
+    const singleOrder = await SingleOrder.findOne({ "orderIds.orderId": orderId });
+
+    if (!singleOrder) {
+      return res.status(404).json({ message: 'Single order not found' });
+    }
+
+    // Belirli orderId'e sahip SingleOrder belgesini güncelle
+    singleOrder.orderIds.forEach(orderIdObj => {
+      if (orderIdObj.orderId.toString() === orderId) {
+        orderIdObj.status = 'Teslim Edildi'; // Durumu güncelle
+      }
+    });
+
+    // SingleOrder belgesinin durumunu güncelle
+    singleOrder.status = 'Teslim Edildi';
+
+    // Güncellenmiş belgeyi kaydet
+    const updatedSingleOrder = await singleOrder.save();
+
+    res.status(200).json({ message: 'Status updated successfully', singleOrder: updatedSingleOrder });
+  } catch (error) {
+    console.error('Error updating status for single order:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 app.put('/singleOrder/:orderId/status', async (req, res) => {
   const { orderId } = req.params;
 
