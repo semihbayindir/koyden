@@ -29,7 +29,7 @@ const addressSchema = new mongoose.Schema({
 const verificationSchema = new mongoose.Schema({
   type: {
     type: String,
-    enum: ['Individual', 'Company'], // ?????
+    enum: ['Individual', 'Company'],
     required: false
   },
   producerAddress: {
@@ -59,6 +59,18 @@ const qualityRatingSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
+  transportSpeed: {
+    type: Number,
+    required: false
+  },
+  longDistance: {
+    type: Number,
+    required: false
+  },
+  transportReliability: {
+    type: Number,
+    required: false
+  }
 });
 
 const userSchema = new mongoose.Schema({
@@ -88,7 +100,7 @@ const userSchema = new mongoose.Schema({
     required: false
   },
   address: {
-    type: addressSchema, // Adres bilgisi, özel bir şema olarak tanımlanmıştır.
+    type: addressSchema,
     required: false
   },
   paymentDetails: {
@@ -96,11 +108,11 @@ const userSchema = new mongoose.Schema({
     required: false
   },
   verification: {
-    type: verificationSchema, // Doğrulama bilgileri, özel bir şema olarak tanımlanmıştır.
+    type: verificationSchema,
     required: false
   },
   qualityRating: {
-    type: qualityRatingSchema, // Kalite değerlendirme bilgileri, özel bir şema olarak tanımlanmıştır.
+    type: qualityRatingSchema,
     required: false
   }
 });

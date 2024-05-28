@@ -865,3 +865,56 @@ app.put('/singleOrder/:orderId/status', async (req, res) => {
   }
 });
 
+
+// Endpoint to add or update consumer ratings
+app.post('/users/:id/rateProducer', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { productQuality, reliability, serviceQuality } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { 
+        'qualityRating.productQuality': productQuality,
+        'qualityRating.reliability': reliability,
+        'qualityRating.serviceQuality': serviceQuality
+      },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+// Endpoint to add or update transporter ratings
+app.post('/users/:id/rateTransporter', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { transportSpeed, longDistance, transportReliability } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        'qualityRating.transportSpeed': transportSpeed,
+        'qualityRating.longDistance': longDistance,
+        'qualityRating.transportReliability': transportReliability
+      },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
