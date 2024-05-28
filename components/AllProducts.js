@@ -113,7 +113,7 @@ const AllProducts = () => {
   const filteredProducts = filterProducts(fuzzySearch(searchKeyword, products.filter(product => !filteredCategory || product.category === filteredCategory)), selectedFilter);
 
   const renderProductItem = ({ item, index }) => {
-    const producerInfo = producerInfos[index];
+    const producerInfo = producerInfos.find(p => p._id === item.producerId);
     return (
       <TouchableOpacity style={styles.urunler} onPress={() => handleProductPress(item._id)}>
         {item.images && item.images.length > 0 ? (
@@ -297,12 +297,12 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 20,
+    borderRadius: 30,
     width: '80%',
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
   },

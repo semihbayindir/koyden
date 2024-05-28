@@ -20,7 +20,7 @@ const UreticiOrders = () => {
   }, [userId]);
 
   const renderOrderItem = ({ item }) => (
-    <View style={{margin:20}}>
+    <View style={{marginHorizontal:20, marginVertical:10}}>
       <TouchableOpacity style={styles.order}>
             <View>
               <Text style={styles.orderText}>Sipariş Tarihi: {new Date(item.orderDate).toLocaleDateString("tr-TR")}</Text>
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
           borderColor: 'lightgrey',
           backgroundColor:'#f9fbe5',
           padding: 10,
-          marginBottom: 10,
+          
         },
         orderText: {
           fontSize: 20,
