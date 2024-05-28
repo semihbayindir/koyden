@@ -51,7 +51,7 @@ const Orders = () => {
         
         <View style={{flexDirection:'row'}}>
         {item.products.map((product, index) => (
-          <View style={{flexDirection:'row', borderWidth:1, borderColor:'lightgray', borderRadius:10, backgroundColor:'white', padding:5, marginBottom:10, marginRight: 10}}>
+          <View key={index} style={{flexDirection:'row', borderWidth:1, borderColor:'lightgray', borderRadius:10, backgroundColor:'white', padding:5, marginBottom:10, marginRight: 10}}>
           <Image source={{ uri: product.productId.images[0] }} style={{ width: 70, height: 70}} />
           </View>
           ))}
