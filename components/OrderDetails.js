@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, LogBox, TextInput } from 'react-native';
 
 const OrderDetails = ({ route }) => {
   const { orderDetails } = route.params;
@@ -10,6 +10,18 @@ const OrderDetails = ({ route }) => {
   const [statusUpdated, setStatusUpdated] = useState(false); // State to track if status update is needed
   const [lastStatusUpdated, setLastStatusUpdated] = useState(false); // State to track if last status update is needed
 
+
+  const [productQuality, setProductQuality] = useState('');
+  const [reliability, setReliability] = useState('');
+  const [serviceQuality, setServiceQuality] = useState('');
+  const [transportSpeed, setTransportSpeed] = useState('');
+  const [longDistance, setLongDistance] = useState('');
+  const [transportReliability, setTransportReliability] = useState('');
+
+
+  LogBox.ignoreLogs([
+    'Non-serializable values were found in the navigation state',
+  ]);
   useEffect(() => {
     let isMounted = true;
 
@@ -246,6 +258,34 @@ const OrderDetails = ({ route }) => {
     return new Date(date).toLocaleDateString('tr-TR', options);
   };
 
+  const handleConsumerRatingSubmit = async (producerId) => {
+    try {
+      await axios.post(`http://localhost:8000/users/${producerId}/rateProducer`, {
+        productQuality: parseInt(productQuality, 10),
+        reliability: parseInt(reliability, 10),
+        serviceQuality: parseInt(serviceQuality, 10),
+      });
+      alert('Değerlendirme başarılı');
+    } catch (error) {
+      console.error('Error submitting producer rating:', error);
+      alert('Değerlendirme gönderilemedi');
+    }
+  };
+
+  const handleTransporterRatingSubmit = async (transporterId) => {
+    try {
+      await axios.post(`http://localhost:8000/users/${transporterId}/rateTransporter`, {
+        transportSpeed: parseInt(transportSpeed, 10),
+        longDistance: parseInt(longDistance, 10),
+        transportReliability: parseInt(transportReliability, 10)
+      });
+      alert('Değerlendirme başarılı');
+    } catch (error) {
+      console.error('Error submitting transporter rating:', error);
+      alert('Değerlendirme gönderilemedi');
+    }
+  };
+
   return (
     <View style={styles.container}>
       {productDetails.length > 0 && (
@@ -309,7 +349,85 @@ const OrderDetails = ({ route }) => {
                         </TouchableOpacity>
                       </View>
                     )}
+
+                    
+                    {item.order.isOfferAccept === true && (
+                      <View>
+                        <TouchableOpacity style={styles.button} onPress={() => handleStatus(item.order.transportDetailsId, item.order._id)}>
+                          <Text>Teslim Aldım</Text>
+                        </TouchableOpacity>
+                        <Text style={[styles.orderInfoText, { color: item.order.status === 'Hazırlanıyor' ? '#2285a1' : 'green' }]}>{item.order.status}</Text>
+                      </View>
+                    )}
+
+{item.order.status === 'Teslim Edildi' && (
+            <View style={styles.ratingContainer}>
+              {/* Üretici Değerlendirmesi */}
+              <View>
+              <Text style={styles.ratingTitle}>Üretici Değerlendirme:</Text>
+              <TextInput
+                style={styles.ratingInput}
+                placeholder="Ürün Kalitesi"
+                value={productQuality}
+                onChangeText={setProductQuality}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.ratingInput}
+                placeholder="Güvenilirlik"
+                value={reliability}
+                onChangeText={setReliability}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.ratingInput}
+                placeholder="Hizmet Kalitesi"
+                value={serviceQuality}
+                onChangeText={setServiceQuality}
+                keyboardType="numeric"
+              />
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={() => handleConsumerRatingSubmit(item.order.producerId)}
+              >
+                <Text style={styles.submitButtonText}>Üretici Değerlendirme</Text>
+              </TouchableOpacity>
               </View>
+              {/* Taşıyıcı Değerlendirmesi */}
+              <View>
+              <Text style={styles.ratingTitle}>Taşıyıcı Değerlendirme:</Text>
+              <TextInput
+                style={styles.ratingInput}
+                placeholder="Ulaşım Hızı"
+                value={transportSpeed}
+                onChangeText={setTransportSpeed}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.ratingInput}
+                placeholder="Uzun Mesafe"
+                value={longDistance}
+                onChangeText={setLongDistance}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.ratingInput}
+                placeholder="Ulaşım Güvenilirliği"
+                value={transportReliability}
+                onChangeText={setTransportReliability}
+                keyboardType="numeric"
+              />
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={() => handleTransporterRatingSubmit(item.order.transporterInfo._id)}
+              >
+                <Text style={styles.submitButtonText}>Taşıyıcı Değerlendirme</Text>
+              </TouchableOpacity>
+              </View>
+            </View>
+          )}
+                  </View>
+             
             ))}
             {item.order.isOfferAccept !== true && (
               <TouchableOpacity style={styles.button1} onPress={() => handleCancelOrder(item.order._id)}>
