@@ -254,11 +254,12 @@ const OrderDetails = ({ route }) => {
           <Text style={{ fontSize: 18 }}>Sipariş Durumu: {productDetails[0].order.status}</Text>
         </View>
       )}
+      <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: '800', marginBottom: 10 }]}>Sipariş Detayları</Text>
       <FlatList
         data={productDetails}
         renderItem={({ item }) => (
           <View style={styles.orderDetail}>
-            <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: '800', marginBottom: 10 }]}>Sipariş Detayları</Text>
+            
             {item.products.map((product, index) => (
               <View key={index}>
                 <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: '800', marginBottom: 10 }]}>{product.name}</Text>
@@ -281,28 +282,33 @@ const OrderDetails = ({ route }) => {
                     {item.order.transporterInfo && (
                       <Text style={styles.orderInfoText}>{item.order.transporterInfo.name}</Text>
                     )}
-                    {item.order.isOfferAccept !== true && item.order.transportDetailsId && (
+                    <View>
+                    
+                    </View>
+                    {item.order.isOfferAccept === true && (
                       <View>
-                        <TouchableOpacity style={styles.button} onPress={() => handleAcceptOffer(item.order.transportDetailsId, item.order._id)}>
-
+                        <TouchableOpacity style={styles.button} onPress={() => handleStatus(item.order.transportDetailsId, item.order._id)}>
+                          <Text style={{ color: 'white', fontSize: 17 }}>Teslim Aldım</Text>
+                        </TouchableOpacity>
+                        
+                      </View>
+                    )}
+                  </View>
+                  
+                </View>
+                <View >
+                      <Text style={[styles.orderInfoText, {textAlign:'right', marginRight:'5%', color: item.order.status === 'Hazırlanıyor' ? '#2285a1' : 'green' }]}>{item.order.status}</Text>
+                      </View>
+                {item.order.isOfferAccept !== true && item.order.transportDetailsId && (
+                      <View style={{flexDirection:'row', flex:1}}>
+                        <TouchableOpacity style={[styles.button,{flex:0.5,marginRight:5}]} onPress={() => handleAcceptOffer(item.order.transportDetailsId, item.order._id)}>
                           <Text style={{ color: 'white', fontSize: 17 }}>Taşıyıcıyı Kabul Et</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.button1} onPress={() => handleRejectOffer(item.order._id, item.order.transportDetailsId)}>
+                        <TouchableOpacity style={[styles.button1,{flex:0.5}]} onPress={() => handleRejectOffer(item.order._id, item.order.transportDetailsId)}>
                           <Text style={{ color: 'white', fontSize: 17 }}>Taşıyıcı Reddet</Text>
                         </TouchableOpacity>
                       </View>
                     )}
-                    
-                    {item.order.isOfferAccept === true && (
-                      <View>
-                        <TouchableOpacity style={styles.button} onPress={() => handleStatus(item.order.transportDetailsId, item.order._id)}>
-                          <Text>Teslim Aldım</Text>
-                        </TouchableOpacity>
-                        <Text style={[styles.orderInfoText, { color: item.order.status === 'Hazırlanıyor' ? '#2285a1' : 'green' }]}>{item.order.status}</Text>
-                      </View>
-                    )}
-                  </View>
-                </View>
               </View>
             ))}
             {item.order.isOfferAccept !== true && (
@@ -351,14 +357,14 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   button: {
-    backgroundColor: '#2285a1',
+    backgroundColor: '#729c44',
     padding: 10,
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 10,
   },
   button1: {
-    backgroundColor: '#ff5252',
+    backgroundColor: '#FF0000',
     padding: 10,
     borderRadius: 10,
     alignItems: 'center',
