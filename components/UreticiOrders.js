@@ -48,7 +48,7 @@ const UreticiOrders = () => {
     <View>
   
       {orders.length === 0 ? (
-        <Text style={{ textAlign: 'center' }}>Henüz siparişiniz bulunmamaktadır.</Text>
+        <Text style={{textAlign:'center', marginTop:'80%'}}>Henüz siparişiniz bulunmamaktadır.</Text>
       ) : (
         <FlatList
           data={orders}

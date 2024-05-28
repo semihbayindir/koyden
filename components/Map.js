@@ -363,7 +363,7 @@ function calculateDistance(coord1, coord2) {
 
         {origin && <Marker coordinate={origin} icon={ require("../assets/map-marker_1673221.png")}/>}
         {destination && <Marker coordinate={destination} 
-        icon={ require("../assets/map-marker_1673221.png")}/>}
+        icon={ require("../assets/map-marker_1673221.png")}/>}        
 
         
         {/* Tanımlanan markers'lar */}
