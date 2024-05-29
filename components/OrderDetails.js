@@ -1,6 +1,10 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, LogBox, TextInput } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, LogBox, TextInput, Modal, ScrollView } from 'react-native';
+import Stars from 'react-native-stars';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 const OrderDetails = ({ route }) => {
   const { orderDetails } = route.params;
@@ -10,6 +14,18 @@ const OrderDetails = ({ route }) => {
   const [statusUpdated, setStatusUpdated] = useState(false); // State to track if status update is needed
   const [lastStatusUpdated, setLastStatusUpdated] = useState(false); // State to track if last status update is needed
 
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [producerRatings, setProducerRatings] = useState({
+    productQuality: 0,
+    reliability: 0,
+    serviceQuality: 0,
+  });
+  const [transporterRatings, setTransporterRatings] = useState({
+    transportSpeed: 0,
+    longDistance: 0,
+    transportReliability: 0,
+  });
 
   const [productQuality, setProductQuality] = useState('');
   const [reliability, setReliability] = useState('');
@@ -124,6 +140,15 @@ const OrderDetails = ({ route }) => {
     }
   };
 
+
+  const handleRatingSubmit = () => {
+    // Değerlendirmeleri sunucuya gönderme işlemi burada yapılır
+    setModalVisible(false);
+    console.log(producerRatings, transporterRatings);
+    
+  };
+
+
   useEffect(() => {
     const updateOrderStatus = async () => {
       const statuses = productDetails.map(item => item.order.status);
@@ -186,6 +211,9 @@ const OrderDetails = ({ route }) => {
     try {
       response = await axios.put(`http://localhost:8000/orders/${orderId}/lastStatus`);
       alert('Teslim Alındı', response.data);
+
+      setModalVisible(true)
+
 
       setProductDetails(prevDetails => {
         const updatedDetails = prevDetails.map(item => {
@@ -294,11 +322,12 @@ const OrderDetails = ({ route }) => {
           <Text style={{ fontSize: 18 }}>Sipariş Durumu: {productDetails[0].order.status}</Text>
         </View>
       )}
+      <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: '800', marginBottom: 10 }]}>Sipariş Detayları</Text>
       <FlatList
         data={productDetails}
         renderItem={({ item }) => (
           <View style={styles.orderDetail}>
-            <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: '800', marginBottom: 10 }]}>Sipariş Detayları</Text>
+            
             {item.products.map((product, index) => (
               <View key={index}>
                 <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: '800', marginBottom: 10 }]}>{product.name}</Text>
@@ -321,96 +350,121 @@ const OrderDetails = ({ route }) => {
                     {item.order.transporterInfo && (
                       <Text style={styles.orderInfoText}>{item.order.transporterInfo.name}</Text>
                     )}
-                    {item.order.isOfferAccept !== true && item.order.transportDetailsId && (
+                    <View>
+                    
+                    </View>
+                    {item.order.isOfferAccept === true && (
                       <View>
-                        <TouchableOpacity style={styles.button} onPress={() => handleAcceptOffer(item.order.transportDetailsId, item.order._id)}>
-
+                        <TouchableOpacity style={styles.button} onPress={() => handleStatus(item.order.transportDetailsId, item.order._id)}>
+                          <Text style={{ color: 'white', fontSize: 17 }}>Teslim Aldım</Text>
+                        </TouchableOpacity>
+                        
+                      </View>
+                    )}
+                  </View>
+                  
+                </View>
+                  <View >
+                      <Text style={[styles.orderInfoText, {textAlign:'right', marginRight:'5%', color: item.order.status === 'Hazırlanıyor' ? '#2285a1' : 'green' }]}>{item.order.status}</Text>
+                  </View>
+                {item.order.isOfferAccept !== true && item.order.transportDetailsId && (
+                      <View style={{flexDirection:'row', flex:1}}>
+                        <TouchableOpacity style={[styles.button,{flex:0.5,marginRight:5}]} onPress={() => handleAcceptOffer(item.order.transportDetailsId, item.order._id)}>
                           <Text style={{ color: 'white', fontSize: 17 }}>Taşıyıcıyı Kabul Et</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.button1} onPress={() => handleRejectOffer(item.order._id, item.order.transportDetailsId)}>
+                        <TouchableOpacity style={[styles.button1,{flex:0.5}]} onPress={() => handleRejectOffer(item.order._id, item.order.transportDetailsId)}>
                           <Text style={{ color: 'white', fontSize: 17 }}>Taşıyıcı Reddet</Text>
                         </TouchableOpacity>
                       </View>
                     )}
-                    
-                    {item.order.isOfferAccept === true && (
-                      <View>
-                        <TouchableOpacity style={styles.button} onPress={() => handleStatus(item.order.transportDetailsId, item.order._id)}>
-                          <Text>Teslim Aldım</Text>
-                        </TouchableOpacity>
-                        <Text style={[styles.orderInfoText, { color: item.order.status === 'Hazırlanıyor' ? '#2285a1' : 'green' }]}>{item.order.status}</Text>
-                      </View>
-                    )}
 
 {item.order.status === 'Teslim Edildi' && (
-            <View style={styles.ratingContainer}>
-              {/* Üretici Değerlendirmesi */}
-              <View>
-              <Text style={styles.ratingTitle}>Üretici Değerlendirme:</Text>
-              <TextInput
-                style={styles.ratingInput}
-                placeholder="Ürün Kalitesi"
-                value={productQuality}
-                onChangeText={setProductQuality}
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.ratingInput}
-                placeholder="Güvenilirlik"
-                value={reliability}
-                onChangeText={setReliability}
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.ratingInput}
-                placeholder="Hizmet Kalitesi"
-                value={serviceQuality}
-                onChangeText={setServiceQuality}
-                keyboardType="numeric"
-              />
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={() => handleConsumerRatingSubmit(item.order.producerId)}
-              >
-                <Text style={styles.submitButtonText}>Üretici Değerlendirme</Text>
-              </TouchableOpacity>
-              </View>
-              {/* Taşıyıcı Değerlendirmesi */}
-              <View>
-              <Text style={styles.ratingTitle}>Taşıyıcı Değerlendirme:</Text>
-              <TextInput
-                style={styles.ratingInput}
-                placeholder="Ulaşım Hızı"
-                value={transportSpeed}
-                onChangeText={setTransportSpeed}
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.ratingInput}
-                placeholder="Uzun Mesafe"
-                value={longDistance}
-                onChangeText={setLongDistance}
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.ratingInput}
-                placeholder="Ulaşım Güvenilirliği"
-                value={transportReliability}
-                onChangeText={setTransportReliability}
-                keyboardType="numeric"
-              />
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={() => handleTransporterRatingSubmit(item.order.transporterInfo._id)}
-              >
-                <Text style={styles.submitButtonText}>Taşıyıcı Değerlendirme</Text>
-              </TouchableOpacity>
-              </View>
+  
+
+  <View style={styles.container}>
+             <Modal
+          visible={modalVisible}
+          animationType="slide"
+          transparent={true}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <ScrollView>
+                <View style={styles.modalSection}>
+                  <Text style={styles.modalTitle}>Üreticiyi Değerlendir</Text>
+                  <Text style={{fontSize:16, marginLeft:10}}>Ürün Kalitesi</Text>
+                  <Stars
+                    default={producerRatings.productQuality}
+                    count={5}
+                    update={(val) => setProducerRatings({ ...producerRatings, productQuality: val })}
+                    fullStar={<MaterialCommunityIcons name="food-apple" size={40} color="#f51128" />}
+                    emptyStar={<MaterialCommunityIcons name="food-apple-outline" size={40} color="#f51128" />}
+                  />
+                
+                  <Text style={{fontSize:16, marginLeft:10}}>Güvenilirlik</Text>
+                  <Stars
+                    default={producerRatings.reliability}
+                    count={5}
+                    update={(val) => setProducerRatings({ ...producerRatings, reliability: val })}
+                    fullStar={<MaterialCommunityIcons name="food-apple" size={40} color="#f51128" />}
+                    emptyStar={<MaterialCommunityIcons name="food-apple-outline" size={40} color="#f51128" />}
+                  />
+                
+                  <Text style={{fontSize:16, marginLeft:10}}>Hizmet Kalitesi</Text>
+                  <Stars
+                    default={producerRatings.serviceQuality}
+                    count={5}
+                    update={(val) => setProducerRatings({ ...producerRatings, serviceQuality: val })}
+                    fullStar={<MaterialCommunityIcons name="food-apple" size={40} color="#f51128" />}
+                    emptyStar={<MaterialCommunityIcons name="food-apple-outline" size={40} color="#f51128" />}
+                  />
+                  
+                </View>
+                <View style={styles.modalSection}>
+                  <Text style={styles.modalTitle}>Taşıyıcıyı Değerlendir</Text>
+                  <Text style={{fontSize:16, marginLeft:10}}>Hız</Text>
+                  <Stars
+                    default={transporterRatings.transportSpeed}
+                    count={5}
+                    update={(val) => setTransporterRatings({ ...transporterRatings, transportSpeed: val })}
+                    fullStar={<MaterialCommunityIcons name="truck" size={40} color="#729c44" />}
+                    emptyStar={<MaterialCommunityIcons name="truck-outline" size={40} color="#729c44" />}
+                  />
+                  
+                  <Text style={{fontSize:16, marginLeft:10}}>Uzun Mesafe</Text>
+                  <Stars
+                    default={transporterRatings.longDistance}
+                    count={5}
+                    update={(val) => setTransporterRatings({ ...transporterRatings, longDistance: val })}
+                    fullStar={<MaterialCommunityIcons name="truck" size={40} color="#729c44" />}
+                    emptyStar={<MaterialCommunityIcons name="truck-outline" size={40} color="#729c44" />}
+                  />
+                  
+                  <Text style={{fontSize:16, marginLeft:10}}>Güvenilirlik</Text>
+                  <Stars
+                    default={transporterRatings.transportReliability}
+                    count={5}
+                    update={(val) => setTransporterRatings({ ...transporterRatings, transportReliability: val })}
+                    fullStar={<MaterialCommunityIcons name="truck" size={40} color="#729c44" />}
+                    emptyStar={<MaterialCommunityIcons name="truck-outline" size={40} color="#729c44" />}
+                  />
+                  
+                </View>
+                <TouchableOpacity
+                  style={styles.button3}
+                  onPress={handleRatingSubmit}
+                >
+                  <Text style={styles.buttonText}>Değerlendir</Text>
+                </TouchableOpacity>
+              </ScrollView>
             </View>
+          </View>
+        </Modal>
+           </View>
+    
           )}
                   </View>
-                </View>
-              </View>
+             
             ))}
             {item.order.isOfferAccept !== true && (
               <TouchableOpacity style={styles.button1} onPress={() => handleCancelOrder(item.order._id)}>
@@ -458,18 +512,70 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   button: {
-    backgroundColor: '#2285a1',
+    backgroundColor: '#729c44',
     padding: 10,
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 10,
   },
   button1: {
-    backgroundColor: '#ff5252',
+    backgroundColor: '#FF0000',
     padding: 10,
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    height:'auto',
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    padding: 12,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -3,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  modalSection: {
+    marginBottom: 20,
+    backgroundColor: "#ecf2e6",
+    borderRadius:30,
+    padding:7
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    marginLeft:5
+  },
+
+  button3: {
+    backgroundColor:'#de510b',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 15,
+    marginVertical: 7,
+    marginHorizontal:15,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize:18,
+    fontWeight: 'bold',
   },
 });
 
