@@ -19,6 +19,8 @@ const AllOrders = () => {
             })
     });
 
+    const ordersWithoutTransporter = orders.filter(order => order.transportDetailsId == undefined);
+
     renderOrderItem = ({item}) => {
       return (
         <View>
@@ -59,13 +61,18 @@ const AllOrders = () => {
               <Text style={{fontSize:20}}>Siparişlerim</Text>
             </TouchableOpacity>
           </View>
-              {orders.length > 0 && (
-                <FlatList
-                  data={orders}
-                  renderItem={renderOrderItem}
-                  keyExtractor={item => item._id.toString()}
-                  />
-              )}
+             {ordersWithoutTransporter.length > 0 ? (
+        <FlatList
+          data={ordersWithoutTransporter}
+          renderItem={renderOrderItem}
+          keyExtractor={item => item._id.toString()}
+        />
+      ) : (
+        <View>
+           <Image style={{height:200, width:200, alignSelf:'center',marginTop:'40%'}} source={require('../assets/üretici/aa.png')}></Image>
+       
+        </View>
+      )}
         </View>
       );
     }  
