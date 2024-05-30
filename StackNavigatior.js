@@ -252,7 +252,7 @@ const StackNavigator = () => {
         name="TasiyiciOrders"
         component={TasiyiciOrders}
         options={{
-          title: 'KÖYDEN',
+          title: 'Siparişlerim',
           //headerTitle: (props) => <LogoTitle {...props} />,
           headerBackTitle: '‎',
           headerStyle: {
@@ -261,6 +261,7 @@ const StackNavigator = () => {
           headerTintColor: '#fff',
           headerTitleStyle: {
             fontWeight: 'bold',
+            fontSize:20
           },        
         }}
         />
