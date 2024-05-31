@@ -18,13 +18,9 @@ const SingleProductScreen = ({ route }) => {
   const userId = useUserIdDecoder();
   const [priceOffer,setPriceOffer] = useState(null);
   const [refreshFlag,setRefreshFlag] = useState(false);
-  const navigation = useNavigation(); 
-
-
-
+  const [producerInfo, setProducerInfo] = useState();
   const [orderQuantity, setOrderQuantity] = useState('-'); // Sipariş miktarı state'i
   const [quantityOptions, setQuantityOptions] = useState([]);
-
   const handleOrderQuantityChange = (quantity) => {
     setOrderQuantity(quantity);
   };
@@ -50,10 +46,17 @@ const SingleProductScreen = ({ route }) => {
     }
   }, [product]);
 
-
-
-
-
+  useEffect(() => {
+    if(product){
+      axios.get(`http://localhost:8000/producer/${product.producerId}`)
+      .then(response => {
+        setProducerInfo(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching producerInfo', error);
+      })
+    }
+  })
   const handleAddToCart = async () => {
     try {
       // Dropdown'dan seçilen miktarı al
@@ -171,6 +174,16 @@ const handleResetScreen = () => {
           dropdownTextHighlightStyle={{ color: 'green' }} 
         />
       </View>
+      <View style={{flexDirection:'row', marginTop:8,backgroundColor:'#cde8b5',borderRadius:15, margin:10, padding:4}}>
+          <Text style={styles.productHead}>Üretici Bilgileri:</Text>
+          <Text style={styles.productInfo}>{producerInfo.producer.name} {producerInfo.producer.surname}</Text>
+          <Text style={styles.productInfo}>Ürün Kalitesi: {producerInfo.producer.qualityRating.productQuality}</Text>
+          <Text style={styles.productInfo}>Güvenilirlik: {producerInfo.producer.qualityRating.reliability}</Text>
+          <Text style={styles.productInfo}>Paketleme: {producerInfo.producer.qualityRating.serviceQuality}</Text>
+          <Image source={{ uri: producerInfo.producer.image }} style={{ width: 50, height: 50, borderRadius:30, alignSelf:'center'}} />
+
+
+        </View>
       </View>
 
       {userType === 'tasiyici' && (

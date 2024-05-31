@@ -351,9 +351,6 @@ const OrderDetails = ({ route }) => {
                         <Text style={styles.orderInfoText}>Uzun yol: {item.order.transporterInfo.qualityRating.longDistance}</Text>
                         <Text style={styles.orderInfoText}>Güvenilirlik: {item.order.transporterInfo.qualityRating.transportReliability}</Text>
                         <Text style={styles.orderInfoText}>Hız: {item.order.transporterInfo.qualityRating.transportSpeed}</Text>
-
-
-
                       </View>
                     )}
                     <View>
