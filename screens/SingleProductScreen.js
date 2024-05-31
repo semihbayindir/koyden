@@ -1,12 +1,13 @@
 // SingleProductScreen.js
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView, Modal, StyleSheet, Alert, TextInput, Button } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, Modal, StyleSheet, Alert, TextInput, Button, LogBox } from 'react-native';
 import axios from 'axios';
 import { useUserIdDecoder } from '../components/UserIdDecoder';
 import UpdateProduct from '../components/UpdateProduct';
 import { useNavigation } from '@react-navigation/native'; // React Navigation'ın useNavigation hook'u
 import ModalDropdown from 'react-native-modal-dropdown'; 
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 
@@ -24,6 +25,13 @@ const SingleProductScreen = ({ route }) => {
   const handleOrderQuantityChange = (quantity) => {
     setOrderQuantity(quantity);
   };
+
+  LogBox.ignoreLogs([
+   'initialScrollIndex "-1" is not valid (list has 100 items)',
+  ]);
+  LogBox.ignoreLogs([
+    'initialScrollIndex "-1" is not valid (list has 40 items)',
+   ]);
 
 
 
@@ -56,7 +64,7 @@ const SingleProductScreen = ({ route }) => {
         console.error('Error fetching producerInfo', error);
       })
     }
-  })
+  }, [product,producerInfo])
   const handleAddToCart = async () => {
     try {
       // Dropdown'dan seçilen miktarı al
@@ -174,14 +182,32 @@ const handleResetScreen = () => {
           dropdownTextHighlightStyle={{ color: 'green' }} 
         />
       </View>
-      <View style={{flexDirection:'row', marginTop:8,backgroundColor:'#cde8b5',borderRadius:15, margin:10, padding:4}}>
-          <Text style={styles.productHead}>Üretici Bilgileri:</Text>
-          <Text style={styles.productInfo}>{producerInfo.producer.name} {producerInfo.producer.surname}</Text>
-          <Text style={styles.productInfo}>Ürün Kalitesi: {producerInfo.producer.qualityRating.productQuality}</Text>
-          <Text style={styles.productInfo}>Güvenilirlik: {producerInfo.producer.qualityRating.reliability}</Text>
-          <Text style={styles.productInfo}>Paketleme: {producerInfo.producer.qualityRating.serviceQuality}</Text>
-          <Image source={{ uri: producerInfo.producer.image }} style={{ width: 50, height: 50, borderRadius:30, alignSelf:'center'}} />
-
+      <View style={{flexDirection: 'row', marginTop: 8, backgroundColor: '#cde8b5', borderRadius: 15, margin: 10, padding: 4}}>
+  {producerInfo && (
+    <View>
+      <Text style={styles.productHead1}>Üretici Bilgileri:</Text>
+      <Text style={[styles.productInfo1, {marginTop: 10}]}>{producerInfo.producer.name} {producerInfo.producer.surname}</Text>
+      {producerInfo.producer.qualityRating && (
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {producerInfo.producer.image ? (
+            <Image source={{ uri: producerInfo.producer.image }} style={{ width: 70, height: 70, borderRadius: 50, margin: 20, marginLeft: 40 }} />
+          ) : (
+            <MaterialCommunityIcons name="account-circle" size={80} style={{ margin: 20, marginLeft: 40, color:'#de510b' }} />
+          )}
+          <View style={{ marginRight: 10 }}>
+            <Text style={styles.productInfo1}>Ürün Kalitesi: {producerInfo.producer.qualityRating.productQuality}</Text>
+            <Text style={styles.productInfo1}>Güvenilirlik: {producerInfo.producer.qualityRating.reliability}</Text>
+            <Text style={styles.productInfo1}>Paketleme: {producerInfo.producer.qualityRating.serviceQuality}</Text>
+          </View>
+        </View>
+      )}
+      {!producerInfo.producer.qualityRating && (
+        <View>
+          <Text style={styles.productInfo}>Üretici daha önce değerlendirilmemiş.</Text>
+        </View>
+      )}
+    </View>
+  )}
 
         </View>
       </View>
@@ -213,7 +239,7 @@ const handleResetScreen = () => {
       {userType !== 'tasiyici' && (
         <>
         {userId == product.producerId && (
-        <View style={{flexDirection:'row', flex:1, marginHorizontal:10}}>
+        <View style={{flexDirection:'row', flex:1, marginHorizontal:10, marginBottom:20}}>
         <TouchableOpacity style={styles.button} onPress={toggleUpdateModal}>
           <Text style={{color: 'white', fontSize:22 , textAlign:'center',padding:10 }}>Güncelle</Text>
         </TouchableOpacity>
@@ -234,7 +260,7 @@ const handleResetScreen = () => {
 
       {/* Sepete Ekle Butonu */}
         {userId !== product.producerId && (
-        <TouchableOpacity style={[styles.buttonSepet ,{marginHorizontal:'3%'}]} onPress={handleAddToCart}>
+        <TouchableOpacity style={[styles.buttonSepet ,{marginHorizontal:'3%',marginBottom:20}]} onPress={handleAddToCart}>
           <Text style={{ color: 'white', fontSize:22 , textAlign:'center',padding:10}}>Sepete Ekle</Text>
         </TouchableOpacity>
       )}
@@ -276,13 +302,24 @@ const styles = StyleSheet.create({
   },
   productInfo:{
     flex:0.4,
-    marginLeft:5,
+    marginLeft:15,
+    fontSize:22, 
+  },
+  productInfo1:{
+    
+    marginLeft:15,
     fontSize:22, 
   },
   productHead:{
     fontSize:22, 
     fontWeight:'700',
     flex:0.6,
+    marginLeft:15
+  },
+  productHead1:{
+    fontSize:22, 
+    fontWeight:'700',
+    
     marginLeft:15
   },
   inputContainer: {

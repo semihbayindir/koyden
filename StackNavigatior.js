@@ -269,7 +269,8 @@ const StackNavigator = () => {
         name="Route"
         component={Route}
         options={{
-          headerTitle: (props) => <LogoTitle {...props} />,
+          title:'KÖYDEN',
+          // headerTitle: (props) => <LogoTitle {...props} />,
           headerBackTitle: '‎',
           headerStyle: {
             backgroundColor: '#729c44',

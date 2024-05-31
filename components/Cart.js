@@ -10,6 +10,7 @@ const Cart = () => {
     const [quantities, setQuantities] = useState({});
     const [userCity, setUserCity] = useState(null);
     const [transportFee, setTransportFee] = useState(null);
+    const [totalProductFee, setTotalProductFee] = useState(0); // Added state for total product fee
 
     const GOOGLE_API_KEY = "AIzaSyD1-czL9crUVUOlVOa4z5-iDKAKgdUMegs";
 
@@ -45,6 +46,7 @@ const Cart = () => {
                         setCartItems(groupedCartItems);
                         initializeQuantities(response.data.products);
                         calculateTransportFeeForProducers(groupedCartItems);
+                        calculateTotalProductFee(response.data.products); // Calculate total product fee
                     } else {
                         setCartItems({});
                     }
@@ -75,6 +77,12 @@ const Cart = () => {
         });
         setQuantities(initialQuantities);
     };
+
+    const calculateTotalProductFee = (products) => {
+        const total = products.reduce((sum, product) => sum + (product.productId.price * product.quantity), 0);
+        setTotalProductFee(total);
+    };
+    
 
     const handleOrder = async () => {
         try {
@@ -141,11 +149,35 @@ const Cart = () => {
     };
 
     const handleQuantityChange = (productId, quantityChange) => {
-        setQuantities(prevQuantities => ({
-            ...prevQuantities,
-            [productId]: prevQuantities[productId] + quantityChange
-        }));
+        setQuantities(prevQuantities => {
+            const updatedQuantities = {
+                ...prevQuantities,
+                [productId]: prevQuantities[productId] + quantityChange
+            };
+    
+            // Yeni miktar güncellemeleriyle ürün ücretini yeniden hesaplayın
+            const updatedCartItems = Object.keys(cartItems).reduce((acc, producerId) => {
+                acc[producerId] = cartItems[producerId].map(item => {
+                    if (item.productId._id === productId) {
+                        return {
+                            ...item,
+                            quantity: updatedQuantities[productId]
+                        };
+                    }
+                    return item;
+                });
+                return acc;
+            }, {});
+    
+            // Toplam ürün ücretini ve taşıma ücretini yeniden hesaplayın
+            const allCartItems = Object.values(updatedCartItems).flat();
+            calculateTotalProductFee(allCartItems);
+            calculateTransportFeeForProducers(updatedCartItems);
+    
+            return updatedQuantities;
+        });
     };
+    
 
     const handleDeleteCartItem = async (productId) => {
         try {
@@ -248,7 +280,6 @@ const Cart = () => {
     
         return totalTransportFee;
     }
-    
 
     function calculateDistance(coord1, coord2) {
         const R = 6371e3;
@@ -263,6 +294,8 @@ const Cart = () => {
         return distance;
     }
 
+    const totalFee = totalProductFee + (transportFee || 0); // Calculate total fee including transport
+
     return (
         <View>
             <Text style={{ margin: '3%', textAlign: 'center', fontWeight: 'bold', fontSize: 30, fontStyle: 'normal' }}>Sepet ({totalUniqueProductsInCart})</Text>
@@ -270,23 +303,26 @@ const Cart = () => {
                 {Object.values(cartItems).flat().length > 0 ? (
                     Object.values(cartItems).flat().map((cartItem, index) => (
                         <View style={{ flexDirection: 'row', borderRadius: 20, marginHorizontal: '3%', marginVertical: '2%', backgroundColor: '#f9fbe5' }} key={index}>
-                            <View style={{borderWidth:1,borderColor:'lightgray', borderRadius: 15, backgroundColor: 'white', padding: 5, margin: 5 }}>
+                            <View style={{borderWidth:1,borderColor:'lightgray', borderRadius: 15, backgroundColor: 'white', padding: 5, margin: 10 , marginBottom:15}}>
                                 <Image source={{ uri: cartItem.productId.images[0] }} style={styles.productImage} />
                             </View>
-                            <View style={{ margin: '3%', flex: 0.90, padding: 5 }}>
+                            <View style={{ margin: '3%', flex: 0.70, padding: 5 }}>
                                 <Text style={{ fontWeight: 'bold', fontSize: 22 }}>{cartItem.productId.name}</Text>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <TouchableOpacity onPress={() => handleQuantityChange(cartItem.productId._id, -1)} style={{ padding: 5 }}>
                                         <MaterialCommunityIcons name="minus-circle-outline" size={25} />
                                     </TouchableOpacity>
-                                    <Text style={{ fontSize: 20 }}>{quantities[cartItem.productId._id]} {cartItem.qtyFormat}</Text>
+                                    <Text style={{ fontSize: 20 }}>{quantities[cartItem.productId._id]} {cartItem.productId.qtyFormat}</Text>
                                     <TouchableOpacity onPress={() => handleQuantityChange(cartItem.productId._id, 1)} style={{ padding: 5 }}>
                                         <MaterialCommunityIcons name="plus-circle-outline" size={25} />
                                     </TouchableOpacity>
+                                    
                                 </View>
+                              
                             </View>
-                            <View style={{ flex: 0.25, margin: '8%' }}>
-                                <TouchableOpacity onPress={() => handleDeleteCartItem(cartItem.productId._id)}>
+                            <View style={{ flex: 0.40, margin:'10%', flexDirection:'row' }}>
+                                <Text style={{fontSize:20, marginTop:6, fontWeight:700}}>{cartItem.productId.price * quantities[cartItem.productId._id]}₺</Text>
+                                <TouchableOpacity style={{marginLeft:10}} onPress={() => handleDeleteCartItem(cartItem.productId._id)}>
                                     <MaterialCommunityIcons name='delete' size={30} color={'red'} />
                                 </TouchableOpacity>
                             </View>
@@ -297,11 +333,16 @@ const Cart = () => {
                 )}
             </View>
             {transportFee !== null && Object.values(cartItems).flat().length > 0 && (
-                <Text style={{ margin: '3%', textAlign: 'center', fontWeight: 'bold', fontSize: 20 }}>
-                    Toplam Taşıma Ücreti: {transportFee} TL
-                </Text>
+                <View>
+                    <Text style={{ marginRight: '3%',marginTop:'3%', textAlign: 'center', fontWeight: 500, fontSize: 20, textAlign:'right' }}>
+                        Taşıma Ücreti: {transportFee} TL
+                    </Text>
+                    <Text style={{ marginRight: '3%', marginTop:'2%', textAlign: 'center', fontWeight: 700, fontSize: 20, textAlign:'right' }}>
+                        Toplam Ücret: {totalFee} TL
+                    </Text>
+                </View>
             )}
-            <TouchableOpacity style={{ backgroundColor: '#729c44', padding: 10, marginHorizontal: 50, marginTop: 10, borderRadius: 5, alignContent: 'center' }} onPress={handleOrder}>
+            <TouchableOpacity style={{ backgroundColor: '#729c44', padding: 10, marginHorizontal: 50, marginTop: 10, borderRadius: 15, alignContent: 'center'}} onPress={handleOrder}>
                 <Text style={{ textAlign: 'center', color: 'white', fontSize: 22 }}>Sipariş Ver</Text>
             </TouchableOpacity>
         </View>

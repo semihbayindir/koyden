@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, LogBox, TextInput, Modal, ScrollView } from 'react-native';
@@ -14,6 +15,7 @@ const OrderDetails = ({ route }) => {
   const [lastStatusUpdated, setLastStatusUpdated] = useState(false); // State to track if last status update is needed
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedOrderIds, setSelectedOrderIds] = useState({ producerId: null, transporterId: null });
+  const navigation = useNavigation();
 
   const [producerRatings, setProducerRatings] = useState({
     productQuality: 0,
@@ -274,8 +276,11 @@ const OrderDetails = ({ route }) => {
     try {
       const response = await axios.delete(`http://localhost:8000/orders/${orderId}`);
       console.log('Order cancelled:', response.data);
+      const singleOrderResponse = axios.delete(`http://localhost:8000/singleOrder/${orderId}`);
+      console.log('SingleOrder cancelled', singleOrderResponse.data);
+      navigation.navigate("Tuketici");
     } catch (error) {
-      console.error('Error cancelling order:', error);
+      console.error('Error cancelling order/singleOrder:', error);
     }
   };
 
@@ -323,6 +328,7 @@ const OrderDetails = ({ route }) => {
       <Text style={[styles.productDetailText, { fontSize: 22, fontWeight: '800', marginBottom: 10 }]}>Sipariş Detayları</Text>
       <FlatList
         data={productDetails}
+        ListFooterComponent={<View style={{ height: 100 }} />}
         renderItem={({ item }) => (
           <View style={styles.orderDetail}>
             
@@ -343,19 +349,8 @@ const OrderDetails = ({ route }) => {
                     ))}
                     <Text style={styles.productDetailText}>Fiyat: {item.order.totalPrice} ₺</Text>
                     <Text style={styles.orderInfoText}>Gönderen: {item.order.from}</Text>
-                    <Text style={styles.orderInfoText}>TAŞIYICI BİLGİLERİ</Text>
-
-                    {item.order.transporterInfo && (
-                      <View>
-                        <Text style={styles.orderInfoText}>{item.order.transporterInfo.name} {item.order.transporterInfo.surname}</Text>
-                        <Text style={styles.orderInfoText}>Uzun yol: {item.order.transporterInfo.qualityRating.longDistance}</Text>
-                        <Text style={styles.orderInfoText}>Güvenilirlik: {item.order.transporterInfo.qualityRating.transportReliability}</Text>
-                        <Text style={styles.orderInfoText}>Hız: {item.order.transporterInfo.qualityRating.transportSpeed}</Text>
-                      </View>
-                    )}
-                    <View>
                     
-                    </View>
+                    
                     {item.order.isOfferAccept === true && item.order.status !== 'Teslim Edildi' && (                      <View>
                         <TouchableOpacity style={styles.button} onPress={() => handleStatus(item.order.transportDetailsId, item.order._id)}>
                           <Text style={{ color: 'white', fontSize: 17 }}>Teslim Aldım</Text>
@@ -364,9 +359,20 @@ const OrderDetails = ({ route }) => {
                       </View>
                     )}
                   </View>
-                  
                 </View>
-                  <View >
+                  
+                  
+
+                    {item.order.transporterInfo && (
+                      <View>
+                        <Text style={[styles.orderInfoText1,{fontWeight:700}]}>TAŞIYICI BİLGİLERİ</Text>
+                        <Text style={styles.orderInfoText1}>{item.order.transporterInfo.name} {item.order.transporterInfo.surname}</Text>
+                        <Text style={styles.orderInfoText1}>Uzun yol: {item.order.transporterInfo.qualityRating.longDistance}</Text>
+                        <Text style={styles.orderInfoText1}>Güvenilirlik: {item.order.transporterInfo.qualityRating.transportReliability}</Text>
+                        <Text style={styles.orderInfoText1}>Hız: {item.order.transporterInfo.qualityRating.transportSpeed}</Text>
+                      </View>
+                    )}
+                    <View >
                       <Text style={[styles.orderInfoText, {textAlign:'right', marginRight:'5%', color: item.order.status === 'Hazırlanıyor' ? '#2285a1' : 'green' }]}>{item.order.status}</Text>
                   </View>
                 {item.order.isOfferAccept !== true && item.order.transportDetailsId && (
@@ -495,6 +501,11 @@ const styles = StyleSheet.create({
   orderInfoText: {
     fontSize: 18,
     marginBottom: 5,
+  },
+  orderInfoText1: {
+    fontSize: 18,
+    marginBottom: 5,
+    marginLeft:10
   },
   productDetail: {
     flexDirection: 'row',

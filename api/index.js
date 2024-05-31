@@ -589,7 +589,22 @@ app.delete('/orders/:orderId', async (req, res) => {
   }
 });
 
+// OrderId ile SingleOrder'ı silmek için endpoint
+app.delete('/singleOrder/:orderId', async (req, res) => {
+  const { orderId } = req.params;
 
+  try {
+    const result = await SingleOrder.findOneAndDelete({ 'orderIds.orderId': orderId });
+
+    if (!result) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.status(200).json({ message: 'Order deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
 app.delete('/cart/:userId/product/:productId', async (req, res) => {
   const userId = req.params.userId;
   const productId = req.params.productId;
