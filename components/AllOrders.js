@@ -19,6 +19,8 @@ const AllOrders = () => {
             })
     });
 
+    const ordersWithoutTransporter = orders.filter(order => order.transportDetailsId == undefined);
+
     renderOrderItem = ({item}) => {
       return (
         <View>
@@ -55,17 +57,22 @@ const AllOrders = () => {
             <Text style={{textAlign:'left', fontWeight:800, fontSize:30, fontStyle:'normal'}}>  TAŞIYICI,</Text>
           </Text>
           <View style={{flexDirection:'row', alignItems:'center', marginTop:5, marginBottom:10 }}>
-            <TouchableOpacity style={styles.butons} onPress={() => navigation.navigate('TasiyiciOrders')}>
-              <Text style={{fontSize:18}}>Siparişlerim</Text>
+            <TouchableOpacity style={styles.buttons} onPress={() => navigation.navigate('TasiyiciOrders')}>
+              <Text style={{fontSize:20}}>Siparişlerim</Text>
             </TouchableOpacity>
           </View>
-              {orders.length > 0 && (
-                <FlatList
-                  data={orders}
-                  renderItem={renderOrderItem}
-                  keyExtractor={item => item._id.toString()}
-                  />
-              )}
+             {ordersWithoutTransporter.length > 0 ? (
+        <FlatList
+          data={ordersWithoutTransporter}
+          renderItem={renderOrderItem}
+          keyExtractor={item => item._id.toString()}
+        />
+      ) : (
+        <View>
+           <Image style={{height:200, width:200, alignSelf:'center',marginTop:'40%'}} source={require('../assets/üretici/aa.png')}></Image>
+       
+        </View>
+      )}
         </View>
       );
     }  
@@ -98,13 +105,13 @@ const AllOrders = () => {
           marginTop:15,
           marginHorizontal:15
         },
-        butons:{
-          margin:10,
-          borderWidth:2,
-          borderRadius:10,
-          borderColor:'#9ab863',
-          paddingHorizontal:10,
-          padding:4
+        buttons:{
+          marginHorizontal: 10,
+          marginVertical:10,
+          backgroundColor: '#fff',
+          borderRadius: 12,
+          paddingHorizontal: 10,
+          paddingVertical: 8,
         },
 
 

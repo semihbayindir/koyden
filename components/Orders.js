@@ -82,6 +82,7 @@ const Orders = () => {
           data={singleOrders}
           renderItem={renderSingleOrderItem}
           keyExtractor={item => item._id.toString()}
+          ListFooterComponent={<View style={{ height: 100 }} />}
         />
         </>     
       )}
