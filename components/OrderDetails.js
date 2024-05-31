@@ -2,7 +2,6 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, LogBox, TextInput, Modal, ScrollView } from 'react-native';
 import Stars from 'react-native-stars';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
@@ -13,9 +12,9 @@ const OrderDetails = ({ route }) => {
   const [transporterInfos, setTransporterInfos] = useState([]);
   const [statusUpdated, setStatusUpdated] = useState(false); // State to track if status update is needed
   const [lastStatusUpdated, setLastStatusUpdated] = useState(false); // State to track if last status update is needed
-
-
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedOrderIds, setSelectedOrderIds] = useState({ producerId: null, transporterId: null });
+
   const [producerRatings, setProducerRatings] = useState({
     productQuality: 0,
     reliability: 0,
@@ -25,15 +24,7 @@ const OrderDetails = ({ route }) => {
     transportSpeed: 0,
     longDistance: 0,
     transportReliability: 0,
-  });
-
-  const [productQuality, setProductQuality] = useState('');
-  const [reliability, setReliability] = useState('');
-  const [serviceQuality, setServiceQuality] = useState('');
-  const [transportSpeed, setTransportSpeed] = useState('');
-  const [longDistance, setLongDistance] = useState('');
-  const [transportReliability, setTransportReliability] = useState('');
-
+  })
 
   LogBox.ignoreLogs([
     'Non-serializable values were found in the navigation state',
@@ -141,14 +132,6 @@ const OrderDetails = ({ route }) => {
   };
 
 
-  const handleRatingSubmit = () => {
-    // Değerlendirmeleri sunucuya gönderme işlemi burada yapılır
-    setModalVisible(false);
-    console.log(producerRatings, transporterRatings);
-    
-  };
-
-
   useEffect(() => {
     const updateOrderStatus = async () => {
       const statuses = productDetails.map(item => item.order.status);
@@ -207,14 +190,28 @@ const OrderDetails = ({ route }) => {
   };
 
 
+  // Status handler
   const handleStatus = async (transportDetailsId, orderId) => {
     try {
-      response = await axios.put(`http://localhost:8000/orders/${orderId}/lastStatus`);
+      console.log('transportDetailsId', transportDetailsId);
+      console.log('orderId', orderId);
+  
+      // Transporter detaylarını getir
+      const transportDetailsResponse = await axios.get(`http://localhost:8000/transportDetails/id/${transportDetailsId}`);
+      const transporterId = transportDetailsResponse.data.transportDetails.transporterId;
+      console.log('transporterId', transporterId);
+  
+      // Order detaylarını getir
+      const orderResponse = await axios.get(`http://localhost:8000/orders/${orderId}`);
+      const producerId = orderResponse.data.producerId;
+      console.log('producerId', producerId);
+  
+      const response = await axios.put(`http://localhost:8000/orders/${orderId}/lastStatus`);
       alert('Teslim Alındı', response.data);
+      setModalVisible(true);
+      setSelectedOrderIds({ producerId, transporterId });
 
-      setModalVisible(true)
-
-
+  
       setProductDetails(prevDetails => {
         const updatedDetails = prevDetails.map(item => {
           if (item.order._id === orderId) {
@@ -229,19 +226,20 @@ const OrderDetails = ({ route }) => {
           }
           return item;
         });
-
+  
         const allSameStatus = updatedDetails.every((item, index, array) => item.order.status === array[0].order.status);
-
+  
         if (allSameStatus) {
           updateSingleOrderLastStatus(orderId);
         }
-
+  
         return updatedDetails;
       });
     } catch (error) {
       console.error('Teslim edilemedi:', error);
     }
   };
+  
 
 
   const handleRejectOffer = async (orderId, transportDetailsId) => {
@@ -286,34 +284,34 @@ const OrderDetails = ({ route }) => {
     return new Date(date).toLocaleDateString('tr-TR', options);
   };
 
-  const handleConsumerRatingSubmit = async (producerId) => {
+  const handleRatingSubmit = async () => {
+    const { producerId, transporterId } = selectedOrderIds;
     try {
-      await axios.post(`http://localhost:8000/users/${producerId}/rateProducer`, {
-        productQuality: parseInt(productQuality, 10),
-        reliability: parseInt(reliability, 10),
-        serviceQuality: parseInt(serviceQuality, 10),
+      const producerRatingResponse = await axios.post(`http://localhost:8000/users/${producerId}/rateProducer`, {
+        productQuality: producerRatings.productQuality,
+        reliability: producerRatings.reliability,
+        serviceQuality: producerRatings.serviceQuality,
       });
+      console.log('Producer rating response:', producerRatingResponse.data);
+  
+      const transporterRatingResponse = await axios.post(`http://localhost:8000/users/${transporterId}/rateTransporter`, {
+        transportSpeed: transporterRatings.transportSpeed,
+        longDistance: transporterRatings.longDistance,
+        transportReliability: transporterRatings.transportReliability,
+      });
+      console.log('Transporter rating response:', transporterRatingResponse.data);
+  
       alert('Değerlendirme başarılı');
     } catch (error) {
-      console.error('Error submitting producer rating:', error);
+      console.error('Error submitting rating:', error.response ? error.response.data : error.message);
       alert('Değerlendirme gönderilemedi');
     }
+    setModalVisible(false);
+    console.log(producerRatings, transporterRatings);
   };
+  
 
-  const handleTransporterRatingSubmit = async (transporterId) => {
-    try {
-      await axios.post(`http://localhost:8000/users/${transporterId}/rateTransporter`, {
-        transportSpeed: parseInt(transportSpeed, 10),
-        longDistance: parseInt(longDistance, 10),
-        transportReliability: parseInt(transportReliability, 10)
-      });
-      alert('Değerlendirme başarılı');
-    } catch (error) {
-      console.error('Error submitting transporter rating:', error);
-      alert('Değerlendirme gönderilemedi');
-    }
-  };
-
+  
   return (
     <View style={styles.container}>
       {productDetails.length > 0 && (
@@ -348,13 +346,20 @@ const OrderDetails = ({ route }) => {
                     <Text style={styles.orderInfoText}>TAŞIYICI BİLGİLERİ</Text>
 
                     {item.order.transporterInfo && (
-                      <Text style={styles.orderInfoText}>{item.order.transporterInfo.name}</Text>
+                      <View>
+                        <Text style={styles.orderInfoText}>{item.order.transporterInfo.name} {item.order.transporterInfo.surname}</Text>
+                        <Text style={styles.orderInfoText}>Uzun yol: {item.order.transporterInfo.qualityRating.longDistance}</Text>
+                        <Text style={styles.orderInfoText}>Güvenilirlik: {item.order.transporterInfo.qualityRating.transportReliability}</Text>
+                        <Text style={styles.orderInfoText}>Hız: {item.order.transporterInfo.qualityRating.transportSpeed}</Text>
+
+
+
+                      </View>
                     )}
                     <View>
                     
                     </View>
-                    {item.order.isOfferAccept === true && (
-                      <View>
+                    {item.order.isOfferAccept === true && item.order.status !== 'Teslim Edildi' && (                      <View>
                         <TouchableOpacity style={styles.button} onPress={() => handleStatus(item.order.transportDetailsId, item.order._id)}>
                           <Text style={{ color: 'white', fontSize: 17 }}>Teslim Aldım</Text>
                         </TouchableOpacity>
@@ -379,8 +384,6 @@ const OrderDetails = ({ route }) => {
                     )}
 
 {item.order.status === 'Teslim Edildi' && (
-  
-
   <View style={styles.container}>
              <Modal
           visible={modalVisible}
@@ -451,11 +454,11 @@ const OrderDetails = ({ route }) => {
                   
                 </View>
                 <TouchableOpacity
-                  style={styles.button3}
-                  onPress={handleRatingSubmit}
-                >
-                  <Text style={styles.buttonText}>Değerlendir</Text>
-                </TouchableOpacity>
+  style={styles.button3}
+  onPress={handleRatingSubmit}
+>
+  <Text style={styles.buttonText}>Değerlendir</Text>
+</TouchableOpacity>
               </ScrollView>
             </View>
           </View>

@@ -47,6 +47,11 @@ const verificationSchema = new mongoose.Schema({
 });
 
 const qualityRatingSchema = new mongoose.Schema({
+  ratingCount:{
+    type: Number,
+    default: 0,
+    required: false,
+  },
   productQuality: {
     type: Number,
     required: false

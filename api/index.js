@@ -866,31 +866,44 @@ app.put('/singleOrder/:orderId/status', async (req, res) => {
 });
 
 
-// Endpoint to add or update consumer ratings
+// Endpoint to add or update consumer ratings for producer
 app.post('/users/:id/rateProducer', async (req, res) => {
   try {
     const userId = req.params.id;
     const { productQuality, reliability, serviceQuality } = req.body;
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { 
-        'qualityRating.productQuality': productQuality,
-        'qualityRating.reliability': reliability,
-        'qualityRating.serviceQuality': serviceQuality
-      },
-      { new: true }
-    );
-
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).send('User not found');
     }
+    if (!user.qualityRating) {
+      user.qualityRating = {}; // Eğer yoksa, önce oluşturun
+    }
+    
+
+    const newRatingCount = (user.qualityRating && user.qualityRating.ratingCount || 0) + 1;
+    if (newRatingCount == 1){
+      user.qualityRating.productQuality = productQuality;
+      user.qualityRating.reliability = reliability;
+      user.qualityRating.serviceQuality = serviceQuality;
+      user.qualityRating.ratingCount = newRatingCount;
+    }else {
+      user.qualityRating.productQuality = parseFloat(((productQuality + user.qualityRating.productQuality) / newRatingCount).toFixed(1));
+      user.qualityRating.reliability = parseFloat(((reliability + user.qualityRating.reliability) / newRatingCount).toFixed(1));
+      user.qualityRating.serviceQuality = parseFloat(((serviceQuality + user.qualityRating.serviceQuality) / newRatingCount).toFixed(1));      
+      user.qualityRating.ratingCount = newRatingCount;
+    }
+    
+
+    await user.save();
 
     res.send(user);
   } catch (error) {
+    console.error('Error submitting producer rating:', error); // Log the error
     res.status(500).send(error.message);
   }
 });
+
 
 // Endpoint to add or update transporter ratings
 app.post('/users/:id/rateTransporter', async (req, res) => {
@@ -898,23 +911,34 @@ app.post('/users/:id/rateTransporter', async (req, res) => {
     const userId = req.params.id;
     const { transportSpeed, longDistance, transportReliability } = req.body;
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      {
-        'qualityRating.transportSpeed': transportSpeed,
-        'qualityRating.longDistance': longDistance,
-        'qualityRating.transportReliability': transportReliability
-      },
-      { new: true }
-    );
-
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).send('User not found');
     }
 
+    if (!user.qualityRating) {
+      user.qualityRating = {}; // Eğer yoksa, önce oluşturun
+    }
+    
+
+    const newRatingCount = (user.qualityRating && user.qualityRating.ratingCount || 0) + 1;
+    if (newRatingCount == 1){
+      user.qualityRating.transportSpeed = transportSpeed;
+      user.qualityRating.longDistance = longDistance;
+      user.qualityRating.transportReliability = transportReliability;
+      user.qualityRating.ratingCount = newRatingCount;
+    } else{
+      user.qualityRating.transportSpeed = parseFloat(((transportSpeed + user.qualityRating.transportSpeed) / newRatingCount).toFixed(1));
+      user.qualityRating.longDistance = parseFloat(((longDistance + user.qualityRating.longDistance) / newRatingCount).toFixed(1));
+user.qualityRating.transportReliability = parseFloat(((transportReliability + user.qualityRating.transportReliability) / newRatingCount).toFixed(1));
+      user.qualityRating.ratingCount = newRatingCount;
+    }
+
+    await user.save();
+
     res.send(user);
   } catch (error) {
+    console.error('Error submitting transporter rating:', error); // Log the error
     res.status(500).send(error.message);
   }
 });
-
