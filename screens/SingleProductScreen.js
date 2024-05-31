@@ -18,13 +18,9 @@ const SingleProductScreen = ({ route }) => {
   const userId = useUserIdDecoder();
   const [priceOffer,setPriceOffer] = useState(null);
   const [refreshFlag,setRefreshFlag] = useState(false);
-  const navigation = useNavigation(); 
-
-
-
-  const [orderQuantity, setOrderQuantity] = useState('2'); // Sipariş miktarı state'i
+  const [producerInfo, setProducerInfo] = useState();
+  const [orderQuantity, setOrderQuantity] = useState('-'); // Sipariş miktarı state'i
   const [quantityOptions, setQuantityOptions] = useState([]);
-
   const handleOrderQuantityChange = (quantity) => {
     setOrderQuantity(quantity);
   };
@@ -50,10 +46,17 @@ const SingleProductScreen = ({ route }) => {
     }
   }, [product]);
 
-
-
-
-
+  useEffect(() => {
+    if(product){
+      axios.get(`http://localhost:8000/producer/${product.producerId}`)
+      .then(response => {
+        setProducerInfo(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching producerInfo', error);
+      })
+    }
+  })
   const handleAddToCart = async () => {
     try {
       // Dropdown'dan seçilen miktarı al
@@ -141,44 +144,46 @@ const handleResetScreen = () => {
   return (
     <ScrollView>
       {/* Ürün detayları gösterimi */}
-      <Image source={{ uri: images[0] }} style={{ width: 250, height: 250, margin:15, borderRadius:5, alignSelf:'center'}} />
-      <View style={{backgroundColor:'#cde8b5',borderRadius:15, margin:10}}>
-        <View style={{flexDirection:'row'}}>
-          <Text style={{fontSize:26, fontWeight:800, marginTop:10, marginLeft:15}}>{name}</Text>
-        </View>
-        <View style={{ marginTop:8, flex:1}}>
+      <Image source={{ uri: images[0] }} style={{ width: 250, height: 250, margin:15, marginTop:30, borderRadius:30, alignSelf:'center'}} />
+      <View >
+          <Text style={{fontSize:26, fontWeight:800, textAlign:'center', marginLeft:15}}>{name}</Text>
+      </View>
+        <View style={{marginTop:20}}>
+        <View style={{ marginTop:8, flex:1,backgroundColor:'#ed896f',borderRadius:15, margin:10, padding:4}}>
           <Text style={styles.productHead}>Açıklama:</Text>
           <Text style={{flex:1, marginLeft:15, marginRight:15,fontSize:22, }}>{description}</Text>
         </View>
-        <View style={{flexDirection:'row', marginTop:8}}>
+        <View style={{flexDirection:'row', marginTop:8,backgroundColor:'#cde8b5',borderRadius:15, margin:10, padding:4}}>
           <Text style={styles.productHead}>Kategori:</Text>
           <Text style={styles.productInfo}>{category}</Text>
         </View>
-        <View style={{flexDirection:'row', marginTop:8}}>
-          <Text style={styles.productHead}>Stok:</Text>
-          <Text style={styles.productInfo}>{qty} kg</Text>
-        </View>
-        <View style={{flexDirection:'row', marginTop:8}}>
-          <Text style={styles.productHead}>Min Sipariş Miktarı:</Text>
-          <Text style={styles.productInfo}>{minQty}</Text>
-        </View>
-        <View style={{flexDirection:'row', marginTop:8}}>
+        <View style={{flexDirection:'row', marginTop:8, backgroundColor:'#cde8b5',borderRadius:15, margin:10, padding:4}}>
           <Text style={styles.productHead}>Birim Fiyatı: </Text>
           <Text style={styles.productInfo}>{price} ₺</Text>
         </View>
-        <View style={{flexDirection:'row', marginTop:8, marginBottom:10}}>
+        <View style={{flexDirection:'row', marginTop:8, marginBottom:10,backgroundColor:'#cde8b5',borderRadius:15, margin:10, padding:4}}>
         <Text style={styles.productHead}>Sipariş Miktarı:</Text>
         <ModalDropdown
           options={quantityOptions}
           defaultValue={orderQuantity}
           onSelect={(index, value) => handleOrderQuantityChange(value)}
-          style={{ fontSize: 22, marginBottom:5, marginLeft:10, borderRadius: 10, paddingHorizontal:15, backgroundColor:'white' }}
+          style={{ fontSize: 22, marginBottom:5, marginLeft:'15%', borderRadius: 10, paddingHorizontal:15, backgroundColor:'white' }}
           textStyle={{ fontSize: 22, color: 'gray' }}
           dropdownStyle={{ fontSize: 22, height: 200, borderRadius: 10, padding: 9, backgroundColor:'white', }}
           dropdownTextStyle={{ fontSize: 22 }} 
           dropdownTextHighlightStyle={{ color: 'green' }} 
         />
       </View>
+      <View style={{flexDirection:'row', marginTop:8,backgroundColor:'#cde8b5',borderRadius:15, margin:10, padding:4}}>
+          <Text style={styles.productHead}>Üretici Bilgileri:</Text>
+          <Text style={styles.productInfo}>{producerInfo.producer.name} {producerInfo.producer.surname}</Text>
+          <Text style={styles.productInfo}>Ürün Kalitesi: {producerInfo.producer.qualityRating.productQuality}</Text>
+          <Text style={styles.productInfo}>Güvenilirlik: {producerInfo.producer.qualityRating.reliability}</Text>
+          <Text style={styles.productInfo}>Paketleme: {producerInfo.producer.qualityRating.serviceQuality}</Text>
+          <Image source={{ uri: producerInfo.producer.image }} style={{ width: 50, height: 50, borderRadius:30, alignSelf:'center'}} />
+
+
+        </View>
       </View>
 
       {userType === 'tasiyici' && (
@@ -208,24 +213,28 @@ const handleResetScreen = () => {
       {userType !== 'tasiyici' && (
         <>
         {userId == product.producerId && (
+        <View style={{flexDirection:'row', flex:1, marginHorizontal:10}}>
         <TouchableOpacity style={styles.button} onPress={toggleUpdateModal}>
           <Text style={{color: 'white', fontSize:22 , textAlign:'center',padding:10 }}>Güncelle</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={{backgroundColor: 'red',borderRadius: 15, flex:0.5, marginTop:20  }} onPress={handleDeleteProduct}>
+          <Text style={{ color: 'white', fontSize:22 , textAlign:'center',padding:10}}>Sil</Text>
+        </TouchableOpacity>
+        </View>
       )}
-
+{/* 
         {userId == product.producerId && (
         <TouchableOpacity style={{backgroundColor: 'red',
-        marginVertical: 9,
-        borderRadius: 5,
+        borderRadius: 15,
         marginHorizontal: '20%',
-        marginBottom:20,}} onPress={handleDeleteProduct}>
+        }} onPress={handleDeleteProduct}>
           <Text style={{ color: 'white', fontSize:22 , textAlign:'center',padding:10 }}>Sil</Text>
         </TouchableOpacity>
-      )}
+      )} */}
 
       {/* Sepete Ekle Butonu */}
         {userId !== product.producerId && (
-        <TouchableOpacity style={styles.button} onPress={handleAddToCart}>
+        <TouchableOpacity style={[styles.buttonSepet ,{marginHorizontal:'3%'}]} onPress={handleAddToCart}>
           <Text style={{ color: 'white', fontSize:22 , textAlign:'center',padding:10}}>Sepete Ekle</Text>
         </TouchableOpacity>
       )}
@@ -246,11 +255,17 @@ const handleResetScreen = () => {
 const styles = StyleSheet.create({
   button: {
     backgroundColor: '#729c44',
-    marginVertical: 9,
-    borderRadius: 5,
-    marginHorizontal: '20%',
-    marginTop: 10,
-    marginBottom:10,
+    borderRadius: 15,
+    flex:0.5,
+    marginTop: 20,
+    marginRight:5
+  },
+  buttonSepet: {
+    backgroundColor: '#729c44',
+    borderRadius: 15,
+    flex:0.5,
+    marginTop: 30,
+   
   },
   buttonTrans: {
     backgroundColor: '#729c44',

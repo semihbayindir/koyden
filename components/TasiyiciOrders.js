@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import axios from 'axios';
 import { useUserIdDecoder } from './UserIdDecoder';
 import { useNavigation } from '@react-navigation/native';
@@ -86,42 +86,56 @@ const TasiyiciOrders = () => {
     const offerAcceptStatus = 'Onaylandı';
     const producerInfo = producerInfos[order.producerId];
 
-    return (
-      <View>
-        <View>
-          {producerInfo && (
-            <View>
-              <Text>Producer Name: {producerInfo.name}</Text>
-              <Text>Producer Phone : {producerInfo.phone}</Text>
-              <Text>{producerInfo.verification.producerAddress.city + " " +
-                producerInfo.verification.producerAddress.district + " " 
-                + producerInfo.verification.producerAddress.street}</Text>
-            </View>
-          )}
-        </View>
-        <Text>Sipariş kabul durumu: {offerAcceptStatus}</Text>
-        <Text>Başlangıç: {order.from}</Text>
-        <Text>Varış: {order.to}</Text>
 
+    // {products[product.productId].name}
+
+
+    return (
+      <View style={[styles.order ,{marginHorizontal:20, marginVertical:10}]}>
+        
+        
+        <View style={styles.order}>
+            {producerInfo && (
+              <View>
+                <Text style={styles.orderText}>Üretici: {producerInfo.name}</Text>
+                <Text style={styles.orderText}>Telefpn Numarası: {producerInfo.phone}</Text>
+                <Text style={styles.orderText}>{producerInfo.verification.producerAddress.city + " " +
+                  producerInfo.verification.producerAddress.district + " " 
+                  + producerInfo.verification.producerAddress.street}</Text>
+              </View>
+            )}
+          
+        </View>
+        <View>
         {order.products.map((product, index) => (
+          
           <View key={index}>
             {products[product.productId] && (
-              <View>
-                <Text>Ürün adı: {products[product.productId].name}</Text>
+              <View style={{flexDirection:'row'}} >
+                <View style={{ borderWidth: 1, borderColor:'lightgray', borderRadius: 15, backgroundColor: 'white', padding: 5, marginBottom:45 }}>
                 <Image source={{ uri: products[product.productId].images[0] }} style={{ width: 100, height: 100}} />
+                </View>
+                <View style={{marginLeft:'5%', marginTop:'5%'}}>
+                  <Text style={[styles.orderText, { fontWeight:'bold',fontSize:20}]}>{products[product.productId].name}</Text>
+                  <Text style={[styles.orderText, ]}>Başlangıç: {order.from}</Text>
+                  <Text style={[styles.orderText, ]}>Varış: {order.to}</Text>
+                  <Text style={[styles.orderText,{color:'#729c44', marginLeft:'50%', marginTop:30}]}>{offerAcceptStatus}</Text>
+                </View>
               </View>
+
             )}
           </View>
         ))}
+          
+        </View>
       </View>
     );
   };
 
   return (
     <View>
-      <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }}>Siparişlerim</Text>
-      <TouchableOpacity onPress={() => navigation.navigate("Route")}>
-        <Text>Rota</Text>
+      <TouchableOpacity style={{backgroundColor:'#de510b', borderRadius:15, margin:20, padding:10}} onPress={() => navigation.navigate("Route")}>
+        <Text style={{fontSize:20, color:'#fff', textAlign:'center'}}>ROTA</Text>
       </TouchableOpacity>      
       {transportDetails.length === 0 ? (
         <Text style={{ textAlign: 'center' }}>Henüz siparişiniz bulunmamaktadır.</Text>
@@ -130,10 +144,32 @@ const TasiyiciOrders = () => {
           data={orders}
           renderItem={renderOrderItem}
           keyExtractor={(item) => item._id.toString()}
+          ListFooterComponent={<View style={{ height: 100 }} />}
         />
       )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  order: {
+        
+    borderRadius:20,
+    borderColor: 'lightgrey',
+    backgroundColor:'#f9fbe5',
+    padding: 10,
+    
+  },
+  orderText: {
+    fontSize: 18,
+    marginBottom: 5,
+    
+  },
+
+  productDetailText: {
+    fontSize: 18,
+    marginBottom: 5,
+  },
+})
 
 export default TasiyiciOrders;

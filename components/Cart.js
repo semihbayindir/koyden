@@ -293,7 +293,7 @@ const Cart = () => {
                         </View>
                     ))
                 ) : (
-                    <Text style={{ textAlign: 'center', fontSize: 20, marginBottom: 20 }}>Sepetiniz Boş</Text>
+                    <Image style={{height:200, width:200, alignSelf:'center',marginTop:'40%'}} source={require('../assets/empty-cart.png')}></Image>
                 )}
             </View>
             {transportFee !== null && Object.values(cartItems).flat().length > 0 && (

@@ -222,6 +222,7 @@ const AllProducts = () => {
           renderItem={renderProductItem}
           keyExtractor={(item) => item?._id?.toString() || Math.random().toString()}
           numColumns={2}
+          ListFooterComponent={<View style={{ height: 100 }} />}
         />
       )}
     </View>
