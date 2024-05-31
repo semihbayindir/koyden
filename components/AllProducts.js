@@ -70,16 +70,60 @@ const AllProducts = () => {
 
   const handleAddToCart = async (productId) => {
     try {
-      const response = await axios.post(`http://localhost:8000/cart/add/${userId}`, {
-        productId,
-        quantity: 1
-      });
-      console.log('Product added to cart:', response.data);
-      Alert.alert('Ürün sepete eklendi.');
+      // Dropdown'dan seçilen miktarı al
+      const quantity = 1;
+  
+      // Kullanıcının sepetini almak için GET isteği
+      const cartResponse = await axios.get(`http://localhost:8000/cart/${userId}`);
+      const userCart = cartResponse.data;
+  
+      // Eğer kullanıcının sepeti bulunamadıysa yeni bir sepet oluştur
+      if (!userCart) {
+        const createCartResponse = await axios.post(`http://localhost:8000/cart/create`, {
+          userId,
+          productId
+        });
+        const addToCartResponse = await axios.put(`http://localhost:8000/cart/add/${userId}`, {
+          productId,
+          quantity
+        });
+        console.log('New cart created:', createCartResponse.data);
+        console.log('Product added to cart:', addToCartResponse.data);
+        Alert.alert('Ürün sepete eklendi.')
+        return;
+      }
+  
+      // Kullanıcının sepetinde eklemek istediği ürünü ara
+      const existingProductIndex = userCart.products.findIndex(product => product.productId === productId);
+  
+      // Eğer ürün sepete daha önce eklenmemişse, sepete ekle
+      if (existingProductIndex === -1) {
+        const addToCartResponse = await axios.put(`http://localhost:8000/cart/add/${userId}`, {
+          productId,
+          quantity
+        });
+        console.log('Product added to cart:', addToCartResponse.data);
+        Alert.alert('Ürün sepete eklendi.')
+      } else {
+        Alert.alert('Ürün zaten sepetinizde bulunmaktadır.');
+      }
     } catch (error) {
       console.error('Error adding product to cart:', error);
     }
   };
+
+  // const handleAddToCart = async (productId) => {
+  //   try {
+  //     const response = await axios.post(`http://localhost:8000/cart/add/${userId}`, {
+  //       productId,
+  //       quantity: 1
+  //     });
+  //     console.log('Product added to cart:', response.data);
+  //     Alert.alert('Ürün sepete eklendi.');
+  //   } catch (error) {
+  //     console.error('Error adding product to cart:', error);
+  //   }
+  // };
 
   const handleShowAllProducts = () => {
     axios.get(`http://localhost:8000/products`)

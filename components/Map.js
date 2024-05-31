@@ -62,8 +62,8 @@ function InputAutocomplete({
   );
 }
 
-const Map = () => {
-  const navigation = useNavigation();
+const Map = ({navigation}) => {
+
   const [origin, setOrigin] = useState(null);
   const [destination, setDestination] = useState(null);
   const [showDirections, setShowDirections] = useState(false);
@@ -81,6 +81,7 @@ const Map = () => {
   const [waypoints, setWaypoints] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const userId = useUserIdDecoder();
+  navigation = useNavigation();
 
   const [otherMarkersInfo, setOtherMarkersInfo] = useState([]);
 
@@ -330,6 +331,9 @@ function calculateDistance(coord1, coord2) {
             transportDetailsId
           });
           console.log('TransportDetailsId added to order:', addTransportDetailsIdResponse.data);
+          setSelectedMarker(null);
+          alert('İşi kabul ettin.');
+          navigation.navigate('TasiyiciOrders')
         }catch (error) {
         console.error('Error creating offer:', error);
       }
