@@ -91,11 +91,8 @@ const Cart = () => {
             for (const producerId in cartItems) {
                 const products = cartItems[producerId];
                 const totalPrice = products.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
-                const userCoordinates = await getCoordinatesFromAddress(userCity);
-                const producerCity = await fetchProducerCity(producerId);
-                const producerCoordinates = await getCoordinatesFromAddress(producerCity);
-                const transportFee = calculateTransportFee(userCoordinates, producerCoordinates, products);
-
+    
+                // transportFee state'ini doğrudan kullanın
                 const orderData = {
                     userId: userId,
                     producerId: producerId,
@@ -105,11 +102,11 @@ const Cart = () => {
                         price: item.productId.price,
                     })),
                     totalPrice: totalPrice,
-                    from: producerCity,
+                    from: userCity,
                     to: userCity,
-                    transportFee: transportFee
+                    transportFee: transportFee // Doğrudan state'ten alınan taşıma ücreti
                 };
-
+    
                 const response = await axios.post('http://localhost:8000/orders/create', orderData);
                 console.log('Order placed successfully for producer', producerId, ':', response.data);
                 orderIds.push({ orderId: response.data._id });
@@ -121,6 +118,7 @@ const Cart = () => {
             console.error('Error placing order:', error);
         }
     };
+    
 
     const handleSingleOrder = async (orderIds) => {
         try {
