@@ -17,12 +17,12 @@ const TasiyiciOrders = () => {
       if (userId) {
         try {
           const transportResponse = await axios.get(`http://localhost:8000/transportDetails/${userId}`);
-          const filteredTransportDetails = transportResponse.data.filter(detail => detail.isOfferAccept);
-          setTransportDetails(filteredTransportDetails);
+          const transportDetailsData = transportResponse.data;
+          setTransportDetails(transportDetailsData);
 
-          const orderPromises = filteredTransportDetails.map(async (transportDetail) => {
+          const orderPromises = transportDetailsData.map(async (transportDetail) => {
             const orderResponse = await axios.get(`http://localhost:8000/orders/${transportDetail.orderId}`);
-            return orderResponse.data;
+            return { ...orderResponse.data, isOfferAccept: transportDetail.isOfferAccept };
           });
 
           const orderData = await Promise.all(orderPromises);
@@ -81,61 +81,55 @@ const TasiyiciOrders = () => {
     });
   }, [orders]);
 
-  const renderOrderItem = ({ item, index }) => {
+  const renderOrderItem = ({ item }) => {
     const order = item;
-    const offerAcceptStatus = 'Onaylandı';
+    const offerAcceptStatus = order.isOfferAccept ? 'Onaylandı' : 'Tüketici Onayı Bekliyor';
     const producerInfo = producerInfos[order.producerId];
-
-
-    // {products[product.productId].name}
-
-
+  
     return (
-      <View style={[styles.order ,{marginHorizontal:20, marginVertical:10}]}>
-        
-        
+      <View style={[styles.order, { marginHorizontal: 20, marginVertical: 10 }]}>
         <View style={styles.order}>
-            {producerInfo && (
-              <View>
-                <Text style={styles.orderText}>Üretici: {producerInfo.name}</Text>
-                <Text style={styles.orderText}>Telefpn Numarası: {producerInfo.phone}</Text>
-                <Text style={styles.orderText}>{producerInfo.verification.producerAddress.city + " " +
-                  producerInfo.verification.producerAddress.district + " " 
-                  + producerInfo.verification.producerAddress.street}</Text>
-              </View>
-            )}
-          
+          {order.isOfferAccept && producerInfo && (
+            <View>
+              <Text style={styles.orderText}>Üretici: {producerInfo.name}</Text>
+              <Text style={styles.orderText}>Telefon Numarası: {producerInfo.phone}</Text>
+              <Text style={styles.orderText}>{producerInfo.verification.producerAddress.city + " " +
+                producerInfo.verification.producerAddress.district + " " 
+                + producerInfo.verification.producerAddress.street}</Text>
+            </View>
+          )}
         </View>
         <View>
-        {order.products.map((product, index) => (
-          
-          <View key={index}>
-            {products[product.productId] && (
-              <View style={{flexDirection:'row'}} >
-                <View style={{ borderWidth: 1, borderColor:'lightgray', borderRadius: 15, backgroundColor: 'white', padding: 5, marginBottom:45 }}>
-                <Image source={{ uri: products[product.productId].images[0] }} style={{ width: 100, height: 100}} />
-                </View>
-                <View style={{marginLeft:'5%', marginTop:'5%'}}>
-                  <Text style={[styles.orderText, { fontWeight:'bold',fontSize:20}]}>{products[product.productId].name}</Text>
-                  <Text style={[styles.orderText, ]}>Başlangıç: {order.from}</Text>
-                  <Text style={[styles.orderText, ]}>Varış: {order.to}</Text>
-                  <Text style={[styles.orderText,{color:'#729c44', marginLeft:'50%', marginTop:30}]}>{offerAcceptStatus}</Text>
-                </View>
-              </View>
-
-            )}
-          </View>
-        ))}
-          
+          {order.products.map((product, index) => (
+            <View key={index}>
+              {products[product.productId] && (
+                <>
+                  <View style={{ flexDirection: 'row' }}>
+                    <View style={{ borderWidth: 1, borderColor: 'lightgray', borderRadius: 15, backgroundColor: 'white', padding: 5, marginBottom: 10 }}>
+                      <Image source={{ uri: products[product.productId].images[0] }} style={{ width: 100, height: 100 }} />
+                    </View>
+                    <View style={{ marginLeft: '5%', marginTop: '5%' }}>
+                      <Text style={[styles.orderText, { fontWeight: 'bold', fontSize: 20 }]}>{products[product.productId].name}</Text>
+                      <Text style={[styles.orderText]}>Başlangıç: {order.from}</Text>
+                      <Text style={[styles.orderText]}>Varış: {order.to}</Text>
+                    </View>
+                  </View>
+                  <View>
+                    <Text style={[styles.orderText, { color: order.isOfferAccept ? '#729c44' : '#ff9900', textAlign: 'right' }]}>{offerAcceptStatus}</Text>
+                  </View>
+                </>
+              )}
+            </View>
+          ))}
         </View>
       </View>
     );
   };
-
+  
   return (
     <View>
-      <TouchableOpacity style={{backgroundColor:'#de510b', borderRadius:15, margin:20, padding:10}} onPress={() => navigation.navigate("Route")}>
-        <Text style={{fontSize:20, color:'#fff', textAlign:'center'}}>ROTA</Text>
+      <TouchableOpacity style={{ backgroundColor: '#de510b', borderRadius: 15, margin: 20, padding: 10 }} onPress={() => navigation.navigate("Route")}>
+        <Text style={{ fontSize: 20, color: '#fff', textAlign: 'center' }}>ROTA</Text>
       </TouchableOpacity>      
       {transportDetails.length === 0 ? (
         <Text style={{ textAlign: 'center' }}>Henüz siparişiniz bulunmamaktadır.</Text>
@@ -153,23 +147,19 @@ const TasiyiciOrders = () => {
 
 const styles = StyleSheet.create({
   order: {
-        
-    borderRadius:20,
+    borderRadius: 20,
     borderColor: 'lightgrey',
-    backgroundColor:'#f9fbe5',
+    backgroundColor: '#f9fbe5',
     padding: 10,
-    
   },
   orderText: {
     fontSize: 18,
     marginBottom: 5,
-    
   },
-
   productDetailText: {
     fontSize: 18,
     marginBottom: 5,
   },
-})
+});
 
 export default TasiyiciOrders;

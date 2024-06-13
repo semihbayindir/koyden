@@ -54,26 +54,32 @@ const qualityRatingSchema = new mongoose.Schema({
   },
   productQuality: {
     type: Number,
+    default:0,
     required: false
   },
   reliability: {
     type: Number,
+    default:0,
     required: false
   },
   serviceQuality: {
     type: Number,
+    default:0,
     required: false
   },
   transportSpeed: {
     type: Number,
+    default:0,
     required: false
   },
   longDistance: {
     type: Number,
+    default:0,
     required: false
   },
   transportReliability: {
     type: Number,
+    default:0,
     required: false
   }
 });
@@ -121,6 +127,21 @@ const userSchema = new mongoose.Schema({
     required: false
   }
 });
+// Example validation middleware for qualityRatingSchema
+qualityRatingSchema.pre('save', function(next) {
+  // Check each field and sanitize or validate as needed
+  if (isNaN(this.transportSpeed)) {
+    this.transportSpeed = 0; // or handle error condition
+  }
+  if (isNaN(this.longDistance)) {
+    this.longDistance = 0; // or handle error condition
+  }
+  if (isNaN(this.transportReliability)) {
+    this.transportReliability = 0; // or handle error condition
+  }
+  next();
+});
+
 
 const User = mongoose.model("User", userSchema);
 

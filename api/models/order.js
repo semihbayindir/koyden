@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const TransportDetails = require('./transport_details');
 
 const orderSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -23,7 +24,7 @@ orderSchema.virtual('adjustedTransportFee').get(function() {
   const currentDate = new Date();
   const orderDate = new Date(this.orderDate);
   const diffDays = Math.floor((currentDate - orderDate) / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays > 2) {
     return this.transportFee * 1.1; // %10 artış
   }
@@ -32,6 +33,16 @@ orderSchema.virtual('adjustedTransportFee').get(function() {
 
 orderSchema.set('toJSON', { virtuals: true });
 orderSchema.set('toObject', { virtuals: true });
+
+// Middleware to delete associated TransportDetails when an Order is removed
+orderSchema.pre('remove', async function(next) {
+  try {
+    await TransportDetails.deleteOne({ orderId: this._id });
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 const Order = mongoose.model('Order', orderSchema);
 

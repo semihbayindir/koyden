@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
     color:'#fff'
   },
   modalContainer1: {
-    height:'auto',
+    height: 300,
     position: "absolute",
     bottom: 0,
     left: 0,
