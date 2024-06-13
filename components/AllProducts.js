@@ -23,6 +23,9 @@ const AllProducts = () => {
   const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState('');
 
+  const [product, setProduct] = useState(null);
+  const [orderQuantity, setOrderQuantity] = useState(null);
+
   useEffect(() => {
     if (userId) {
       axios.get(`http://localhost:8000/products`)
@@ -64,15 +67,27 @@ const AllProducts = () => {
     fetchProducerInfo();
   }, [products]);
 
+  useEffect(() => {
+    if (product) {
+      const stockQuantity = parseInt(product.qty); // Ürün stok miktarı
+      const minStock = parseInt(product.minQty);
+    }
+  }, [product]);
+
   const handleProductPress = (productId) => {
     navigation.navigate('SingleProduct', { productId: productId });
   };
-
-  const handleAddToCart = async (productId) => {
-    try {
-      // Dropdown'dan seçilen miktarı al
-      const quantity = 1;
   
+  const handleAddToCart = async (productId) => {
+    
+      try {
+        const product = products.find(p => p._id === productId);
+        if (!product) {
+          return;
+        }
+      // Dropdown'dan seçilen miktarı al
+      const quantity = product.minQty;
+
       // Kullanıcının sepetini almak için GET isteği
       const cartResponse = await axios.get(`http://localhost:8000/cart/${userId}`);
       const userCart = cartResponse.data;
