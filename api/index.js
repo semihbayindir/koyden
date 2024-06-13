@@ -381,24 +381,33 @@ app.post('/cart/create', async (req, res) => {
   }
 });
 
-// Ürün eklemek için PUT isteği
 app.put('/cart/add/:userId', async (req, res) => {
-  const { productId } = req.body;
-  const { quantity } = req.body;
+  const { productId, quantity } = req.body;
   const userId = req.params.userId;
+
   try {
-    let cart = await Cart.findOne({ userId: userId });
+    // Kullanıcının sepetini bul veya yeni sepet oluştur
+    let cart = await Cart.findOne({ userId: new mongoose.Types.ObjectId(userId) });
     if (!cart) {
-      cart = new Cart({ userId: userId, products: [] });
+      cart = new Cart({ userId: new mongoose.Types.ObjectId(userId), products: [] });
     }
-    const existingProductIndex = cart.products.findIndex(item => item.productId === productId );
+
+    const existingProductIndex = cart.products.findIndex(item => item.productId.toString() === productId);
+
     if (existingProductIndex !== -1) {
-      // Ürün sepette zaten var, miktarını arttır
-      cart.products[existingProductIndex].quantity++;
+      // Ürün sepette zaten var, miktarını güncelle
+      cart.products[existingProductIndex].quantity += quantity;
+      
+      // Bu kısımda doğrudan MongoDB'ye update işlemi yapabilirsiniz
+      await Cart.updateOne(
+        { userId: new mongoose.Types.ObjectId(userId), "products.productId": new mongoose.Types.ObjectId(productId) },
+        { $set: { "products.$.quantity": cart.products[existingProductIndex].quantity } }
+      );
     } else {
       // Yeni ürünü sepete ekle
-      cart.products.push({ productId: productId, quantity: quantity });
+      cart.products.push({ productId: new mongoose.Types.ObjectId(productId), quantity: quantity });
     }
+
     await cart.save();
     res.status(200).json(cart);
   } catch (error) {
@@ -406,6 +415,8 @@ app.put('/cart/add/:userId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
 // Sepeti silmek için DELETE isteği
 app.delete('/cart/:userId', async (req, res) => {
   const userId = req.params.userId;
