@@ -70,47 +70,41 @@ const AllProducts = () => {
 
   const handleAddToCart = async (productId) => {
     try {
-      // Dropdown'dan seçilen miktarı al
-      const quantity = 1;
+      // Ürünün minQty değerini al
+      const product = products.find(p => p._id === productId);
+      const quantity = product.minQty;
   
       // Kullanıcının sepetini almak için GET isteği
       const cartResponse = await axios.get(`http://localhost:8000/cart/${userId}`);
-      const userCart = cartResponse.data;
+      let userCart = cartResponse.data;
   
       // Eğer kullanıcının sepeti bulunamadıysa yeni bir sepet oluştur
       if (!userCart) {
-        const createCartResponse = await axios.post(`http://localhost:8000/cart/create`, {
-          userId,
-          productId
-        });
-        const addToCartResponse = await axios.put(`http://localhost:8000/cart/add/${userId}`, {
-          productId,
-          quantity
-        });
-        console.log('New cart created:', createCartResponse.data);
-        console.log('Product added to cart:', addToCartResponse.data);
-        Alert.alert('Ürün sepete eklendi.')
-        return;
+        const createCartResponse = await axios.post(`http://localhost:8000/cart/create`, { userId });
+        userCart = createCartResponse.data;
       }
   
       // Kullanıcının sepetinde eklemek istediği ürünü ara
-      const existingProductIndex = userCart.products.findIndex(product => product.productId === productId);
+      const existingProduct = userCart.products.find(product => product.productId === productId);
   
-      // Eğer ürün sepete daha önce eklenmemişse, sepete ekle
-      if (existingProductIndex === -1) {
-        const addToCartResponse = await axios.put(`http://localhost:8000/cart/add/${userId}`, {
-          productId,
-          quantity
-        });
+      // Eğer ürün sepette daha önce eklenmemişse, sepete ekle
+      if (!existingProduct) {
+        const addToCartResponse = await axios.put(`http://localhost:8000/cart/add/${userId}`, { productId, quantity });
         console.log('Product added to cart:', addToCartResponse.data);
-        Alert.alert('Ürün sepete eklendi.')
+        Alert.alert('Ürün sepete eklendi.');
       } else {
-        Alert.alert('Ürün zaten sepetinizde bulunmaktadır.');
+        // Ürünün miktarını güncelle
+        const updatedQuantity = existingProduct.quantity + quantity;
+        const updateCartResponse = await axios.put(`http://localhost:8000/cart/update/${userId}`, { productId, quantity: updatedQuantity });
+        console.log('Product quantity updated in cart:', updateCartResponse.data);
+        Alert.alert('Ürünün miktarı güncellendi.');
       }
     } catch (error) {
       console.error('Error adding product to cart:', error);
     }
   };
+  
+  
 
   // const handleAddToCart = async (productId) => {
   //   try {

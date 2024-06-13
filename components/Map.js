@@ -430,7 +430,7 @@ function calculateDistance(coord1, coord2) {
                 <Text style={[styles.productDetailsText,{fontWeight:'800',marginVertical:5}]}>{`${markerInfo.orderInfo.from} -> ${markerInfo.orderInfo.to}`}</Text>
                 <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
                 <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
-                <Text style={styles.productDetailsText}>{"Taşıma Ücreti : " + orders[markerInfo.marker.id].transportFee}</Text>
+                <Text style={styles.productDetailsText}>{"Taşıma Ücreti : " + Math.floor(orders[markerInfo.marker.id].adjustedTransportFee)} TL</Text>
                 
               </View>
               <TouchableOpacity style={{backgroundColor:'#de510b', flex:0.2, marginRight:'1%',borderRadius:40, padding:10}} onPress={() => addMarkerRoute(markerInfo.marker.coordinate)}>
@@ -486,7 +486,7 @@ function calculateDistance(coord1, coord2) {
                   <View style={{flexDirection:'row', marginLeft:'1%'}} key={productIndex}>
                     <View >
                     <Text style={{fontSize:22, fontWeight:900, paddingLeft:7}}>{`${otherMarker.orderInfo.from} -> ${otherMarker.orderInfo.to}`}</Text>
-                      <Text style={styles.productDetailsText}>{"Taşıma Ücreti : " + orders[otherMarker.marker.id].transportFee}</Text>
+                      <Text style={styles.productDetailsText}>{"Taşıma Ücreti : " + Math.floor(orders[otherMarker.marker.id].adjustedTransportFee)} TL</Text>
 
                     <Text style={styles.productDetailsText}>{`Ürün Adı: ${product.productId.name}`}</Text>
                     <Text style={styles.productDetailsText}>{`Ağırlık: ${product.quantity} ${product.productId.qtyFormat}`}</Text>
