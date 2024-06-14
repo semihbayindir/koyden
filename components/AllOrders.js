@@ -42,12 +42,12 @@ const AllOrders = () => {
         }
     };
 
-    const filteredOrders = filterOrders(orders.filter(order => order.transportDetailsId === undefined), selectedFilter);
+    const filteredOrders = filterOrders(orders.filter(order => order.transportDetailsId === undefined || order.transportDetailsId === null ), selectedFilter);
 
     const renderOrderItem = ({ item }) => {
         return (
             <View>
-                {item.transportDetailsId === undefined && (
+                {item && (
                     <TouchableOpacity style={styles.order}>
                         <View>
                             <Text style={styles.orderText}>Sipariş Tarihi: {new Date(item.orderDate).toLocaleDateString("tr-TR")}</Text>
@@ -232,6 +232,9 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
+    },
+    buttonText: {
+      fontSize: 20,
     },
 });
 export default AllOrders;

@@ -45,7 +45,7 @@ const OrderDetails = ({ route }) => {
         }));
         if (isMounted) setProductDetails(details);
       } catch (error) {
-        console.error('Error fetching product details:', error);
+        // console.error('Error fetching product details:', error);
       }
     };
 
@@ -77,7 +77,7 @@ const OrderDetails = ({ route }) => {
           });
         }
       } catch (error) {
-        console.error('Error fetching transport details:', error);
+        // console.error('Error fetching transport details:', error);
       }
     };
     productDetails.forEach((item, index) => {
@@ -246,11 +246,13 @@ const OrderDetails = ({ route }) => {
 
   const handleRejectOffer = async (orderId, transportDetailsId) => {
     try {
+      // transportDetailsId'yi kaldıran endpoint'i çağırın
       await axios.delete(`http://localhost:8000/orders/${orderId}/removeTransportDetailsId`);
-
+  
+      // isOfferAccept alanını güncelleyen endpoint'i çağırın
       const response = await axios.put(`http://localhost:8000/transportDetails/update/isOfferAccept/${transportDetailsId}`, { isOfferAccept: false });
       console.log('Offer rejected:', response.data);
-
+  
       setProductDetails(prevDetails => {
         const updatedDetails = prevDetails.map(item => {
           if (item.order._id === orderId) {
@@ -267,9 +269,12 @@ const OrderDetails = ({ route }) => {
         return updatedDetails;
       });
     } catch (error) {
-      console.error('Error rejecting offer:', error);
+      // console.error('Error rejecting offer:', error);
     }
+    navigation.navigate("Orders");
+
   };
+  
 
   const handleCancelOrder = async (orderId) => {
     console.log('Order ID to cancel:', orderId);
@@ -482,7 +487,7 @@ const OrderDetails = ({ route }) => {
                   </View>
              
             ))}
-            {item.order.isOfferAccept !== true && (
+            {item.order.transportDetailsId == null && item.order.transportDetailsId == null && (
               <TouchableOpacity style={styles.button1} onPress={() => handleCancelOrder(item.order._id)}>
                 <Text style={{ color: 'white', fontSize: 17 }}>Siparişi İptal Et</Text>
               </TouchableOpacity>

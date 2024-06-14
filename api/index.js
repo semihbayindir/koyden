@@ -585,11 +585,13 @@ app.post('/orders/addTransportDetailsId', async (req, res) => {
 });
 
 app.delete('/orders/:orderId', async (req, res) => {
-  const orderId = req.params.orderId; // orderId olarak değiştirildi
+  const orderId = req.params.orderId;
   try {
-    // Order'ı bul ve sil
-    const deletedOrder = await Order.findByIdAndDelete(orderId);
-    if (deletedOrder) {
+    // Find the order by ID
+    const order = await Order.findById(orderId);
+    if (order) {
+      // Remove the order, which will trigger the pre('deleteOne') middleware
+      await order.deleteOne();
       res.status(200).json({ message: 'Order deleted successfully' });
     } else {
       res.status(404).json({ error: 'Order not found' });
@@ -599,6 +601,7 @@ app.delete('/orders/:orderId', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // OrderId ile SingleOrder'ı silmek için endpoint
 app.delete('/singleOrder/:orderId', async (req, res) => {
@@ -751,40 +754,52 @@ app.get('/transportDetails/id/:transportDetailsId', async (req, res) => {
     res.status(500).json({ message: 'Sunucu hatası.' });
   }
 });
-// DELETE request to remove transportDetailsId from order
+
 app.delete('/orders/:orderId/removeTransportDetailsId', async (req, res) => {
-  const orderId = req.params.orderId;
+  const { orderId } = req.params;
   try {
-    const order = await Order.findByIdAndUpdate(orderId, { transportDetailsId: null }, { new: true });
+    // Order'ı ID'ye göre bulun
+    const order = await Order.findById(orderId);
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      return res.status(404).json({ error: 'Order not found' });
     }
-    res.json(order);
+
+    // Order'daki transportDetailsId'yi kaldırın
+    order.transportDetailsId = null;
+    await order.save();
+
+    // İlgili TransportDetails belgesini silin
+    await TransportDetails.deleteOne({ orderId: new mongoose.Types.ObjectId(orderId) });
+
+    res.status(200).json({ message: 'TransportDetails removed successfully' });
   } catch (error) {
-    console.error('Error removing transportDetailsId from order:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error removing TransportDetails:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// PUT endpoint for updating offer acceptance status of an order
 app.put('/transportDetails/update/isOfferAccept/:transportDetailsId', async (req, res) => {
-  try {
-    const { transportDetailsId } = req.params;
-    const { isOfferAccept } = req.body;
+  const { transportDetailsId } = req.params;
+  const { isOfferAccept } = req.body;
 
-    // Taşıma detaylarını bul ve teklif kabul durumunu güncelle
-    const updatedTransportDetails = await TransportDetails.findByIdAndUpdate(transportDetailsId, { isOfferAccept }, { new: true });
+  try {
+    const updatedTransportDetails = await TransportDetails.findByIdAndUpdate(
+      transportDetailsId,
+      { isOfferAccept },
+      { new: true }
+    );
 
     if (!updatedTransportDetails) {
-      return res.status(404).json({ message: "Taşıma detayları bulunamadı." });
+      return res.status(404).json({ error: 'TransportDetails not found' });
     }
 
-    res.status(200).json({ message: "Teklif kabul durumu başarıyla güncellendi.", transportDetails: updatedTransportDetails });
+    res.status(200).json(updatedTransportDetails);
   } catch (error) {
-    console.error('Error updating offer acceptance status:', error);
-    res.status(500).json({ message: 'Sunucu hatası.' });
+    console.error('Error updating TransportDetails:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // Sipariş durumunu güncelleyen endpoint
 app.put('/orders/:orderId/status', async (req, res) => {

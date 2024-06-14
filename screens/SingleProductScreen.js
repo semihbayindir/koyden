@@ -220,29 +220,6 @@ const handleResetScreen = () => {
 
         </View>
       </View>
-
-      {userType === 'tasiyici' && (
-      <>
-      <Text style={{fontSize:22, fontWeight:700, marginLeft:15}}>TEKLİF VER</Text>
-        <View style={{flexDirection:'row', alignItems:'center', justifyContent:'center', marginBottom:20, marginRight:20}}>
-          <View style={styles.inputContainer}>
-            <TextInput
-            placeholder="Fiyat Teklifi"
-            onChangeText={handlePriceOfferChange}
-            value={priceOffer}
-            keyboardType="numeric"
-            style={styles.input}
-            />
-            <Text style={styles.currencySymbol}>₺</Text>
-          </View>      
-          <View>
-            <TouchableOpacity style={styles.buttonTrans} onPress={handlePriceOffer} >
-              <Text style={{textAlign:'center', fontSize:20, color:'#fff', padding:10}}>Teklif Ver</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </>
-      )}
       
 
       {userType !== 'tasiyici' && (
