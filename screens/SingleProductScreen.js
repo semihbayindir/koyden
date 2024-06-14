@@ -204,8 +204,15 @@ const handleResetScreen = () => {
         </View>
       )}
       {!producerInfo.producer.qualityRating && (
+        <View style={{flexDirection:'row'}}>
+        {producerInfo.producer.image ? (
+          <Image source={{ uri: producerInfo.producer.image }} style={{ width: 70, height: 70, borderRadius: 50, margin: 20, marginLeft: 40 }} />
+        ) : (
+          <MaterialCommunityIcons name="account-circle" size={80} style={{ margin: 20, marginLeft: 40, color:'#de510b' }} />
+        )}
         <View>
           <Text style={styles.productInfo}>Üretici daha önce değerlendirilmemiş.</Text>
+        </View>
         </View>
       )}
     </View>
@@ -282,6 +289,7 @@ const styles = StyleSheet.create({
   productInfo:{
     flex:0.4,
     marginLeft:15,
+    marginTop:20,
     fontSize:22, 
   },
   productInfo1:{

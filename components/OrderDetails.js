@@ -372,9 +372,19 @@ const OrderDetails = ({ route }) => {
                       <View>
                         <Text style={[styles.orderInfoText1,{fontWeight:700}]}>TAŞIYICI BİLGİLERİ</Text>
                         <Text style={styles.orderInfoText1}>{item.order.transporterInfo.name} {item.order.transporterInfo.surname}</Text>
+                        {item.order.transporterInfo.qualityRating && (
+                          <View>
+              
                         <Text style={styles.orderInfoText1}>Uzun yol: {item.order.transporterInfo.qualityRating.longDistance}</Text>
                         <Text style={styles.orderInfoText1}>Güvenilirlik: {item.order.transporterInfo.qualityRating.transportReliability}</Text>
                         <Text style={styles.orderInfoText1}>Hız: {item.order.transporterInfo.qualityRating.transportSpeed}</Text>
+                          </View>
+                        )}
+                        {item.order.transporterInfo.qualityRating == undefined && (
+                          <View>
+                            <Text style={{marginLeft:10}}>Taşıyıcı değerlendirilmemiş.</Text>
+                          </View>
+                        )}                          
                       </View>
                     )}
                     <View >
